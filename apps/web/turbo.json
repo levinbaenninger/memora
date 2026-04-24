@@ -6,11 +6,10 @@
       "outputs": ["$TURBO_EXTENDS$", ".output/**"],
       "env": [
         "BETTER_AUTH_SECRET",
-        "BETTER_AUTH_URL",
-        "CORS_ORIGIN",
         "DATABASE_URL",
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
+        "OAUTH_PROXY_SECRET",
         "RESEND_API_KEY"
       ]
     },

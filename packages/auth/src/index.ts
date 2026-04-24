@@ -6,6 +6,7 @@ import { env } from "@memora/env/server";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
+import { oAuthProxy } from "better-auth/plugins/oauth-proxy";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
 import {
@@ -20,7 +21,6 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
-  trustedOrigins: [env.CORS_ORIGIN],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -56,12 +56,26 @@ export const auth = betterAuth({
     }),
   },
   secret: env.BETTER_AUTH_SECRET,
-  baseURL: env.BETTER_AUTH_URL,
+  baseURL: {
+    allowedHosts: [
+      "memora.baenninger.me",
+      "memora-*-levexis.vercel.app",
+      "localhost:3000",
+    ],
+    fallback: "https://memora.baenninger.me",
+    protocol: process.env.NODE_ENV === "development" ? "http" : "https",
+  },
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
-  plugins: [tanstackStartCookies()],
+  plugins: [
+    tanstackStartCookies(),
+    oAuthProxy({
+      productionURL: "https://memora.baenninger.me",
+      secret: env.OAUTH_PROXY_SECRET ?? env.BETTER_AUTH_SECRET,
+    }),
+  ],
 });
