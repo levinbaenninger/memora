@@ -1,0 +1,67 @@
+"use server";
+
+import { db } from "@memora/db";
+import * as schema from "@memora/db/schema/auth";
+import { env } from "@memora/env/server";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
+
+import {
+  sendChangeEmailConfirmation,
+  sendPasswordChangedEmail,
+  sendResetPasswordEmail,
+  sendVerificationEmail,
+} from "./emails";
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema,
+  }),
+  trustedOrigins: [env.CORS_ORIGIN],
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendResetPasswordEmail(user.email, url);
+    },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendVerificationEmail(user.email, url);
+    },
+    autoSignInAfterVerification: true,
+  },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailConfirmation: async ({ newEmail, url }) => {
+        await sendChangeEmailConfirmation(newEmail, url);
+      },
+    },
+  },
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/change-password") {
+        const session = ctx.context.session;
+        if (session?.user?.email) {
+          await sendPasswordChangedEmail(session.user.email);
+        }
+      }
+    }),
+  },
+  secret: env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL,
+  socialProviders: {
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
+  },
+  plugins: [tanstackStartCookies()],
+});

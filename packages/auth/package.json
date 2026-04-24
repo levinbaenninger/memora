@@ -1,0 +1,31 @@
+{
+  "name": "@memora/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-email/render": "catalog:",
+    "@memora/db": "workspace:*",
+    "@memora/email": "workspace:*",
+    "@memora/env": "workspace:*",
+    "@memora/ui": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "react": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@memora/config": "workspace:*",
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
+  }
+}

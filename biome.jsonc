@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/biome/core", "ultracite/biome/react"],
+  "files": {
+    "includes": [
+      "!.agents",
+      "!packages/ui/src/components",
+      "!packages/ui/src/hooks",
+      "!packages/ui/src/lib/utils.ts"
+    ]
+  },
+  "overrides": [
+    {
+      "includes": ["apps/web/src/routes/api/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    }
+  ],
+  "linter": {
+    "rules": {
+      "performance": {
+        "noBarrelFile": "off",
+        "noNamespaceImport": "off"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@memora/db",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@memora/env": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "@neondatabase/serverless": "catalog:"
+  },
+  "devDependencies": {
+    "@memora/config": "workspace:*",
+    "drizzle-kit": "catalog:",
+    "typescript": "catalog:"
+  }
+}

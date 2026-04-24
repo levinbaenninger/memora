@@ -1,0 +1,20 @@
+{
+  "name": "@memora/email",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@memora/env": "workspace:*",
+    "resend": "catalog:"
+  },
+  "devDependencies": {
+    "@memora/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
