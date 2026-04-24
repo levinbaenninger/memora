@@ -13,7 +13,7 @@ import { RootNotFound } from "@/components/root-not-found";
 import appCss from "@/index.css?url";
 import type { orpc } from "@/utils/orpc";
 
-export interface RouterAppContext {
+interface RouterAppContext {
   orpc: typeof orpc;
   queryClient: QueryClient;
 }

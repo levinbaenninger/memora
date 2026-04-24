@@ -57,5 +57,5 @@ const getORPCClient = createIsomorphicFn()
     return createORPCClient(link);
   });
 
-export const client: RouterClient<typeof appRouter> = getORPCClient();
+const client: RouterClient<typeof appRouter> = getORPCClient();
 export const orpc = createTanstackQueryUtils(client);
