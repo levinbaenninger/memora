@@ -14,9 +14,25 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void
 }
 
+const UNSAFE_SCRIPT_CHARS: Record<string, string> = {
+  "&": "\\u0026",
+  "<": "\\u003C",
+  ">": "\\u003E",
+  "/": "\\u002F",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
+}
+
+function safeScriptJson(value: string) {
+  return JSON.stringify(value).replace(
+    /[&<>/\u2028\u2029]/g,
+    (char) => UNSAFE_SCRIPT_CHARS[char] ?? char
+  )
+}
+
 function getThemeScript(storageKey: string, defaultTheme: Theme) {
-  const key = JSON.stringify(storageKey)
-  const fallback = JSON.stringify(defaultTheme)
+  const key = safeScriptJson(storageKey)
+  const fallback = safeScriptJson(defaultTheme)
 
   return `(function(){try{var t=localStorage.getItem(${key});if(t!=='light'&&t!=='dark'&&t!=='system'){t=${fallback}}var d=matchMedia('(prefers-color-scheme: dark)').matches;var r=t==='system'?(d?'dark':'light'):t;var e=document.documentElement;e.classList.add(r);e.style.colorScheme=r}catch(e){}})();`
 }
