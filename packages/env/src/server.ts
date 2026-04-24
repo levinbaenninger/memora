@@ -7,6 +7,17 @@ import { z } from "zod";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: resolve(__dirname, "../../../apps/web/.env") });
 
+const formatEnvIssuePath = (
+  path: readonly (PropertyKey | { key: PropertyKey })[]
+) =>
+  path
+    .map((segment) =>
+      typeof segment === "object" && segment !== null && "key" in segment
+        ? String(segment.key)
+        : String(segment)
+    )
+    .join(".");
+
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().min(1),
@@ -18,4 +29,17 @@ export const env = createEnv({
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
+  onValidationError: (issues) => {
+    const details = issues
+      .map((issue) => {
+        const variable = issue.path?.length
+          ? formatEnvIssuePath(issue.path)
+          : "unknown";
+
+        return `${variable}: ${issue.message}`;
+      })
+      .join("; ");
+
+    throw new Error(`Invalid environment variables: ${details}`);
+  },
 });
