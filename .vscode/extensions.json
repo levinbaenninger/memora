@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "biomejs.biome",
+    "databricks.neon-local-connect",
+    "bradlc.vscode-tailwindcss",
+    "oven.bun-vscode",
+    "redhat.vscode-yaml",
+    "eamodio.gitlens",
+    "christian-kohler.path-intellisense",
+    "yoavbls.pretty-ts-errors",
+    "vivaxy.vscode-conventional-commits",
+    "tamasfe.even-better-toml"
+  ]
+}
