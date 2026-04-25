@@ -1,0 +1,20 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["$TURBO_EXTENDS$", "routes:generate"],
+      "outputs": ["$TURBO_EXTENDS$", ".output/**"],
+      "env": [
+        "BETTER_AUTH_SECRET",
+        "DATABASE_URL",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "OAUTH_PROXY_SECRET",
+        "RESEND_API_KEY"
+      ]
+    },
+    "check-types": {
+      "dependsOn": ["$TURBO_EXTENDS$", "routes:generate"]
+    }
+  }
+}
