@@ -1,4 +1,4 @@
-import { env } from "@memora/env/server";
+import { env } from "@memora/env/db";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
