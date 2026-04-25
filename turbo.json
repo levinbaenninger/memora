@@ -21,14 +21,16 @@
       "interruptible": true
     },
     "db:generate": {
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
     "db:migrate": {
       "cache": false,
       "env": ["DATABASE_URL"]
     },
     "db:studio": {
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
     "deploy": {
       "cache": false
