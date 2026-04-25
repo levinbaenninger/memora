@@ -45,6 +45,24 @@ type SidebarContextProps = {
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
 
+function isEditableShortcutTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return false
+  }
+
+  if (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target.isContentEditable
+  ) {
+    return true
+  }
+
+  return !!target.closest(
+    '[contenteditable]:not([contenteditable="false"]), [role="textbox"], [data-lexical-editor], [data-slate-editor="true"], .ProseMirror'
+  )
+}
+
 function useSidebar() {
   const context = React.useContext(SidebarContext)
   if (!context) {
@@ -84,7 +102,9 @@ function SidebarProvider({
       }
 
       // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      const secureAttribute =
+        window.location.protocol === "https:" ? "; Secure" : ""
+      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax${secureAttribute}`
     },
     [setOpenProp, open]
   )
@@ -101,6 +121,10 @@ function SidebarProvider({
         event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
         (event.metaKey || event.ctrlKey)
       ) {
+        if (isEditableShortcutTarget(event.target ?? document.activeElement)) {
+          return
+        }
+
         event.preventDefault()
         toggleSidebar()
       }
@@ -458,7 +482,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-0", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-1", className)}
       {...props}
     />
   )
@@ -532,11 +556,8 @@ function SidebarMenuButton({
     return comp
   }
 
-  if (typeof tooltip === "string") {
-    tooltip = {
-      children: tooltip,
-    }
-  }
+  const resolvedTooltip =
+    typeof tooltip === "string" ? { children: tooltip } : tooltip
 
   return (
     <Tooltip>
@@ -545,7 +566,7 @@ function SidebarMenuButton({
         side="right"
         align="center"
         hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
+        {...resolvedTooltip}
       />
     </Tooltip>
   )
@@ -605,10 +626,11 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean
 }) {
-  // Random width between 50 to 90%.
-  const [width] = React.useState(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  })
+  const [width, setWidth] = React.useState("70%")
+
+  React.useEffect(() => {
+    setWidth(`${Math.floor(Math.random() * 40) + 50}%`)
+  }, [])
 
   return (
     <div

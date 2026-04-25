@@ -3,10 +3,13 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Loading03Icon } from "@hugeicons/core-free-icons"
 
 function Spinner({ className, strokeWidth, ...props }: React.ComponentProps<"svg">) {
-  const resolvedStroke =
-    typeof strokeWidth === "string"
-      ? Number.parseFloat(strokeWidth) || 2
-      : (strokeWidth ?? 2)
+  let resolvedStroke = typeof strokeWidth === "number" ? strokeWidth : 2
+
+  if (typeof strokeWidth === "string") {
+    const parsed = Number.parseFloat(strokeWidth)
+    resolvedStroke = Number.isNaN(parsed) ? 2 : parsed
+  }
+
   return (
     <HugeiconsIcon
       icon={Loading03Icon}

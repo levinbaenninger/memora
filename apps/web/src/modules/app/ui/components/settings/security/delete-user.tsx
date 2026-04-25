@@ -55,7 +55,9 @@ export function DeleteUser({ className }: DeleteUserProps) {
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open);
-    setPassword("");
+    if (!open) {
+      setPassword("");
+    }
   };
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
@@ -102,11 +104,11 @@ export function DeleteUser({ className }: DeleteUserProps) {
         <AlertDialog onOpenChange={handleDialogOpenChange} open={confirmOpen}>
           <AlertDialogTrigger
             render={
-              <Button disabled={!accounts} size="sm" variant="destructive" />
+              <Button disabled={!accounts} size="sm" variant="destructive">
+                {localization.settings.deleteUser}
+              </Button>
             }
-          >
-            {localization.settings.deleteUser}
-          </AlertDialogTrigger>
+          />
 
           <AlertDialogContent>
             <form className="flex flex-col gap-6" onSubmit={handleSubmit}>

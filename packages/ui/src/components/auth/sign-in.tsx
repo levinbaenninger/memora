@@ -36,7 +36,7 @@ function isEmail(value: string): boolean {
 }
 
 /**
- * Render the sign-in form UI with email/password, magic link, and social provider options.
+ * Render the sign-in form UI with email/password and social provider options.
  *
  * @param className - Optional additional container class names
  * @param socialLayout - Layout style for social provider buttons

@@ -59,9 +59,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
       if (error instanceof Error) {
         toast.error(error.message);
       }
+    } finally {
+      setIsUploading(false);
     }
-
-    setIsUploading(false);
   }
 
   function handleDelete() {
@@ -123,7 +123,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
             {localization.settings.changeAvatar}
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="min-w-fit">
+          <DropdownMenuContent className="w-fit">
             <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
               <Upload className="text-muted-foreground" />
 

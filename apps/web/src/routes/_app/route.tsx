@@ -23,7 +23,7 @@ function AppShellLayout() {
   return (
     <AppShell
       pathname={pathname}
-      renderLink={(to) => <Link to={to} />}
+      renderLink={(to, params) => <Link params={params} to={to} />}
       user={session.user}
     >
       <Outlet />

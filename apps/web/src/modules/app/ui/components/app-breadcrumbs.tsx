@@ -7,12 +7,11 @@ import {
   BreadcrumbSeparator,
 } from "@memora/ui/components/breadcrumb";
 import { Fragment, type ReactNode } from "react";
-import type { AppLinkRenderer } from "@/modules/app/routes";
+import type { AppLinkRenderer, SidebarNavItem } from "@/modules/app/routes";
 
-interface AppBreadcrumbPage {
+interface AppBreadcrumbPage
+  extends Pick<SidebarNavItem, "icon" | "params" | "path" | "title"> {
   icon?: ReactNode;
-  path?: string;
-  title: string;
 }
 
 export function AppBreadcrumbs({
@@ -43,7 +42,7 @@ export function AppBreadcrumbs({
                 ) : (
                   <BreadcrumbLink
                     className="flex items-center gap-2 [&>svg]:size-3.5"
-                    render={renderLink(item.path)}
+                    render={renderLink(item.path, item.params)}
                   >
                     {item.icon}
                     {item.title}

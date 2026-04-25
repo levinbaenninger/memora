@@ -34,16 +34,13 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         {navGroups.map((group) => (
-          <NavigationGroup
-            key={group.label}
-            renderLink={renderLink}
-            {...group}
-          />
+          <NavigationGroup key={group.id} renderLink={renderLink} {...group} />
         ))}
       </SidebarContent>
       <SidebarFooter>
         <NavigationGroup
           className="p-0"
+          id="footer"
           items={footerNavLinks}
           label=""
           renderLink={renderLink}

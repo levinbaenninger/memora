@@ -9,7 +9,7 @@ import {
 export function CustomSidebarTrigger() {
   return (
     <Tooltip>
-      <TooltipTrigger delay={1000} render={<SidebarTrigger />} />
+      <TooltipTrigger delay={300} render={<SidebarTrigger />} />
       <TooltipContent className="px-2 py-1" side="right">
         Toggle Sidebar{" "}
         <KbdGroup>

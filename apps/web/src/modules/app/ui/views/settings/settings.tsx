@@ -7,6 +7,7 @@ import {
   TabsTrigger,
 } from "@memora/ui/components/tabs";
 import { cn } from "@memora/ui/lib/utils";
+import { notFound } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AccountSettings } from "../../components/settings/account/account-settings";
 import { SecuritySettings } from "../../components/settings/security/security-settings";
@@ -31,12 +32,6 @@ interface SettingsProps {
 export function Settings({ className, view, path, hideNav }: SettingsProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth();
 
-  if (!(view || path)) {
-    throw new Error(
-      "[Better Auth UI] Either `view` or `path` must be provided"
-    );
-  }
-
   const settingsPathViews = useMemo(
     () =>
       Object.fromEntries(
@@ -45,7 +40,17 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
     [viewPaths.settings]
   );
 
-  const currentView = view || (path ? settingsPathViews[path] : undefined);
+  if (!(view || path)) {
+    throw new Error(
+      "[Better Auth UI] Either `view` or `path` must be provided"
+    );
+  }
+
+  const currentView = view ?? settingsPathViews[path ?? ""];
+
+  if (!currentView) {
+    throw notFound();
+  }
 
   return (
     <Tabs

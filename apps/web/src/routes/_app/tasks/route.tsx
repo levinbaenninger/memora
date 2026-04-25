@@ -4,9 +4,9 @@ export const Route = createFileRoute("/_app/tasks")({
   head: () => ({
     meta: [{ title: "Tasks" }],
   }),
-  component: TasksIndexPage,
+  component: TasksPage,
 });
 
-function TasksIndexPage() {
+function TasksPage() {
   return <p className="text-muted-foreground text-sm">Tasks</p>;
 }

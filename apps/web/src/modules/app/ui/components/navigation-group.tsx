@@ -15,7 +15,76 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@memora/ui/components/sidebar";
-import type { AppLinkRenderer, SidebarNavGroup } from "@/modules/app/routes";
+import { useState } from "react";
+import type {
+  AppLinkRenderer,
+  SidebarNavGroup,
+  SidebarNavItem,
+} from "@/modules/app/routes";
+
+interface NavigationMenuItemProps {
+  item: SidebarNavItem;
+  renderLink: AppLinkRenderer;
+}
+
+function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
+  const [open, setOpen] = useState(
+    !!item.isActive || !!item.subItems?.some((i) => !!i.isActive)
+  );
+
+  return (
+    <Collapsible
+      className="group/collapsible"
+      key={item.title}
+      onOpenChange={setOpen}
+      open={open}
+      render={<SidebarMenuItem />}
+    >
+      {item.subItems?.length ? (
+        <>
+          <CollapsibleTrigger
+            render={<SidebarMenuButton isActive={item.isActive} />}
+          >
+            {item.icon}
+            <span>{item.title}</span>
+            <HugeiconsIcon
+              className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90"
+              icon={ArrowRight01Icon}
+              strokeWidth={2}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {item.subItems?.map((subItem) => (
+                <SidebarMenuSubItem key={subItem.title}>
+                  <SidebarMenuSubButton
+                    isActive={subItem.isActive}
+                    render={
+                      subItem.path
+                        ? renderLink(subItem.path, subItem.params)
+                        : undefined
+                    }
+                  >
+                    {subItem.icon}
+                    <span>{subItem.title}</span>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </>
+      ) : (
+        <SidebarMenuButton
+          isActive={item.isActive}
+          render={item.path ? renderLink(item.path, item.params) : undefined}
+        >
+          {item.icon}
+          <span>{item.title}</span>
+        </SidebarMenuButton>
+      )}
+    </Collapsible>
+  );
+}
 
 export function NavigationGroup({
   label,
@@ -28,55 +97,11 @@ export function NavigationGroup({
       {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarMenu>
         {items.map((item) => (
-          <Collapsible
-            className="group/collapsible"
-            defaultOpen={
-              !!item.isActive || item.subItems?.some((i) => !!i.isActive)
-            }
-            key={`${item.title}-${item.isActive ? "active" : "idle"}`}
-            render={<SidebarMenuItem />}
-          >
-            {item.subItems?.length ? (
-              <>
-                <CollapsibleTrigger
-                  render={<SidebarMenuButton isActive={item.isActive} />}
-                >
-                  {item.icon}
-                  <span>{item.title}</span>
-                  <HugeiconsIcon
-                    className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90"
-                    icon={ArrowRight01Icon}
-                    strokeWidth={2}
-                  />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {item.subItems?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton
-                          isActive={subItem.isActive}
-                          render={
-                            subItem.path ? renderLink(subItem.path) : undefined
-                          }
-                        >
-                          {subItem.icon}
-                          <span>{subItem.title}</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </>
-            ) : (
-              <SidebarMenuButton
-                isActive={item.isActive}
-                render={item.path ? renderLink(item.path) : undefined}
-              >
-                {item.icon}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            )}
-          </Collapsible>
+          <NavigationMenuItem
+            item={item}
+            key={item.title}
+            renderLink={renderLink}
+          />
         ))}
       </SidebarMenu>
     </SidebarGroup>
