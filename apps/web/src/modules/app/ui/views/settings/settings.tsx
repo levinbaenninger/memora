@@ -11,7 +11,7 @@ import { useMemo } from "react";
 import { AccountSettings } from "../../components/settings/account/account-settings";
 import { SecuritySettings } from "../../components/settings/security/security-settings";
 
-export interface SettingsProps {
+interface SettingsProps {
   className?: string;
   hideNav?: boolean;
   path?: string;

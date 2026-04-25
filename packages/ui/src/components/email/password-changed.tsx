@@ -44,13 +44,13 @@ const passwordChangedEmailLocalization = {
  *
  * Contains all text content used in the password changed notification email template.
  */
-export type PasswordChangedEmailLocalization =
+type PasswordChangedEmailLocalization =
   typeof passwordChangedEmailLocalization
 
 /**
  * Props for the PasswordChangedEmail component.
  */
-export interface PasswordChangedEmailProps {
+interface PasswordChangedEmailProps {
   /** Email address of the user account */
   email?: string
   /** Timestamp when the password was changed */
@@ -376,5 +376,3 @@ PasswordChangedEmail.PreviewProps = {
   supportEmail: "support@example.com",
   darkMode: true
 } as PasswordChangedEmailProps
-
-export default PasswordChangedEmail

@@ -38,9 +38,9 @@ const changeEmailLocalization = {
   POWERED_BY_BETTER_AUTH: "Powered by {betterAuth}"
 }
 
-export type ChangeEmailLocalization = typeof changeEmailLocalization
+type ChangeEmailLocalization = typeof changeEmailLocalization
 
-export interface ChangeEmailProps {
+interface ChangeEmailProps {
   /** Confirmation URL that users must click to confirm the email change */
   url: string
   /** New email address being confirmed */
@@ -308,5 +308,3 @@ ChangeEmail.PreviewProps = {
   appName: "Better Auth",
   darkMode: true
 } as ChangeEmailProps
-
-export default ChangeEmail

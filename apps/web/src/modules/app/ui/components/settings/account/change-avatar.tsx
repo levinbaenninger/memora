@@ -15,7 +15,7 @@ import { type ChangeEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 import { UserAvatar } from "@/modules/app/ui/components/user/user-avatar";
 
-export interface ChangeAvatarProps {
+interface ChangeAvatarProps {
   className?: string;
 }
 

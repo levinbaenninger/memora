@@ -31,7 +31,7 @@ function routeIcon(icon: Parameters<typeof HugeiconsIcon>[0]["icon"]) {
   return createElement(HugeiconsIcon, { icon, strokeWidth: 2 });
 }
 
-export const navGroups: SidebarNavGroup[] = [
+const navGroups: SidebarNavGroup[] = [
   {
     label: "Workspace",
     items: [
@@ -79,22 +79,13 @@ export const navGroups: SidebarNavGroup[] = [
   },
 ];
 
-export const footerNavLinks: SidebarNavItem[] = [
+const footerNavLinks: SidebarNavItem[] = [
   {
     title: "Settings",
     path: "/settings/account",
     matchPaths: ["/settings"],
     icon: routeIcon(Settings01Icon),
   },
-];
-
-export const navLinks: SidebarNavItem[] = [
-  ...navGroups.flatMap((group) =>
-    group.items.flatMap((item) =>
-      item.subItems?.length ? [item, ...item.subItems] : [item]
-    )
-  ),
-  ...footerNavLinks,
 ];
 
 function isNavItemActive(item: SidebarNavItem, pathname: string) {
@@ -105,12 +96,20 @@ function isNavItemActive(item: SidebarNavItem, pathname: string) {
   );
 }
 
-export function getBreadcrumbItems(pathname: string) {
+function comparePathLengthDesc(a: SidebarNavItem, b: SidebarNavItem) {
+  return (b.path?.length ?? 0) - (a.path?.length ?? 0);
+}
+
+function getActiveSubItem(item: SidebarNavItem, pathname: string) {
+  return item.subItems
+    ?.filter((child) => isNavItemActive(child, pathname))
+    .sort(comparePathLengthDesc)[0];
+}
+
+function getActiveNavBreadcrumb(pathname: string) {
   for (const group of navGroups) {
     for (const item of group.items) {
-      const subItem = item.subItems
-        ?.filter((child) => isNavItemActive(child, pathname))
-        .sort((a, b) => (b.path?.length ?? 0) - (a.path?.length ?? 0))[0];
+      const subItem = getActiveSubItem(item, pathname);
 
       if (subItem) {
         return [item, subItem];
@@ -120,6 +119,14 @@ export function getBreadcrumbItems(pathname: string) {
         return [item];
       }
     }
+  }
+}
+
+export function getBreadcrumbItems(pathname: string) {
+  const activeNavBreadcrumb = getActiveNavBreadcrumb(pathname);
+
+  if (activeNavBreadcrumb) {
+    return activeNavBreadcrumb;
   }
 
   const footerItem = footerNavLinks.find((item) =>

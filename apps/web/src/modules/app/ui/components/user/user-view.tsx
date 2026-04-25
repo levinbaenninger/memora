@@ -6,7 +6,7 @@ import { cn } from "@memora/ui/lib/utils";
 import type { User } from "better-auth";
 import { UserAvatar } from "./user-avatar";
 
-export interface UserViewProps {
+interface UserViewProps {
   className?: string;
   isPending?: boolean;
   /** @remarks `User` */

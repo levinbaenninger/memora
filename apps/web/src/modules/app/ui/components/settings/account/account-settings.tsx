@@ -8,7 +8,7 @@ import { ChangeEmail } from "./change-email";
 import { ManageAccounts } from "./manage-accounts";
 import { UserProfile } from "./user-profile";
 
-export interface AccountSettingsProps {
+interface AccountSettingsProps {
   className?: string;
 }
 

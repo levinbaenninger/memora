@@ -25,7 +25,7 @@ import { type SyntheticEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ChangeAvatar } from "./change-avatar";
 
-export interface UserProfileProps {
+interface UserProfileProps {
   className?: string;
 }
 

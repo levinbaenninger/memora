@@ -7,7 +7,7 @@ import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
 import { ActiveSession } from "./active-session";
 
-export interface ActiveSessionsProps {
+interface ActiveSessionsProps {
   className?: string;
 }
 

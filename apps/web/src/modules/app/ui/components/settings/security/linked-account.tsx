@@ -15,7 +15,7 @@ import type { Account, SocialProvider } from "better-auth";
 import { Link2, Link2Off, Plug } from "lucide-react";
 import { toast } from "sonner";
 
-export interface LinkedAccountProps {
+interface LinkedAccountProps {
   account?: Account;
   provider: SocialProvider;
 }

@@ -6,7 +6,7 @@ import { useMemo } from "react"
 import { cn } from "@memora/ui/lib/utils"
 import { ProviderButton } from "./provider-button"
 
-export type ProviderButtonsProps = {
+type ProviderButtonsProps = {
   isPending?: boolean
   socialLayout?: SocialLayout
 }

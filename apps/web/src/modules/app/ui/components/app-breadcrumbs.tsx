@@ -9,7 +9,7 @@ import {
 import { Fragment, type ReactNode } from "react";
 import type { AppLinkRenderer } from "@/modules/app/routes";
 
-export interface AppBreadcrumbPage {
+interface AppBreadcrumbPage {
   icon?: ReactNode;
   path?: string;
   title: string;

@@ -2,14 +2,13 @@ import { useAuth } from "@better-auth-ui/react"
 import type { AuthView } from "@better-auth-ui/react/core"
 
 import { ForgotPassword } from "./forgot-password"
-import { MagicLink } from "./magic-link"
 import type { SocialLayout } from "./provider-buttons"
 import { ResetPassword } from "./reset-password"
 import { SignIn } from "./sign-in"
 import { SignOut } from "./sign-out"
 import { SignUp } from "./sign-up"
 
-export type AuthProps = {
+type AuthProps = {
   className?: string
   path?: string
   socialLayout?: SocialLayout
@@ -62,14 +61,6 @@ export function Auth({
     case "signUp":
       return (
         <SignUp
-          className={className}
-          socialLayout={socialLayout}
-          socialPosition={socialPosition}
-        />
-      )
-    case "magicLink":
-      return (
-        <MagicLink
           className={className}
           socialLayout={socialLayout}
           socialPosition={socialPosition}

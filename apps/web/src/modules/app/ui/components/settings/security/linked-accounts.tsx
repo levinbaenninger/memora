@@ -7,7 +7,7 @@ import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
 import { LinkedAccount } from "./linked-account";
 
-export interface LinkedAccountsProps {
+interface LinkedAccountsProps {
   className?: string;
 }
 

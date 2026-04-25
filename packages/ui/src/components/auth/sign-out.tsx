@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { Spinner } from "@memora/ui/components/spinner"
 import { cn } from "@memora/ui/lib/utils"
 
-export type SignOutProps = {
+type SignOutProps = {
   className?: string
 }
 

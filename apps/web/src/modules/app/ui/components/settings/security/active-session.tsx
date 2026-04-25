@@ -30,7 +30,7 @@ function timeAgo(date: Date) {
   return rtf.format(0, "second");
 }
 
-export interface ActiveSessionProps {
+interface ActiveSessionProps {
   activeSession: Session;
 }
 

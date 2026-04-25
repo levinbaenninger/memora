@@ -23,7 +23,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { type SyntheticEvent, useState } from "react";
 import { toast } from "sonner";
 
-export interface ChangePasswordProps {
+interface ChangePasswordProps {
   className?: string;
 }
 

@@ -9,11 +9,11 @@ import { DropdownMenuItem } from "@memora/ui/components/dropdown-menu";
 import { Spinner } from "@memora/ui/components/spinner";
 import { UserView } from "./user-view";
 
-export type DeviceSession = NonNullable<
+type DeviceSession = NonNullable<
   ReturnType<typeof useListDeviceSessions>["data"]
 >[number];
 
-export interface SwitchAccountItemProps {
+interface SwitchAccountItemProps {
   deviceSession: DeviceSession;
 }
 

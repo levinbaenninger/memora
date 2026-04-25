@@ -12,7 +12,7 @@ import type { User } from "better-auth";
 import { User2 } from "lucide-react";
 import type { ReactNode } from "react";
 
-export interface UserAvatarProps {
+interface UserAvatarProps {
   className?: string;
   fallback?: ReactNode;
   isPending?: boolean;

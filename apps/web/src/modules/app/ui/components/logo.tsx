@@ -16,6 +16,3 @@ export const LogoIcon = (props: React.ComponentProps<"svg">) => (
     </g>
   </svg>
 );
-
-/** Full lockup; wordmark is not in the SVG asset yet, so this matches {@link LogoIcon}. */
-export const Logo = LogoIcon;

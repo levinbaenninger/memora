@@ -19,7 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@memora/ui/components/radio-group";
 import { cn } from "@memora/ui/lib/utils";
 import { Monitor, Moon, Sun } from "lucide-react";
 
-export interface AppearanceProps {
+interface AppearanceProps {
   className?: string;
 }
 

@@ -10,7 +10,7 @@ import { Separator } from "@memora/ui/components/separator";
 import { cn } from "@memora/ui/lib/utils";
 import { ManageAccount } from "./manage-account";
 
-export interface ManageAccountsProps {
+interface ManageAccountsProps {
   className?: string;
 }
 

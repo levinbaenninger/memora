@@ -24,7 +24,7 @@ import { TriangleAlert } from "lucide-react";
 import { type SyntheticEvent, useState } from "react";
 import { toast } from "sonner";
 
-export interface DeleteUserProps {
+interface DeleteUserProps {
   className?: string;
 }
 

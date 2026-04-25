@@ -1,6 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "ignorePatterns": [
+    "apps/web/src/modules/app/routes.ts",
+    "apps/web/src/modules/app/ui/components/**",
+    "apps/web/src/modules/app/ui/views/app-shell.tsx",
+    "apps/web/src/modules/app/ui/views/root/**",
+    "apps/web/src/modules/app/ui/views/settings/**",
     "packages/ui/src/components/**",
     "packages/ui/src/hooks/**",
     "packages/ui/src/lib/utils.ts"

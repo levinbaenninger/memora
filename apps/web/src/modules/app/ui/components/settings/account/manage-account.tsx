@@ -18,12 +18,12 @@ import { ArrowLeftRight, LogOut, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { UserView } from "@/modules/app/ui/components/user/user-view";
 
-export interface DeviceSession {
+interface DeviceSession {
   session: Session;
   user: User;
 }
 
-export interface ManageAccountProps {
+interface ManageAccountProps {
   deviceSession?: DeviceSession | null;
   isPending?: boolean;
 }

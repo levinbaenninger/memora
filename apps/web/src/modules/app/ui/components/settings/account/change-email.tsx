@@ -10,7 +10,7 @@ import { cn } from "@memora/ui/lib/utils";
 import { type SyntheticEvent, useState } from "react";
 import { toast } from "sonner";
 
-export interface ChangeEmailProps {
+interface ChangeEmailProps {
   className?: string;
 }
 
