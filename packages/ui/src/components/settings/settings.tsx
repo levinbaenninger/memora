@@ -1,4 +1,4 @@
-import { useAuth, useAuthenticate } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { useMemo } from "react"
 
@@ -26,7 +26,6 @@ export type SettingsProps = {
  */
 export function Settings({ className, view, path, hideNav }: SettingsProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()
-  useAuthenticate()
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")

@@ -1,6 +1,7 @@
 import { AuthProvider } from "@memora/ui/components/auth/auth-provider";
 import { Toaster } from "@memora/ui/components/sonner";
 import { useTheme } from "@memora/ui/components/theme-provider";
+import { TooltipProvider } from "@memora/ui/components/tooltip";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { authClient } from "@/modules/auth/client";
@@ -25,11 +26,13 @@ export function Providers({ children }: { children: ReactNode }) {
       }}
       Link={Link}
       navigate={navigate}
-      redirectTo="/"
+      redirectTo="/dashboard"
       socialProviders={["google"]}
     >
-      {children}
-      <Toaster />
+      <TooltipProvider>
+        {children}
+        <Toaster />
+      </TooltipProvider>
     </AuthProvider>
   );
 }

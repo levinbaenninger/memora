@@ -3,6 +3,9 @@ import { Auth } from "@memora/ui/components/auth/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/auth/$path")({
+  head: () => ({
+    meta: [{ title: "Authentication" }],
+  }),
   beforeLoad({ params: { path } }) {
     if (!Object.values(viewPaths.auth).includes(path)) {
       throw redirect({ to: "/" });

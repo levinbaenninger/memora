@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth, useSession, useSetActiveSession } from "@better-auth-ui/react"
+import type { User } from "better-auth"
 import {
   ChevronsUpDown,
   LogIn,
@@ -37,6 +38,7 @@ export type UserButtonProps = {
   sideOffset?: number
   size?: "default" | "icon"
   themeToggle?: boolean
+  user?: User & { username?: string | null; displayUsername?: string | null }
   variant?:
     | "default"
     | "destructive"
@@ -66,6 +68,7 @@ export function UserButton({
   sideOffset,
   size = "default",
   themeToggle = true,
+  user,
   variant = "ghost"
 }: UserButtonProps) {
   const {
@@ -78,7 +81,11 @@ export function UserButton({
   } = useAuth()
 
   const { isPending: settingActiveSession } = useSetActiveSession()
-  const { data: session, isPending: sessionPending } = useSession()
+  const { data: session, isPending: sessionPending } = useSession({
+    enabled: !user
+  })
+  const resolvedUser = user ?? session?.user
+  const isAuthenticated = !!resolvedUser
 
   return (
     <DropdownMenu>
@@ -89,15 +96,21 @@ export function UserButton({
         )}
       >
         {size === "icon" ? (
-          <UserAvatar />
+          <UserAvatar
+            isPending={sessionPending || settingActiveSession}
+            user={resolvedUser}
+          />
         ) : (
           <Button
             variant={variant}
             className={cn("py-2.5 h-auto font-normal", className)}
             size="lg"
           >
-            {session || sessionPending || settingActiveSession ? (
-              <UserView isPending={!!settingActiveSession} />
+            {isAuthenticated || sessionPending || settingActiveSession ? (
+              <UserView
+                isPending={!!settingActiveSession}
+                user={resolvedUser}
+              />
             ) : (
               <>
                 <UserAvatar />
@@ -118,11 +131,11 @@ export function UserButton({
         sideOffset={sideOffset}
         align={align}
       >
-        {session && (
+        {isAuthenticated && (
           <>
             <DropdownMenuGroup>
               <DropdownMenuLabel className="text-sm font-normal">
-                <UserView />
+                <UserView user={resolvedUser} />
               </DropdownMenuLabel>
             </DropdownMenuGroup>
 
@@ -130,7 +143,7 @@ export function UserButton({
           </>
         )}
 
-        {session ? (
+        {isAuthenticated ? (
           <>
             <DropdownMenuItem render={<Link href={`${basePaths.settings}/${viewPaths.settings.account}`} />}><Settings className="text-muted-foreground" />{localization.settings.settings}</DropdownMenuItem>
 
