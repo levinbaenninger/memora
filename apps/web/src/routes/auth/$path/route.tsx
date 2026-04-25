@@ -13,6 +13,7 @@ export const Route = createFileRoute("/auth/$path")({
   head: ({ params }) => ({
     meta: [{ title: authPathTitles[params.path] ?? "Authentication" }],
   }),
+  ssr: false,
   beforeLoad({ params: { path } }) {
     if (!Object.values(viewPaths.auth).includes(path)) {
       throw redirect({ to: "/" });

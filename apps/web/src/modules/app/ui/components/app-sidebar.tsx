@@ -28,7 +28,7 @@ export function AppSidebar({
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader className="justify-center">
         <SidebarMenuButton render={renderLink("/dashboard")}>
-          <LogoIcon />
+          <LogoIcon className="text-primary" />
           <span className="font-medium">Memora</span>
         </SidebarMenuButton>
       </SidebarHeader>

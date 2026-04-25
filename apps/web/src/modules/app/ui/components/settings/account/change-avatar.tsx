@@ -75,9 +75,17 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
             setIsDeleting(true);
             try {
               await avatar.delete?.(currentImage);
+              toast.success(localization.settings.avatarDeletedSuccess);
+            } catch (error) {
+              toast.error(
+                error instanceof Error
+                  ? error.message
+                  : "Failed to delete avatar"
+              );
             } finally {
               setIsDeleting(false);
             }
+            return;
           }
 
           toast.success(localization.settings.avatarDeletedSuccess);

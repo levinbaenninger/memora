@@ -13,15 +13,15 @@ export const LogoIcon = (props: React.ComponentProps<"svg">) => {
 
   return (
     <svg
+      {...svgProps}
       aria-hidden={ariaHidden}
       aria-label={isHidden ? undefined : (ariaLabel ?? "Memora")}
       data-logo="logo"
       role={isHidden ? undefined : "img"}
       viewBox="0 0 41 40"
-      {...svgProps}
     >
-      <g id="logogram">
-        <path d={logogramPath} fill="#BB4D00" />
+      <g>
+        <path d={logogramPath} fill="currentColor" />
       </g>
     </svg>
   );

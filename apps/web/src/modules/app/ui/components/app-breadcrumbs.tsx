@@ -6,13 +6,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@memora/ui/components/breadcrumb";
-import { Fragment, type ReactNode } from "react";
+import { Fragment } from "react";
 import type { AppLinkRenderer, SidebarNavItem } from "@/modules/app/routes";
 
-interface AppBreadcrumbPage
-  extends Pick<SidebarNavItem, "icon" | "params" | "path" | "title"> {
-  icon?: ReactNode;
-}
+type AppBreadcrumbPage = Pick<
+  SidebarNavItem,
+  "icon" | "params" | "path" | "title"
+>;
 
 export function AppBreadcrumbs({
   items,
