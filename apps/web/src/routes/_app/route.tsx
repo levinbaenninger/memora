@@ -1,12 +1,12 @@
 import { useAuthenticate } from "@better-auth-ui/react";
-import { AppShell } from "@memora/ui/components/app-shell";
-import { Spinner } from "@memora/ui/components/spinner";
 import {
   createFileRoute,
   Link,
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
+import { AppShell } from "@/modules/app/ui/views/app-shell";
+import { RootLoading } from "@/modules/app/ui/views/root/root-loading";
 
 export const Route = createFileRoute("/_app")({
   component: AppShellLayout,
@@ -17,11 +17,7 @@ function AppShellLayout() {
   const { pathname } = useLocation();
 
   if (!session) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Spinner />
-      </div>
-    );
+    return <RootLoading />;
   }
 
   return (

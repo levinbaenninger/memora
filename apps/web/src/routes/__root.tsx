@@ -8,9 +8,10 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Providers } from "@/components/providers";
-import { RootError } from "@/components/root-error";
-import { RootNotFound } from "@/components/root-not-found";
 import appCss from "@/index.css?url";
+import { RootError } from "@/modules/app/ui/views/root/root-error";
+import { RootLoading } from "@/modules/app/ui/views/root/root-loading";
+import { RootNotFound } from "@/modules/app/ui/views/root/root-not-found";
 import type { orpc } from "@/utils/orpc";
 
 interface RouterAppContext {
@@ -69,6 +70,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
   errorComponent: RootError,
   notFoundComponent: RootNotFound,
+  pendingComponent: RootLoading,
   shellComponent: RootDocument,
 });
 
