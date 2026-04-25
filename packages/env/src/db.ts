@@ -5,11 +5,6 @@ import { runtimeOptions } from "./runtime";
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().min(1),
-    BETTER_AUTH_SECRET: z.string().min(1),
-    OAUTH_PROXY_SECRET: z.string().min(1).optional(),
-    GOOGLE_CLIENT_ID: z.string().min(1),
-    GOOGLE_CLIENT_SECRET: z.string().min(1),
-    RESEND_API_KEY: z.string().min(1),
   },
   ...runtimeOptions,
 });
