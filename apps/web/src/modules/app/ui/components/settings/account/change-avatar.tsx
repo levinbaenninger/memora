@@ -45,12 +45,19 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
       const resized =
         (await avatar.resize?.(file, avatar.size, avatar.extension)) || file;
 
-      const image =
-        (await avatar.upload?.(resized)) || (await fileToBase64(resized));
+      const uploadedImage = await avatar.upload?.(resized);
+      const image = uploadedImage || (await fileToBase64(resized));
 
       updateUser(
         { image },
         {
+          onError: async (error) => {
+            toast.error(error.error?.message || error.message);
+
+            if (uploadedImage) {
+              await avatar.delete?.(uploadedImage);
+            }
+          },
           onSuccess: () =>
             toast.success(localization.settings.avatarChangedSuccess),
         }
@@ -70,6 +77,24 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     updateUser(
       { image: null },
       {
+        onError: async (error) => {
+          toast.error(error.error?.message || error.message);
+
+          if (currentImage) {
+            setIsDeleting(true);
+            try {
+              await avatar.delete?.(currentImage);
+            } catch (deleteError) {
+              toast.error(
+                deleteError instanceof Error
+                  ? deleteError.message
+                  : "Failed to delete avatar"
+              );
+            } finally {
+              setIsDeleting(false);
+            }
+          }
+        },
         onSuccess: async () => {
           if (currentImage) {
             setIsDeleting(true);

@@ -6,6 +6,7 @@ const authPathTitles: Record<string, string> = {
   "forgot-password": "Forgot Password",
   "reset-password": "Reset Password",
   "sign-in": "Sign In",
+  "sign-out": "Sign Out",
   "sign-up": "Sign Up",
 };
 

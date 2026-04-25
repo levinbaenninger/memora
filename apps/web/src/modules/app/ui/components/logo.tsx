@@ -20,9 +20,7 @@ export const LogoIcon = (props: React.ComponentProps<"svg">) => {
       role={isHidden ? undefined : "img"}
       viewBox="0 0 41 40"
     >
-      <g>
-        <path d={logogramPath} fill="currentColor" />
-      </g>
+      <path d={logogramPath} fill="currentColor" />
     </svg>
   );
 };
