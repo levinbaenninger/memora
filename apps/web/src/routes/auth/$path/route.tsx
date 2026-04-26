@@ -1,6 +1,7 @@
 import { viewPaths } from "@better-auth-ui/react/core";
 import { Auth } from "@memora/ui/components/auth/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { authClient } from "@/modules/auth/client";
 
 const authPathTitles: Record<string, string> = {
   "forgot-password": "Forgot Password",
@@ -15,9 +16,15 @@ export const Route = createFileRoute("/auth/$path")({
     meta: [{ title: authPathTitles[params.path] ?? "Authentication" }],
   }),
   ssr: false,
-  beforeLoad({ params: { path } }) {
+  async beforeLoad({ params: { path } }) {
     if (!Object.values(viewPaths.auth).includes(path)) {
       throw redirect({ to: "/" });
+    }
+
+    const { data: session } = await authClient.getSession();
+
+    if (session) {
+      throw redirect({ replace: true, to: "/dashboard" });
     }
   },
   component: AuthPage,
