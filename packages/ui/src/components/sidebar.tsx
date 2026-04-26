@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
+import { useHotkey } from "@tanstack/react-hotkeys"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
 
@@ -31,7 +32,7 @@ const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
-const SIDEBAR_KEYBOARD_SHORTCUT = "b"
+const SIDEBAR_KEYBOARD_SHORTCUT = "Mod+B"
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed"
@@ -44,24 +45,6 @@ type SidebarContextProps = {
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
-
-function isEditableShortcutTarget(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) {
-    return false
-  }
-
-  if (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target.isContentEditable
-  ) {
-    return true
-  }
-
-  return !!target.closest(
-    '[contenteditable]:not([contenteditable="false"]), [role="textbox"], [data-lexical-editor], [data-slate-editor="true"], .ProseMirror'
-  )
-}
 
 function useSidebar() {
   const context = React.useContext(SidebarContext)
@@ -114,25 +97,10 @@ function SidebarProvider({
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
   }, [isMobile, setOpen, setOpenMobile])
 
-  // Adds a keyboard shortcut to toggle the sidebar.
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-        (event.metaKey || event.ctrlKey)
-      ) {
-        if (isEditableShortcutTarget(event.target ?? document.activeElement)) {
-          return
-        }
-
-        event.preventDefault()
-        toggleSidebar()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [toggleSidebar])
+  useHotkey(SIDEBAR_KEYBOARD_SHORTCUT, toggleSidebar, {
+    ignoreInputs: true,
+    preventDefault: true,
+  })
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.

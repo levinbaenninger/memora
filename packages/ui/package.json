@@ -21,6 +21,7 @@
     "@hugeicons/core-free-icons": "4.1.1",
     "@hugeicons/react": "1.1.6",
     "@react-email/components": "catalog:",
+    "@tanstack/react-hotkeys": "catalog:",
     "@tanstack/react-pacer": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
