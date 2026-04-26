@@ -4,15 +4,16 @@ import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
-export default defineConfig(({ command }) => ({
-  plugins: [tailwindcss(), tanstackStart(), viteReact(), nitro()],
-  ssr:
-    command === "build"
-      ? {
-          noExternal: ["react", "react-dom", "use-sync-external-store"],
-        }
-      : undefined,
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+    tanstackStart(),
+    viteReact(),
+    nitro({
+      traceDeps: ["react"],
+    }),
+  ],
   resolve: {
     tsconfigPaths: true,
   },
-}));
+});
