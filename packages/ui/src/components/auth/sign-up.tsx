@@ -26,10 +26,9 @@ import {
 import { Spinner } from "@memora/ui/components/spinner"
 import { cn } from "@memora/ui/lib/utils"
 import { Label } from "@memora/ui/components/label"
-import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignUpProps = {
+type SignUpProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -58,7 +57,6 @@ export function SignUp({
     basePaths,
     emailAndPassword,
     localization,
-    magicLink,
     redirectTo,
     socialProviders,
     username: usernameConfig,
@@ -438,10 +436,6 @@ export function SignUp({
 
                     {localization.auth.signUp}
                   </Button>
-
-                  {magicLink && (
-                    <MagicLinkButton view="signUp" isPending={isPending} />
-                  )}
                 </div>
               </FieldGroup>
             </form>

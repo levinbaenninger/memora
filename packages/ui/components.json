@@ -1,6 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "base-lyra",
+  "style": "base-nova",
   "rsc": false,
   "tsx": true,
   "tailwind": {
@@ -11,6 +11,7 @@
     "prefix": ""
   },
   "iconLibrary": "hugeicons",
+  "rtl": false,
   "aliases": {
     "components": "@memora/ui/components",
     "utils": "@memora/ui/lib/utils",
@@ -20,6 +21,7 @@
   },
   "menuColor": "default-translucent",
   "menuAccent": "subtle",
-  "registries": {},
-  "rtl": false
+  "registries": {
+    "@efferd": "https://efferd.com/r/{style}/{name}.json"
+  }
 }

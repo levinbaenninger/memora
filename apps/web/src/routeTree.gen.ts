@@ -9,89 +9,192 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SettingsPathRouteImport } from './routes/settings/$path'
-import { Route as AuthPathRouteImport } from './routes/auth/$path'
-import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc/$'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
+import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
+import { Route as AppProjectsRouteRouteImport } from './routes/_app/projects/route'
+import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
+import { Route as AppInboxRouteRouteImport } from './routes/_app/inbox/route'
+import { Route as AppFavoritesRouteRouteImport } from './routes/_app/favorites/route'
+import { Route as AppDashboardRouteRouteImport } from './routes/_app/dashboard/route'
+import { Route as AppArchiveRouteRouteImport } from './routes/_app/archive/route'
+import { Route as ApiRpcSplatRouteRouteImport } from './routes/api/rpc/$/route'
+import { Route as ApiAuthSplatRouteRouteImport } from './routes/api/auth/$/route'
+import { Route as AppSettingsPathRouteRouteImport } from './routes/_app/settings/$path/route'
 
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsPathRoute = SettingsPathRouteImport.update({
-  id: '/settings/$path',
-  path: '/settings/$path',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthPathRoute = AuthPathRouteImport.update({
+const AuthPathRouteRoute = AuthPathRouteRouteImport.update({
   id: '/auth/$path',
   path: '/auth/$path',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
+const AppTasksRouteRoute = AppTasksRouteRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppProjectsRouteRoute = AppProjectsRouteRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppNotesRouteRoute = AppNotesRouteRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppInboxRouteRoute = AppInboxRouteRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFavoritesRouteRoute = AppFavoritesRouteRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDashboardRouteRoute = AppDashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppArchiveRouteRoute = AppArchiveRouteRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const ApiRpcSplatRouteRoute = ApiRpcSplatRouteRouteImport.update({
   id: '/api/rpc/$',
   path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+const ApiAuthSplatRouteRoute = ApiAuthSplatRouteRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSettingsPathRouteRoute = AppSettingsPathRouteRouteImport.update({
+  id: '/settings/$path',
+  path: '/settings/$path',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth/$path': typeof AuthPathRoute
-  '/settings/$path': typeof SettingsPathRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/archive': typeof AppArchiveRouteRoute
+  '/dashboard': typeof AppDashboardRouteRoute
+  '/favorites': typeof AppFavoritesRouteRoute
+  '/inbox': typeof AppInboxRouteRoute
+  '/notes': typeof AppNotesRouteRoute
+  '/projects': typeof AppProjectsRouteRoute
+  '/tasks': typeof AppTasksRouteRoute
+  '/auth/$path': typeof AuthPathRouteRoute
+  '/settings/$path': typeof AppSettingsPathRouteRoute
+  '/api/auth/$': typeof ApiAuthSplatRouteRoute
+  '/api/rpc/$': typeof ApiRpcSplatRouteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth/$path': typeof AuthPathRoute
-  '/settings/$path': typeof SettingsPathRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/archive': typeof AppArchiveRouteRoute
+  '/dashboard': typeof AppDashboardRouteRoute
+  '/favorites': typeof AppFavoritesRouteRoute
+  '/inbox': typeof AppInboxRouteRoute
+  '/notes': typeof AppNotesRouteRoute
+  '/projects': typeof AppProjectsRouteRoute
+  '/tasks': typeof AppTasksRouteRoute
+  '/auth/$path': typeof AuthPathRouteRoute
+  '/settings/$path': typeof AppSettingsPathRouteRoute
+  '/api/auth/$': typeof ApiAuthSplatRouteRoute
+  '/api/rpc/$': typeof ApiRpcSplatRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/auth/$path': typeof AuthPathRoute
-  '/settings/$path': typeof SettingsPathRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/_app': typeof AppRouteRouteWithChildren
+  '/_app/archive': typeof AppArchiveRouteRoute
+  '/_app/dashboard': typeof AppDashboardRouteRoute
+  '/_app/favorites': typeof AppFavoritesRouteRoute
+  '/_app/inbox': typeof AppInboxRouteRoute
+  '/_app/notes': typeof AppNotesRouteRoute
+  '/_app/projects': typeof AppProjectsRouteRoute
+  '/_app/tasks': typeof AppTasksRouteRoute
+  '/auth/$path': typeof AuthPathRouteRoute
+  '/_app/settings/$path': typeof AppSettingsPathRouteRoute
+  '/api/auth/$': typeof ApiAuthSplatRouteRoute
+  '/api/rpc/$': typeof ApiRpcSplatRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/archive'
+    | '/dashboard'
+    | '/favorites'
+    | '/inbox'
+    | '/notes'
+    | '/projects'
+    | '/tasks'
     | '/auth/$path'
     | '/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/$path' | '/settings/$path' | '/api/auth/$' | '/api/rpc/$'
+  to:
+    | '/'
+    | '/archive'
+    | '/dashboard'
+    | '/favorites'
+    | '/inbox'
+    | '/notes'
+    | '/projects'
+    | '/tasks'
+    | '/auth/$path'
+    | '/settings/$path'
+    | '/api/auth/$'
+    | '/api/rpc/$'
   id:
     | '__root__'
     | '/'
+    | '/_app'
+    | '/_app/archive'
+    | '/_app/dashboard'
+    | '/_app/favorites'
+    | '/_app/inbox'
+    | '/_app/notes'
+    | '/_app/projects'
+    | '/_app/tasks'
     | '/auth/$path'
-    | '/settings/$path'
+    | '/_app/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthPathRoute: typeof AuthPathRoute
-  SettingsPathRoute: typeof SettingsPathRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiRpcSplatRoute: typeof ApiRpcSplatRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
+  AuthPathRouteRoute: typeof AuthPathRouteRoute
+  ApiAuthSplatRouteRoute: typeof ApiAuthSplatRouteRoute
+  ApiRpcSplatRouteRoute: typeof ApiRpcSplatRouteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -99,43 +202,118 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/$path': {
-      id: '/settings/$path'
-      path: '/settings/$path'
-      fullPath: '/settings/$path'
-      preLoaderRoute: typeof SettingsPathRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth/$path': {
       id: '/auth/$path'
       path: '/auth/$path'
       fullPath: '/auth/$path'
-      preLoaderRoute: typeof AuthPathRouteImport
+      preLoaderRoute: typeof AuthPathRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/tasks': {
+      id: '/_app/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AppTasksRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/projects': {
+      id: '/_app/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AppProjectsRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/notes': {
+      id: '/_app/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof AppNotesRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/inbox': {
+      id: '/_app/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AppInboxRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/favorites': {
+      id: '/_app/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof AppFavoritesRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/archive': {
+      id: '/_app/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof AppArchiveRouteRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/api/rpc/$': {
       id: '/api/rpc/$'
       path: '/api/rpc/$'
       fullPath: '/api/rpc/$'
-      preLoaderRoute: typeof ApiRpcSplatRouteImport
+      preLoaderRoute: typeof ApiRpcSplatRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      preLoaderRoute: typeof ApiAuthSplatRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/settings/$path': {
+      id: '/_app/settings/$path'
+      path: '/settings/$path'
+      fullPath: '/settings/$path'
+      preLoaderRoute: typeof AppSettingsPathRouteRouteImport
+      parentRoute: typeof AppRouteRoute
     }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppArchiveRouteRoute: typeof AppArchiveRouteRoute
+  AppDashboardRouteRoute: typeof AppDashboardRouteRoute
+  AppFavoritesRouteRoute: typeof AppFavoritesRouteRoute
+  AppInboxRouteRoute: typeof AppInboxRouteRoute
+  AppNotesRouteRoute: typeof AppNotesRouteRoute
+  AppProjectsRouteRoute: typeof AppProjectsRouteRoute
+  AppTasksRouteRoute: typeof AppTasksRouteRoute
+  AppSettingsPathRouteRoute: typeof AppSettingsPathRouteRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppArchiveRouteRoute: AppArchiveRouteRoute,
+  AppDashboardRouteRoute: AppDashboardRouteRoute,
+  AppFavoritesRouteRoute: AppFavoritesRouteRoute,
+  AppInboxRouteRoute: AppInboxRouteRoute,
+  AppNotesRouteRoute: AppNotesRouteRoute,
+  AppProjectsRouteRoute: AppProjectsRouteRoute,
+  AppTasksRouteRoute: AppTasksRouteRoute,
+  AppSettingsPathRouteRoute: AppSettingsPathRouteRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthPathRoute: AuthPathRoute,
-  SettingsPathRoute: SettingsPathRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiRpcSplatRoute: ApiRpcSplatRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
+  AuthPathRouteRoute: AuthPathRouteRoute,
+  ApiAuthSplatRouteRoute: ApiAuthSplatRouteRoute,
+  ApiRpcSplatRouteRoute: ApiRpcSplatRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

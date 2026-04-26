@@ -8,9 +8,10 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Providers } from "@/components/providers";
-import { RootError } from "@/components/root-error";
-import { RootNotFound } from "@/components/root-not-found";
 import appCss from "@/index.css?url";
+import { RootError } from "@/modules/app/ui/views/root/root-error";
+import { RootLoading } from "@/modules/app/ui/views/root/root-loading";
+import { RootNotFound } from "@/modules/app/ui/views/root/root-not-found";
 import type { orpc } from "@/utils/orpc";
 
 interface RouterAppContext {
@@ -29,7 +30,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Template",
+        title: "Memora",
+      },
+      {
+        name: "apple-mobile-web-app-title",
+        content: "Memora",
       },
     ],
     links: [
@@ -37,10 +42,35 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         rel: "stylesheet",
         href: appCss,
       },
+      {
+        rel: "icon",
+        type: "image/png",
+        sizes: "96x96",
+        href: "/favicon.png",
+      },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/favicon.svg",
+      },
+      {
+        rel: "shortcut icon",
+        href: "/favicon.ico",
+      },
+      {
+        rel: "apple-touch-icon",
+        sizes: "180x180",
+        href: "/apple-touch-icon.png",
+      },
+      {
+        rel: "manifest",
+        href: "/site.webmanifest",
+      },
     ],
   }),
   errorComponent: RootError,
   notFoundComponent: RootNotFound,
+  pendingComponent: RootLoading,
   shellComponent: RootDocument,
 });
 

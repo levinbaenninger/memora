@@ -23,11 +23,9 @@ import { Input } from "@memora/ui/components/input"
 import { Label } from "@memora/ui/components/label"
 import { Spinner } from "@memora/ui/components/spinner"
 import { cn } from "@memora/ui/lib/utils"
-import { MagicLinkButton } from "./magic-link-button"
-import { PasskeyButton } from "./passkey-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignInProps = {
+type SignInProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -38,7 +36,7 @@ function isEmail(value: string): boolean {
 }
 
 /**
- * Render the sign-in form UI with email/password, magic link, and social provider options.
+ * Render the sign-in form UI with email/password and social provider options.
  *
  * @param className - Optional additional container class names
  * @param socialLayout - Layout style for social provider buttons
@@ -55,8 +53,6 @@ export function SignIn({
     baseURL,
     emailAndPassword,
     localization,
-    magicLink,
-    passkey,
     redirectTo,
     socialProviders,
     username: usernameConfig,
@@ -277,12 +273,6 @@ export function SignIn({
 
                     {localization.auth.signIn}
                   </Button>
-
-                  {magicLink && (
-                    <MagicLinkButton view="signIn" isPending={isPending} />
-                  )}
-
-                  {passkey && <PasskeyButton isPending={isPending} />}
                 </div>
               </FieldGroup>
             </form>

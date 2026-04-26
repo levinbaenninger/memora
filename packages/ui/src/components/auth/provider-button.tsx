@@ -6,7 +6,7 @@ import { type ComponentProps, useState } from "react"
 import { Button } from "@memora/ui/components/button"
 import { Spinner } from "@memora/ui/components/spinner"
 
-export type ProviderButtonProps = {
+type ProviderButtonProps = {
   provider: SocialProvider
   label?: "continueWith" | "providerName" | "none"
   isDisabled?: boolean

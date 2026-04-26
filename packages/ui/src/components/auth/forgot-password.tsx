@@ -17,7 +17,7 @@ import { Spinner } from "@memora/ui/components/spinner"
 import { cn } from "@memora/ui/lib/utils"
 import { Label } from "@memora/ui/components/label"
 
-export type ForgotPasswordProps = {
+type ForgotPasswordProps = {
   className?: string
 }
 

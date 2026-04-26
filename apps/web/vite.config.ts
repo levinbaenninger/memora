@@ -5,7 +5,14 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [tailwindcss(), tanstackStart(), viteReact(), nitro()],
+  plugins: [
+    tailwindcss(),
+    tanstackStart(),
+    viteReact(),
+    nitro({
+      traceDeps: ["react"],
+    }),
+  ],
   resolve: {
     tsconfigPaths: true,
   },

@@ -43,13 +43,13 @@ const emailVerificationEmailLocalization = {
  *
  * Contains all text content used in the email verification email template.
  */
-export type EmailVerificationEmailLocalization =
+type EmailVerificationEmailLocalization =
   typeof emailVerificationEmailLocalization
 
 /**
  * Props for the EmailVerificationEmail component.
  */
-export interface EmailVerificationEmailProps {
+interface EmailVerificationEmailProps {
   /** Verification URL that users must click to verify their email */
   url: string
   /** Email address being verified */
@@ -346,5 +346,3 @@ EmailVerificationEmail.PreviewProps = {
   email: "m@example.com",
   darkMode: true
 } as EmailVerificationEmailProps
-
-export default EmailVerificationEmail
