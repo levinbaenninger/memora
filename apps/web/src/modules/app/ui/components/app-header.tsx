@@ -19,9 +19,9 @@ export function AppHeader({
   return (
     <header className="mb-6 flex items-center justify-between gap-2 px-4 md:px-2">
       <div className="flex items-center gap-3">
-        <CustomSidebarTrigger />
+        <CustomSidebarTrigger className="md:hidden" />
         <Separator
-          className="mr-2 h-4 data-[orientation=vertical]:self-center"
+          className="mr-2 h-4 data-[orientation=vertical]:self-center md:hidden"
           orientation="vertical"
         />
         <AppBreadcrumbs items={breadcrumbItems} renderLink={renderLink} />

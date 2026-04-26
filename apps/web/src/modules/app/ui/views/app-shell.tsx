@@ -34,13 +34,15 @@ export function AppShell({
         renderLink={renderLink}
       />
       <SidebarInset className="p-4 md:p-6">
-        <AppHeader
-          breadcrumbItems={breadcrumbItems}
-          renderLink={renderLink}
-          user={user}
-        />
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
-          {children}
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col">
+          <AppHeader
+            breadcrumbItems={breadcrumbItems}
+            renderLink={renderLink}
+            user={user}
+          />
+          <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
+            {children}
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

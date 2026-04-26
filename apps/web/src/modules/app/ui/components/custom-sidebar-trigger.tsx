@@ -6,10 +6,13 @@ import {
   TooltipTrigger,
 } from "@memora/ui/components/tooltip";
 
-export function CustomSidebarTrigger() {
+export function CustomSidebarTrigger({ className }: { className?: string }) {
   return (
     <Tooltip>
-      <TooltipTrigger delay={300} render={<SidebarTrigger />} />
+      <TooltipTrigger
+        delay={300}
+        render={<SidebarTrigger className={className} />}
+      />
       <TooltipContent className="px-2 py-1" side="right">
         Toggle Sidebar{" "}
         <KbdGroup>
