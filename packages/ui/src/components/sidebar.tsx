@@ -83,14 +83,14 @@ function SidebarProvider({
       } else {
         _setOpen(openState)
       }
-
-      // This sets the cookie to keep the sidebar state.
-      const secureAttribute =
-        window.location.protocol === "https:" ? "; Secure" : ""
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax${secureAttribute}`
     },
     [setOpenProp, open]
   )
+
+  React.useEffect(() => {
+    const secureAttribute = window.location.protocol === "https:" ? "; Secure" : ""
+    document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax${secureAttribute}`
+  }, [open])
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
@@ -99,7 +99,6 @@ function SidebarProvider({
 
   useHotkey(SIDEBAR_KEYBOARD_SHORTCUT, toggleSidebar, {
     ignoreInputs: true,
-    preventDefault: true,
   })
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
@@ -142,6 +141,12 @@ function SidebarProvider({
   )
 }
 
+type SidebarProps = React.ComponentProps<"div"> & {
+  side?: "left" | "right"
+  variant?: "sidebar" | "floating" | "inset"
+  collapsible?: "offcanvas" | "icon" | "none"
+}
+
 function Sidebar({
   side = "left",
   variant = "sidebar",
@@ -150,11 +155,7 @@ function Sidebar({
   children,
   dir,
   ...props
-}: React.ComponentProps<"div"> & {
-  side?: "left" | "right"
-  variant?: "sidebar" | "floating" | "inset"
-  collapsible?: "offcanvas" | "icon" | "none"
-}) {
+}: SidebarProps) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
   if (collapsible === "none") {
@@ -174,7 +175,7 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent
           dir={dir}
           data-sidebar="sidebar"
@@ -192,7 +193,9 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div {...props} className={cn("flex h-full w-full flex-col", className)}>
+            {children}
+          </div>
         </SheetContent>
       </Sheet>
     )

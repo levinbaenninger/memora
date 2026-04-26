@@ -67,10 +67,14 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
         { image },
         {
           onError: async (error) => {
-            toast.error(error.error?.message || error.message);
+            toast.error(error.message);
 
             if (uploadedImage) {
-              await avatar.delete?.(uploadedImage);
+              try {
+                await avatar.delete?.(uploadedImage);
+              } catch {
+                // Keep the update failure as the only user-facing error.
+              }
             }
           },
           onSuccess: () =>
@@ -92,12 +96,8 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     updateUser(
       { image: null },
       {
-        onError: async (error) => {
-          toast.error(error.error?.message || error.message);
-
-          if (currentImage) {
-            await deleteRemoteAvatar(currentImage);
-          }
+        onError: (error) => {
+          toast.error(error.message);
         },
         onSuccess: async () => {
           if (currentImage) {

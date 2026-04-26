@@ -131,7 +131,7 @@ function ChangePasswordForm({
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      toast.error(error.error?.message || error.message);
+      toast.error(error.message);
     },
     onSuccess: () => {
       setCurrentPassword("");
