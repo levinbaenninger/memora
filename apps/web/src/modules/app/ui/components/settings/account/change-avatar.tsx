@@ -31,6 +31,21 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
 
   const isPending = updatePending || isUploading || isDeleting;
 
+  async function deleteRemoteAvatar(image: string) {
+    setIsDeleting(true);
+    try {
+      await avatar.delete?.(image);
+      return true;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete avatar"
+      );
+      return false;
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) {
@@ -81,34 +96,13 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
           toast.error(error.error?.message || error.message);
 
           if (currentImage) {
-            setIsDeleting(true);
-            try {
-              await avatar.delete?.(currentImage);
-            } catch (deleteError) {
-              toast.error(
-                deleteError instanceof Error
-                  ? deleteError.message
-                  : "Failed to delete avatar"
-              );
-            } finally {
-              setIsDeleting(false);
-            }
+            await deleteRemoteAvatar(currentImage);
           }
         },
         onSuccess: async () => {
           if (currentImage) {
-            setIsDeleting(true);
-            try {
-              await avatar.delete?.(currentImage);
+            if (await deleteRemoteAvatar(currentImage)) {
               toast.success(localization.settings.avatarDeletedSuccess);
-            } catch (error) {
-              toast.error(
-                error instanceof Error
-                  ? error.message
-                  : "Failed to delete avatar"
-              );
-            } finally {
-              setIsDeleting(false);
             }
             return;
           }
@@ -134,7 +128,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
       <div className="flex items-center gap-4">
         <Button
           className="h-auto w-auto rounded-full p-0"
-          disabled={isPending}
+          disabled={!session || isPending}
           onClick={() => fileInputRef.current?.click()}
           type="button"
           variant="ghost"
