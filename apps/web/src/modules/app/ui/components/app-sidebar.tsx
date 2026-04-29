@@ -6,6 +6,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenuButton,
+  useSidebar,
 } from "@memora/ui/components/sidebar";
 import type {
   AppLinkRenderer,
@@ -25,11 +26,19 @@ export function AppSidebar({
   navGroups: SidebarNavGroup[];
   renderLink: AppLinkRenderer;
 }) {
+  const { setOpen, setOpenMobile } = useSidebar();
+
+  const closeSidebar = () => {
+    setOpen(false);
+    setOpenMobile(false);
+  };
+
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader className="relative h-12 p-2">
         <SidebarMenuButton
-          className="absolute top-2 left-2 w-[calc(var(--sidebar-width)-4rem)] transition-opacity duration-200 ease-linear group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0"
+          className="absolute top-2 left-2 w-[calc(var(--sidebar-width)-1rem)] transition-opacity duration-200 ease-linear group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0 md:w-[calc(var(--sidebar-width)-4rem)]"
+          onClick={closeSidebar}
           render={renderLink("/dashboard")}
         >
           <LogoIcon className="text-primary" />
