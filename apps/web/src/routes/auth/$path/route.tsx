@@ -23,7 +23,15 @@ export const Route = createFileRoute("/auth/$path")({
 
     const { data: session } = await authClient.getSession();
 
-    if (session) {
+    if (path === viewPaths.auth.signOut && !session) {
+      throw redirect({
+        params: { path: viewPaths.auth.signIn },
+        replace: true,
+        to: "/auth/$path",
+      });
+    }
+
+    if (path !== viewPaths.auth.signOut && session) {
       throw redirect({ replace: true, to: "/dashboard" });
     }
   },
