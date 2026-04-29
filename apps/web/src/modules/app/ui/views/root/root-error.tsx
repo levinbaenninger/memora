@@ -1,6 +1,8 @@
+import { Alert02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button, buttonVariants } from "@memora/ui/components/button";
+import { Card, CardContent } from "@memora/ui/components/card";
 import { Link } from "@tanstack/react-router";
-import { TriangleAlertIcon } from "lucide-react";
 
 export function RootError({
   error,
@@ -12,9 +14,11 @@ export function RootError({
   return (
     <main className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-lg">
-        <div className="rounded-none border bg-card p-6">
-          <div className="flex flex-col gap-3">
-            <TriangleAlertIcon />
+        <Card>
+          <CardContent className="flex flex-col gap-3">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
+              <HugeiconsIcon className="size-4" icon={Alert02Icon} />
+            </div>
             <div className="flex flex-col gap-1">
               <h1 className="font-medium text-sm">Something went wrong.</h1>
               <p className="text-muted-foreground text-xs/relaxed">
@@ -22,7 +26,7 @@ export function RootError({
               </p>
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
-              <Button onClick={() => reset()} type="button">
+              <Button onClick={() => reset()} size="sm" type="button">
                 Try again
               </Button>
               <Link
@@ -32,8 +36,8 @@ export function RootError({
                 Back home
               </Link>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );

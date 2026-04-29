@@ -1,3 +1,5 @@
+import { FileNotFoundIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { buttonVariants } from "@memora/ui/components/button";
 import {
   Empty,
@@ -7,7 +9,6 @@ import {
   EmptyTitle,
 } from "@memora/ui/components/empty";
 import { Link } from "@tanstack/react-router";
-import { SearchSlashIcon } from "lucide-react";
 
 export function RootNotFound() {
   return (
@@ -16,7 +17,7 @@ export function RootNotFound() {
         <Empty className="border bg-card">
           <EmptyHeader>
             <EmptyMedia variant="icon">
-              <SearchSlashIcon />
+              <HugeiconsIcon icon={FileNotFoundIcon} />
             </EmptyMedia>
             <EmptyTitle>Page not found</EmptyTitle>
             <EmptyDescription>
