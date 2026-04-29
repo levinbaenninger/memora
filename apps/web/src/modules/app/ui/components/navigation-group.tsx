@@ -30,7 +30,7 @@ interface NavigationMenuItemProps {
 
 function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
   const { setOpen: setSidebarOpen, setOpenMobile } = useSidebar();
-  const [open, setCollapsibleOpen] = useState(
+  const [open, setOpen] = useState(
     !!item.isActive || !!item.subItems?.some((i) => !!i.isActive)
   );
 
@@ -43,13 +43,14 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
     <Collapsible
       className="group/collapsible"
       key={item.title}
-      onOpenChange={setCollapsibleOpen}
+      onOpenChange={setOpen}
       open={open}
       render={<SidebarMenuItem />}
     >
       {item.subItems?.length ? (
         <>
           <CollapsibleTrigger
+            onClick={closeSidebar}
             render={<SidebarMenuButton isActive={item.isActive} />}
           >
             {item.icon}
