@@ -14,6 +14,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@memora/ui/components/sidebar";
 import { useState } from "react";
 import type {
@@ -28,15 +29,21 @@ interface NavigationMenuItemProps {
 }
 
 function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
-  const [open, setOpen] = useState(
+  const { setOpen: setSidebarOpen, setOpenMobile } = useSidebar();
+  const [open, setCollapsibleOpen] = useState(
     !!item.isActive || !!item.subItems?.some((i) => !!i.isActive)
   );
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+    setOpenMobile(false);
+  };
 
   return (
     <Collapsible
       className="group/collapsible"
       key={item.title}
-      onOpenChange={setOpen}
+      onOpenChange={setCollapsibleOpen}
       open={open}
       render={<SidebarMenuItem />}
     >
@@ -59,6 +66,7 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
                 <SidebarMenuSubItem key={subItem.title}>
                   <SidebarMenuSubButton
                     isActive={subItem.isActive}
+                    onClick={closeSidebar}
                     render={
                       subItem.path
                         ? renderLink(subItem.path, subItem.params)
@@ -76,6 +84,7 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
       ) : (
         <SidebarMenuButton
           isActive={item.isActive}
+          onClick={closeSidebar}
           render={item.path ? renderLink(item.path, item.params) : undefined}
         >
           {item.icon}
