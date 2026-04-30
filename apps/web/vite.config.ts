@@ -10,19 +10,15 @@ const webRoot = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, webRoot, "");
+
   return {
-    define: {
-      "import.meta.env.VITE_SENTRY_DSN": JSON.stringify(
-        env.VITE_SENTRY_DSN ?? env.SENTRY_DSN ?? ""
-      ),
-    },
     plugins: [
       tailwindcss(),
       tanstackStart(),
       sentryTanstackStart({
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        org: "levexis",
-        project: "memora",
+        authToken: env.SENTRY_AUTH_TOKEN,
+        org: env.VITE_SENTRY_ORG,
+        project: env.VITE_SENTRY_PROJECT,
         tunnelRoute: "/tunnel",
       }),
       viteReact(),

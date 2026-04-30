@@ -19,7 +19,6 @@
     "@memora/env": "workspace:*",
     "@memora/ui": "workspace:*",
     "better-auth": "catalog:",
-    "dotenv": "catalog:",
     "react": "catalog:",
     "zod": "catalog:"
   },
