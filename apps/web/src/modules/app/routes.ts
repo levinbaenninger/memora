@@ -1,11 +1,7 @@
 import {
-  ArchiveIcon,
   DashboardSquare01Icon,
-  FolderLibraryIcon,
-  InboxIcon,
   NoteIcon,
   Settings01Icon,
-  StarIcon,
   Task01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -51,11 +47,6 @@ const navGroups: SidebarNavGroup[] = [
         icon: routeIcon(DashboardSquare01Icon),
       },
       {
-        title: "Inbox",
-        path: "/inbox",
-        icon: routeIcon(InboxIcon),
-      },
-      {
         title: "Notes",
         path: "/notes",
         icon: routeIcon(NoteIcon),
@@ -64,27 +55,6 @@ const navGroups: SidebarNavGroup[] = [
         title: "Tasks",
         path: "/tasks",
         icon: routeIcon(Task01Icon),
-      },
-    ],
-  },
-  {
-    id: "organization",
-    label: "Organization",
-    items: [
-      {
-        title: "Projects",
-        path: "/projects",
-        icon: routeIcon(FolderLibraryIcon),
-      },
-      {
-        title: "Favorites",
-        path: "/favorites",
-        icon: routeIcon(StarIcon),
-      },
-      {
-        title: "Archive",
-        path: "/archive",
-        icon: routeIcon(ArchiveIcon),
       },
     ],
   },
