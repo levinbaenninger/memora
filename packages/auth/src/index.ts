@@ -1,5 +1,6 @@
 "use server";
 
+import { dash } from "@better-auth/infra";
 import { db } from "@memora/db";
 import * as schema from "@memora/db/schema/auth";
 import { env } from "@memora/env/server";
@@ -8,7 +9,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { oAuthProxy } from "better-auth/plugins/oauth-proxy";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
-
 import {
   sendChangeEmailConfirmation,
   sendPasswordChangedEmail,
@@ -60,10 +60,11 @@ export const auth = betterAuth({
     allowedHosts: [
       "memora.baenninger.me",
       "memora-*-levexis.vercel.app",
+      "unquick-unarticulative-arlene.ngrok-free.dev",
       "localhost:3000",
     ],
     fallback: "https://memora.baenninger.me",
-    protocol: process.env.NODE_ENV === "development" ? "http" : "https",
+    protocol: process.env.NODE_ENV === "development" ? "https" : "https",
   },
   socialProviders: {
     google: {
@@ -77,5 +78,6 @@ export const auth = betterAuth({
       productionURL: "https://memora.baenninger.me",
       secret: env.OAUTH_PROXY_SECRET ?? env.BETTER_AUTH_SECRET,
     }),
+    dash(),
   ],
 });

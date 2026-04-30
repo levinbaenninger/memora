@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@better-auth-ui/react": "catalog:",
+    "@better-auth/infra": "catalog:",
     "@hugeicons/core-free-icons": "catalog:",
     "@hugeicons/react": "catalog:",
     "@orpc/client": "catalog:",
