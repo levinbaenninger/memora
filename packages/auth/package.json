@@ -13,6 +13,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@better-auth/infra": "catalog:",
     "@react-email/render": "catalog:",
     "@memora/db": "workspace:*",
     "@memora/email": "workspace:*",
