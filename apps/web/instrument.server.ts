@@ -4,4 +4,5 @@ import * as Sentry from "@sentry/tanstackstart-react";
 Sentry.init({
   dsn: env.SENTRY_DSN,
   sendDefaultPii: true,
+  enabled: process.env.NODE_ENV === "production",
 });
