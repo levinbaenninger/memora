@@ -29,14 +29,15 @@ interface NavigationMenuItemProps {
 }
 
 function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
-  const { setOpen: setSidebarOpen, setOpenMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
   const [open, setOpen] = useState(
     !!item.isActive || !!item.subItems?.some((i) => !!i.isActive)
   );
 
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-    setOpenMobile(false);
+  const closeMobileSheet = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   return (
@@ -50,7 +51,6 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
       {item.subItems?.length ? (
         <>
           <CollapsibleTrigger
-            onClick={closeSidebar}
             render={<SidebarMenuButton isActive={item.isActive} />}
           >
             {item.icon}
@@ -67,7 +67,7 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
                 <SidebarMenuSubItem key={subItem.title}>
                   <SidebarMenuSubButton
                     isActive={subItem.isActive}
-                    onClick={closeSidebar}
+                    onClick={closeMobileSheet}
                     render={
                       subItem.path
                         ? renderLink(subItem.path, subItem.params)
@@ -85,7 +85,7 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
       ) : (
         <SidebarMenuButton
           isActive={item.isActive}
-          onClick={closeSidebar}
+          onClick={closeMobileSheet}
           render={item.path ? renderLink(item.path, item.params) : undefined}
         >
           {item.icon}
