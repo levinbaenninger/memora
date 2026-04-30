@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./client": "./src/client.ts",
     "./db": "./src/db.ts",
     "./server": "./src/server.ts"
   },
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@memora/config": "workspace:*",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

@@ -2,7 +2,9 @@ import { Alert02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button, buttonVariants } from "@memora/ui/components/button";
 import { Card, CardContent } from "@memora/ui/components/card";
+import * as Sentry from "@sentry/tanstackstart-react";
 import { Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 export function RootError({
   error,
@@ -11,6 +13,10 @@ export function RootError({
   error: Error;
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <main className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-lg">
