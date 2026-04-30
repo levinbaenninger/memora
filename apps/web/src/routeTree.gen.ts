@@ -13,12 +13,8 @@ import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
 import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
-import { Route as AppProjectsRouteRouteImport } from './routes/_app/projects/route'
 import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
-import { Route as AppInboxRouteRouteImport } from './routes/_app/inbox/route'
-import { Route as AppFavoritesRouteRouteImport } from './routes/_app/favorites/route'
 import { Route as AppDashboardRouteRouteImport } from './routes/_app/dashboard/route'
-import { Route as AppArchiveRouteRouteImport } from './routes/_app/archive/route'
 import { Route as ApiRpcSplatRouteRouteImport } from './routes/api/rpc/$/route'
 import { Route as ApiAuthSplatRouteRouteImport } from './routes/api/auth/$/route'
 import { Route as AppSettingsPathRouteRouteImport } from './routes/_app/settings/$path/route'
@@ -42,34 +38,14 @@ const AppTasksRouteRoute = AppTasksRouteRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppProjectsRouteRoute = AppProjectsRouteRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppNotesRouteRoute = AppNotesRouteRouteImport.update({
   id: '/notes',
   path: '/notes',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppInboxRouteRoute = AppInboxRouteRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppFavoritesRouteRoute = AppFavoritesRouteRouteImport.update({
-  id: '/favorites',
-  path: '/favorites',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppDashboardRouteRoute = AppDashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppArchiveRouteRoute = AppArchiveRouteRouteImport.update({
-  id: '/archive',
-  path: '/archive',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const ApiRpcSplatRouteRoute = ApiRpcSplatRouteRouteImport.update({
@@ -90,12 +66,8 @@ const AppSettingsPathRouteRoute = AppSettingsPathRouteRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/archive': typeof AppArchiveRouteRoute
   '/dashboard': typeof AppDashboardRouteRoute
-  '/favorites': typeof AppFavoritesRouteRoute
-  '/inbox': typeof AppInboxRouteRoute
   '/notes': typeof AppNotesRouteRoute
-  '/projects': typeof AppProjectsRouteRoute
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
@@ -104,12 +76,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/archive': typeof AppArchiveRouteRoute
   '/dashboard': typeof AppDashboardRouteRoute
-  '/favorites': typeof AppFavoritesRouteRoute
-  '/inbox': typeof AppInboxRouteRoute
   '/notes': typeof AppNotesRouteRoute
-  '/projects': typeof AppProjectsRouteRoute
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
@@ -120,12 +88,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteRouteWithChildren
-  '/_app/archive': typeof AppArchiveRouteRoute
   '/_app/dashboard': typeof AppDashboardRouteRoute
-  '/_app/favorites': typeof AppFavoritesRouteRoute
-  '/_app/inbox': typeof AppInboxRouteRoute
   '/_app/notes': typeof AppNotesRouteRoute
-  '/_app/projects': typeof AppProjectsRouteRoute
   '/_app/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
   '/_app/settings/$path': typeof AppSettingsPathRouteRoute
@@ -136,12 +100,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/archive'
     | '/dashboard'
-    | '/favorites'
-    | '/inbox'
     | '/notes'
-    | '/projects'
     | '/tasks'
     | '/auth/$path'
     | '/settings/$path'
@@ -150,12 +110,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/archive'
     | '/dashboard'
-    | '/favorites'
-    | '/inbox'
     | '/notes'
-    | '/projects'
     | '/tasks'
     | '/auth/$path'
     | '/settings/$path'
@@ -165,12 +121,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
-    | '/_app/archive'
     | '/_app/dashboard'
-    | '/_app/favorites'
-    | '/_app/inbox'
     | '/_app/notes'
-    | '/_app/projects'
     | '/_app/tasks'
     | '/auth/$path'
     | '/_app/settings/$path'
@@ -216,13 +168,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTasksRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/projects': {
-      id: '/_app/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof AppProjectsRouteRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/_app/notes': {
       id: '/_app/notes'
       path: '/notes'
@@ -230,32 +175,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNotesRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/inbox': {
-      id: '/_app/inbox'
-      path: '/inbox'
-      fullPath: '/inbox'
-      preLoaderRoute: typeof AppInboxRouteRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/favorites': {
-      id: '/_app/favorites'
-      path: '/favorites'
-      fullPath: '/favorites'
-      preLoaderRoute: typeof AppFavoritesRouteRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/archive': {
-      id: '/_app/archive'
-      path: '/archive'
-      fullPath: '/archive'
-      preLoaderRoute: typeof AppArchiveRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/api/rpc/$': {
@@ -283,23 +207,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteRouteChildren {
-  AppArchiveRouteRoute: typeof AppArchiveRouteRoute
   AppDashboardRouteRoute: typeof AppDashboardRouteRoute
-  AppFavoritesRouteRoute: typeof AppFavoritesRouteRoute
-  AppInboxRouteRoute: typeof AppInboxRouteRoute
   AppNotesRouteRoute: typeof AppNotesRouteRoute
-  AppProjectsRouteRoute: typeof AppProjectsRouteRoute
   AppTasksRouteRoute: typeof AppTasksRouteRoute
   AppSettingsPathRouteRoute: typeof AppSettingsPathRouteRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppArchiveRouteRoute: AppArchiveRouteRoute,
   AppDashboardRouteRoute: AppDashboardRouteRoute,
-  AppFavoritesRouteRoute: AppFavoritesRouteRoute,
-  AppInboxRouteRoute: AppInboxRouteRoute,
   AppNotesRouteRoute: AppNotesRouteRoute,
-  AppProjectsRouteRoute: AppProjectsRouteRoute,
   AppTasksRouteRoute: AppTasksRouteRoute,
   AppSettingsPathRouteRoute: AppSettingsPathRouteRoute,
 }
