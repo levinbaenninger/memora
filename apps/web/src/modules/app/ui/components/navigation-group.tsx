@@ -50,7 +50,9 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
     >
       {item.subItems?.length ? (
         <>
-          <CollapsibleTrigger render={<SidebarMenuButton isActive={item.isActive} />}>
+          <CollapsibleTrigger
+            render={<SidebarMenuButton isActive={item.isActive} />}
+          >
             {item.icon}
             <span>{item.title}</span>
             <HugeiconsIcon
