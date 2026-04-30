@@ -1,10 +1,10 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
-import { runtimeOptions } from "./runtime";
 
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().min(1),
   },
-  ...runtimeOptions,
+  runtimeEnv: process.env,
+  emptyStringAsUndefined: true,
 });

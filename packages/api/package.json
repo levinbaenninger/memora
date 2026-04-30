@@ -20,7 +20,6 @@
     "@memora/auth": "workspace:*",
     "@memora/db": "workspace:*",
     "drizzle-orm": "catalog:",
-    "dotenv": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

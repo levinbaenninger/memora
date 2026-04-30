@@ -10,7 +10,11 @@
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "OAUTH_PROXY_SECRET",
-        "RESEND_API_KEY"
+        "RESEND_API_KEY",
+        "SENTRY_AUTH_TOKEN",
+        "VITE_SENTRY_DSN",
+        "VITE_SENTRY_ORG",
+        "VITE_SENTRY_PROJECT"
       ]
     },
     "check-types": {
