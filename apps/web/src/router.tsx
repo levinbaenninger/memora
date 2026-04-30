@@ -26,7 +26,6 @@ export const getRouter = () => {
   if (!router.isServer) {
     Sentry.init({
       dsn: env.VITE_SENTRY_DSN,
-      sendDefaultPii: true,
       enabled: process.env.NODE_ENV === "production",
     });
   }
