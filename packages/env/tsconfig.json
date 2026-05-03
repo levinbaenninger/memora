@@ -2,6 +2,6 @@
   "extends": "@memora/config/tsconfig.base.json",
   "compilerOptions": {
     "strictNullChecks": true,
-    "types": ["node", "vite/client"]
+    "types": ["node"]
   }
 }
