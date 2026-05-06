@@ -1,10 +1,12 @@
 "use client";
 
 import { useAuth, useListSessions, useSession } from "@better-auth-ui/react";
+
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Separator } from "@memora/ui/components/separator";
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
+
 import { ActiveSession } from "./active-session";
 
 interface ActiveSessionsProps {

@@ -20,6 +20,7 @@
     "@orpc/server": "catalog:",
     "@orpc/tanstack-query": "catalog:",
     "@orpc/zod": "catalog:",
+    "@orpc/contract": "catalog:",
     "@sentry/tanstackstart-react": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-form": "catalog:",

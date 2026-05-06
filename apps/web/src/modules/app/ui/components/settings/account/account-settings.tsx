@@ -1,8 +1,10 @@
 "use client";
 
 import { useAuth } from "@better-auth-ui/react";
-import { cn } from "@memora/ui/lib/utils";
 import type { ComponentProps } from "react";
+
+import { cn } from "@memora/ui/lib/utils";
+
 import { Appearance } from "./appearance";
 import { ChangeEmail } from "./change-email";
 import { ManageAccounts } from "./manage-accounts";

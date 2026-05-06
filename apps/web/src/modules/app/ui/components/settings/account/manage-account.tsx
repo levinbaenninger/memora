@@ -4,6 +4,10 @@ import {
   useSession,
   useSetActiveSession,
 } from "@better-auth-ui/react";
+import type { Session, User } from "better-auth";
+import { ArrowLeftRight, LogOut, MoreHorizontal } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@memora/ui/components/button";
 import { Card, CardContent } from "@memora/ui/components/card";
 import {
@@ -13,9 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@memora/ui/components/dropdown-menu";
 import { Spinner } from "@memora/ui/components/spinner";
-import type { Session, User } from "better-auth";
-import { ArrowLeftRight, LogOut, MoreHorizontal } from "lucide-react";
-import { toast } from "sonner";
+
 import { UserView } from "@/modules/app/ui/components/user/user-view";
 
 interface DeviceSession {

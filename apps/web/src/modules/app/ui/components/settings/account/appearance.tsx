@@ -7,6 +7,8 @@ import {
   useAuth,
   useSession,
 } from "@better-auth-ui/react";
+import { Monitor, Moon, Sun } from "lucide-react";
+
 import { Card, CardContent } from "@memora/ui/components/card";
 import {
   Field,
@@ -17,7 +19,6 @@ import {
 import { Label } from "@memora/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@memora/ui/components/radio-group";
 import { cn } from "@memora/ui/lib/utils";
-import { Monitor, Moon, Sun } from "lucide-react";
 
 interface AppearanceProps {
   className?: string;

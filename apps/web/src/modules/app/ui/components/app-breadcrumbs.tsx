@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,7 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@memora/ui/components/breadcrumb";
-import { Fragment } from "react";
+
 import type { AppLinkRenderer, SidebarNavItem } from "@/modules/app/routes";
 
 type AppBreadcrumbPage = Pick<

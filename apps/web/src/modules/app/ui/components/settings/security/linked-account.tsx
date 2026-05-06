@@ -6,14 +6,15 @@ import {
   useUnlinkAccount,
 } from "@better-auth-ui/react";
 import { getProviderName } from "@better-auth-ui/react/core";
+import type { Account, SocialProvider } from "better-auth";
+import { Link2, Link2Off, Plug } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@memora/ui/components/button";
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
-import type { Account, SocialProvider } from "better-auth";
-import { Link2, Link2Off, Plug } from "lucide-react";
-import { toast } from "sonner";
 
 interface LinkedAccountProps {
   account?: Account;

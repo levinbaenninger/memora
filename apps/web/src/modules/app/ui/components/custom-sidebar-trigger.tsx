@@ -1,3 +1,5 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+
 import { Kbd, KbdGroup } from "@memora/ui/components/kbd";
 import { SidebarTrigger } from "@memora/ui/components/sidebar";
 import {
@@ -5,7 +7,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@memora/ui/components/tooltip";
-import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 const SIDEBAR_TRIGGER_HOTKEY = "Mod+B";
 

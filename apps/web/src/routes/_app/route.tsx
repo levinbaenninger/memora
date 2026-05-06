@@ -5,6 +5,7 @@ import {
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
+
 import { AppShell } from "@/modules/app/ui/views/app-shell";
 import { RootLoading } from "@/modules/app/ui/views/root/root-loading";
 

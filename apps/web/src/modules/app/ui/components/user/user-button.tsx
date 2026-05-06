@@ -5,6 +5,19 @@ import {
   useSession,
   useSetActiveSession,
 } from "@better-auth-ui/react";
+import type { User } from "better-auth";
+import {
+  ChevronsUpDown,
+  LogIn,
+  LogOut,
+  Monitor,
+  Moon,
+  Settings,
+  Sun,
+  UserPlus2,
+  UsersRound,
+} from "lucide-react";
+
 import { Button } from "@memora/ui/components/button";
 import {
   DropdownMenu,
@@ -19,18 +32,7 @@ import {
 } from "@memora/ui/components/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@memora/ui/components/tabs";
 import { cn } from "@memora/ui/lib/utils";
-import type { User } from "better-auth";
-import {
-  ChevronsUpDown,
-  LogIn,
-  LogOut,
-  Monitor,
-  Moon,
-  Settings,
-  Sun,
-  UserPlus2,
-  UsersRound,
-} from "lucide-react";
+
 import { SwitchAccountMenu } from "./switch-account-menu";
 import { UserAvatar } from "./user-avatar";
 import { UserView } from "./user-view";

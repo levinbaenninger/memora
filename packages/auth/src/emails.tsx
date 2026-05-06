@@ -1,11 +1,12 @@
 "use server";
 
+import { render } from "@react-email/render";
+
 import { email } from "@memora/email";
 import { ChangeEmail } from "@memora/ui/components/email/change-email";
 import { EmailVerificationEmail } from "@memora/ui/components/email/email-verification";
 import { PasswordChangedEmail } from "@memora/ui/components/email/password-changed";
 import { ResetPasswordEmail } from "@memora/ui/components/email/reset-password";
-import { render } from "@react-email/render";
 
 const APP_NAME = "Memora";
 const FROM = "Memora <memora@baenninger.me>";

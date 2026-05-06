@@ -6,6 +6,11 @@ import {
   useSession,
   useUpdateUser,
 } from "@better-auth-ui/react";
+import { useDebouncer } from "@tanstack/react-pacer";
+import { Check, X } from "lucide-react";
+import { type SyntheticEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
+
 import { Button } from "@memora/ui/components/button";
 import { Card, CardContent, CardFooter } from "@memora/ui/components/card";
 import { Field, FieldError } from "@memora/ui/components/field";
@@ -19,10 +24,7 @@ import { Label } from "@memora/ui/components/label";
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
-import { useDebouncer } from "@tanstack/react-pacer";
-import { Check, X } from "lucide-react";
-import { type SyntheticEvent, useEffect, useState } from "react";
-import { toast } from "sonner";
+
 import { ChangeAvatar } from "./change-avatar";
 
 interface UserProfileProps {

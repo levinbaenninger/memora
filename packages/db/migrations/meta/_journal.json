@@ -8,6 +8,13 @@
       "when": 1776970062457,
       "tag": "0000_zippy_paladin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777578442764,
+      "tag": "0001_parched_mesmero",
+      "breakpoints": true
     }
   ]
 }

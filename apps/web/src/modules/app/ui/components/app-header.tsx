@@ -1,6 +1,7 @@
 "use client";
 
 import { Separator } from "@memora/ui/components/separator";
+
 import type { AppLinkRenderer, SidebarNavItem } from "@/modules/app/routes";
 import { AppBreadcrumbs } from "@/modules/app/ui/components/app-breadcrumbs";
 import { CustomSidebarTrigger } from "@/modules/app/ui/components/custom-sidebar-trigger";

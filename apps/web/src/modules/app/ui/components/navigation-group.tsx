@@ -1,5 +1,7 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useState } from "react";
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -16,7 +18,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@memora/ui/components/sidebar";
-import { useState } from "react";
+
 import type {
   AppLinkRenderer,
   SidebarNavGroup,

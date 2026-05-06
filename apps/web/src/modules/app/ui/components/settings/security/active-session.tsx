@@ -1,11 +1,12 @@
 import { useAuth, useRevokeSession, useSession } from "@better-auth-ui/react";
-import { Button } from "@memora/ui/components/button";
-import { Card, CardContent } from "@memora/ui/components/card";
-import { Spinner } from "@memora/ui/components/spinner";
 import type { Session } from "better-auth";
 import Bowser from "bowser";
 import { LogOut, Monitor, Smartphone, X } from "lucide-react";
 import { toast } from "sonner";
+
+import { Button } from "@memora/ui/components/button";
+import { Card, CardContent } from "@memora/ui/components/card";
+import { Spinner } from "@memora/ui/components/spinner";
 
 function timeAgo(date: Date) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
