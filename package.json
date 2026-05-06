@@ -22,7 +22,6 @@
       "@neondatabase/serverless": "1.1.0",
       "@orpc/client": "1.14.0",
       "@orpc/contract": "1.14.0",
-      "@orpc/openapi": "1.14.0",
       "@orpc/server": "1.14.0",
       "@orpc/tanstack-query": "1.14.0",
       "@orpc/zod": "1.14.0",

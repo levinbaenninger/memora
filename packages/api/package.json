@@ -16,7 +16,6 @@
     "@memora/auth": "workspace:*",
     "@memora/db": "workspace:*",
     "@orpc/client": "catalog:",
-    "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
     "@tiptap/core": "3.22.4",
