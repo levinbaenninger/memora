@@ -51,7 +51,7 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
           {isPending ? (
             <SessionRowSkeleton />
           ) : (
-            activeSessions?.map((activeSession, index) => (
+            activeSessions.map((activeSession, index) => (
               <div key={activeSession.id}>
                 {index > 0 && <Separator />}
 

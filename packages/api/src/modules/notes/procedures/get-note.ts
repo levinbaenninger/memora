@@ -54,7 +54,7 @@ export const getNote = authorized
       });
     }
 
-    const tags = await db
+    const tagsPromise = db
       .select({
         id: noteTags.id,
         name: noteTags.name,
@@ -64,8 +64,8 @@ export const getNote = authorized
       .innerJoin(noteTags, eq(noteTags.id, notesToTags.tagId))
       .where(and(eq(notesToTags.noteId, note.id), eq(noteTags.userId, userId)));
 
-    const [folder] = note.folderId
-      ? await db
+    const folderPromise = note.folderId
+      ? db
           .select({
             id: noteFolders.id,
             name: noteFolders.name,
@@ -80,6 +80,7 @@ export const getNote = authorized
           )
           .limit(1)
       : [];
+    const [tags, [folder]] = await Promise.all([tagsPromise, folderPromise]);
 
     return getNoteResponseDtoSchema.parse({
       id: note.id,
