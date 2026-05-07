@@ -4,7 +4,7 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteFolders, notes } from "@memora/db/schema";
 
-import { authorized } from "@/procedures/authorized";
+import { authorized } from "../../../procedures/authorized";
 
 export const restoreNoteRequestDtoSchema = z.object({
   id: z.uuid(),

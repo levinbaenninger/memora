@@ -5,7 +5,7 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteFolders } from "@memora/db/schema";
 
-import { authorized } from "@/procedures/authorized";
+import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../schemas";
 
 export const listFoldersRequestDtoSchema = z.object({

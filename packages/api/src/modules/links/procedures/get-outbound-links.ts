@@ -11,10 +11,10 @@ import {
   noteTags,
 } from "@memora/db/schema";
 
-import { folderSchema } from "@/modules/folders/schemas";
-import { noteSchema } from "@/modules/notes/schemas";
-import { tagSchema } from "@/modules/tags/schemas";
-import { authorized } from "@/procedures/authorized";
+import { folderSchema } from "../../folders/schemas";
+import { noteSchema } from "../../notes/schemas";
+import { tagSchema } from "../../tags/schemas";
+import { authorized } from "../../../procedures/authorized";
 
 export const getOutboundLinksRequestDtoSchema = z.object({
   id: z.uuid(),

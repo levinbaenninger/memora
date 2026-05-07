@@ -4,7 +4,7 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteTags } from "@memora/db/schema";
 
-import { authorized } from "@/procedures/authorized";
+import { authorized } from "../../../procedures/authorized";
 
 export const deleteTagRequestDtoSchema = z.object({
   id: z.uuid(),

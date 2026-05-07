@@ -5,10 +5,10 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteFolders, notes, notesToTags, noteTags } from "@memora/db/schema";
 
-import { folderSchema } from "@/modules/folders/schemas";
-import { paginationSchema } from "@/modules/shared/pagination";
-import { tagSchema } from "@/modules/tags/schemas";
-import { authorized } from "@/procedures/authorized";
+import { folderSchema } from "../../folders/schemas";
+import { paginationSchema } from "../../shared/pagination";
+import { tagSchema } from "../../tags/schemas";
+import { authorized } from "../../../procedures/authorized";
 import { noteSchema } from "../schemas";
 
 export const listNotesRequestDtoSchema = paginationSchema.extend({

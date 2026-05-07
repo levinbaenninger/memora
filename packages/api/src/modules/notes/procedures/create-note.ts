@@ -10,9 +10,9 @@ import {
   noteTags,
 } from "@memora/db/schema";
 
-import { folderSchema } from "@/modules/folders/schemas";
-import { tagSchema } from "@/modules/tags/schemas";
-import { authorized } from "@/procedures/authorized";
+import { folderSchema } from "../../folders/schemas";
+import { tagSchema } from "../../tags/schemas";
+import { authorized } from "../../../procedures/authorized";
 import { normalizeNoteContent, noteContentSchema } from "../content/schema";
 import { noteSchema } from "../schemas";
 

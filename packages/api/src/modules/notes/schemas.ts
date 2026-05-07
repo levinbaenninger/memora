@@ -3,15 +3,15 @@ import { z } from "zod";
 import { noteContentSchema } from "./content/schema";
 
 export const noteSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: noteContentSchema,
+  favorite: z.boolean(),
+  pinned: z.boolean(),
+  folderId: z.string().nullable(),
+  userId: z.string(),
   archivedAt: z.date().nullable(),
   archiveExpiresAt: z.date().nullable().optional(),
-  content: noteContentSchema,
   createdAt: z.date(),
-  favorite: z.boolean(),
-  folderId: z.string().nullable(),
-  id: z.string(),
-  pinned: z.boolean(),
-  title: z.string(),
   updatedAt: z.date(),
-  userId: z.string(),
 });

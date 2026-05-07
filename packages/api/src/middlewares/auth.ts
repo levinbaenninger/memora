@@ -1,6 +1,6 @@
 import { auth } from "@memora/auth";
 
-import { base } from "@/procedures/base";
+import { base } from "../procedures/base";
 
 export const authMiddleware = base
   .errors({
