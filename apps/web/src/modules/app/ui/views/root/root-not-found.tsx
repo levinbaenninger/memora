@@ -1,5 +1,7 @@
 import { FileNotFoundIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Link } from "@tanstack/react-router";
+
 import { buttonVariants } from "@memora/ui/components/button";
 import {
   Empty,
@@ -8,7 +10,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@memora/ui/components/empty";
-import { Link } from "@tanstack/react-router";
 
 export function RootNotFound() {
   return (

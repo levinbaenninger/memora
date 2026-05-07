@@ -1,6 +1,7 @@
 import { useAuth } from "@better-auth-ui/react";
 
 import { cn } from "@memora/ui/lib/utils";
+
 import { DeleteUser } from "./delete-user";
 
 interface DangerZoneProps {

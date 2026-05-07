@@ -1,14 +1,16 @@
 "use server";
 
 import { dash } from "@better-auth/infra";
-import { db } from "@memora/db";
-import * as schema from "@memora/db/schema/auth";
-import { env } from "@memora/env/server";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { oAuthProxy } from "better-auth/plugins/oauth-proxy";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
+
+import { db } from "@memora/db";
+import * as schema from "@memora/db/schema/auth";
+import { env } from "@memora/env/server";
+
 import {
   sendChangeEmailConfirmation,
   sendPasswordChangedEmail,

@@ -1,10 +1,11 @@
 import { Alert02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button, buttonVariants } from "@memora/ui/components/button";
-import { Card, CardContent } from "@memora/ui/components/card";
 import * as Sentry from "@sentry/tanstackstart-react";
 import { Link } from "@tanstack/react-router";
 import { useEffect } from "react";
+
+import { Button, buttonVariants } from "@memora/ui/components/button";
+import { Card, CardContent } from "@memora/ui/components/card";
 
 export function RootError({
   error,

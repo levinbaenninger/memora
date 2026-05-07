@@ -28,5 +28,22 @@
         "noNamespaceImport": "off"
       }
     }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              [":PACKAGE:", ":PACKAGE_WITH_PROTOCOL:", "!@memora/**"],
+              ":BLANK_LINE:",
+              ["@memora/**"],
+              ":BLANK_LINE:"
+            ]
+          }
+        }
+      }
+    }
   }
 }

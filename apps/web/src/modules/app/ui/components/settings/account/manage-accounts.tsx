@@ -5,9 +5,11 @@ import {
   useListDeviceSessions,
   useSession,
 } from "@better-auth-ui/react";
+
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Separator } from "@memora/ui/components/separator";
 import { cn } from "@memora/ui/lib/utils";
+
 import { ManageAccount } from "./manage-account";
 
 interface ManageAccountsProps {

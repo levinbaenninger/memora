@@ -5,6 +5,10 @@ import {
   useRequestPasswordReset,
   useSession,
 } from "@better-auth-ui/react";
+import { Eye, EyeOff } from "lucide-react";
+import { type SyntheticEvent, useState } from "react";
+import { toast } from "sonner";
+
 import { Button } from "@memora/ui/components/button";
 import { Card, CardContent, CardFooter } from "@memora/ui/components/card";
 import { Field, FieldError } from "@memora/ui/components/field";
@@ -19,9 +23,6 @@ import { Label } from "@memora/ui/components/label";
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
-import { Eye, EyeOff } from "lucide-react";
-import { type SyntheticEvent, useState } from "react";
-import { toast } from "sonner";
 
 interface ChangePasswordProps {
   className?: string;

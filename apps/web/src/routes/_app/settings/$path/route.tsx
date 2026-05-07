@@ -1,5 +1,6 @@
 import { viewPaths } from "@better-auth-ui/react/core";
 import { createFileRoute, notFound } from "@tanstack/react-router";
+
 import { Settings } from "@/modules/app/ui/views/settings/settings";
 
 export const Route = createFileRoute("/_app/settings/$path")({

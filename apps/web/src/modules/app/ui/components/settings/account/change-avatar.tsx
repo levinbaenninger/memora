@@ -1,5 +1,9 @@
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react";
 import { fileToBase64 } from "@better-auth-ui/react/core";
+import { Trash2, Upload } from "lucide-react";
+import { type ChangeEvent, useRef, useState } from "react";
+import { toast } from "sonner";
+
 import { Button } from "@memora/ui/components/button";
 import {
   DropdownMenu,
@@ -10,9 +14,7 @@ import {
 import { Field } from "@memora/ui/components/field";
 import { Label } from "@memora/ui/components/label";
 import { Spinner } from "@memora/ui/components/spinner";
-import { Trash2, Upload } from "lucide-react";
-import { type ChangeEvent, useRef, useState } from "react";
-import { toast } from "sonner";
+
 import { UserAvatar } from "@/modules/app/ui/components/user/user-avatar";
 
 interface ChangeAvatarProps {
