@@ -28,6 +28,10 @@ export const searchNotesResponseDtoSchema = z.array(
   })
 );
 
+function escapeIlike(value: string) {
+  return value.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
+}
+
 export const searchNotes = authorized
   .input(searchNotesRequestDtoSchema)
   .output(searchNotesResponseDtoSchema)
@@ -76,10 +80,11 @@ export const searchNotes = authorized
       }
     }
 
+    const escapedQuery = escapeIlike(input.query);
     const searchWhere = or(
       sql`to_tsvector('simple', coalesce(${notes.title}, '') || ' ' || coalesce(${notes.contentText}, '')) @@ plainto_tsquery('simple', ${input.query})`,
-      ilike(notes.title, `%${input.query}%`),
-      ilike(notes.contentText, `%${input.query}%`)
+      ilike(notes.title, `%${escapedQuery}%`),
+      ilike(notes.contentText, `%${escapedQuery}%`)
     );
 
     if (!searchWhere) {
@@ -105,7 +110,19 @@ export const searchNotes = authorized
     }
 
     const foundNotes = await db
-      .select()
+      .select({
+        id: notes.id,
+        userId: notes.userId,
+        folderId: notes.folderId,
+        title: notes.title,
+        contentText: notes.contentText,
+        pinned: notes.pinned,
+        favorite: notes.favorite,
+        archivedAt: notes.archivedAt,
+        archiveExpiresAt: notes.archiveExpiresAt,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+      })
       .from(notes)
       .where(and(...where))
       .orderBy(

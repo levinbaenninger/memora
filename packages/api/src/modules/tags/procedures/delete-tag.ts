@@ -19,19 +19,19 @@ export const deleteTag = authorized
   .output(deleteTagResponseDtoSchema)
   .errors({ NOT_FOUND: {} })
   .handler(async ({ context, input, errors }) => {
-    const deleted = await db
+    const [deleted] = await db
       .delete(noteTags)
       .where(
         and(eq(noteTags.id, input.id), eq(noteTags.userId, context.user.id))
       )
       .returning({ id: noteTags.id });
 
-    if (deleted.length === 0) {
+    if (!deleted) {
       throw errors.NOT_FOUND({
         message: "Tag not found.",
         data: { id: input.id },
       });
     }
 
-    return deleteTagResponseDtoSchema.parse({ id: input.id });
+    return deleted;
   });

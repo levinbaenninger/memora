@@ -27,9 +27,18 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
 
   const { data: sessions, isPending } = useListSessions();
 
-  const activeSessions = [...(sessions ?? [])].sort((activeSession) =>
-    activeSession.id === session?.session.id ? -1 : 1
-  );
+  const currentSessionId = session?.session.id;
+  const activeSessions = [...(sessions ?? [])].sort((a, b) => {
+    if (a.id === currentSessionId && b.id !== currentSessionId) {
+      return -1;
+    }
+
+    if (b.id === currentSessionId && a.id !== currentSessionId) {
+      return 1;
+    }
+
+    return 0;
+  });
 
   return (
     <div>

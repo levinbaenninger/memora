@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -33,60 +33,63 @@ export const moveFolder = authorized
       });
     }
 
-    if (input.parentId) {
-      const [parent] = await db
-        .select({ id: noteFolders.id })
-        .from(noteFolders)
+    const [moved] = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId}))`);
+
+      if (input.parentId) {
+        const [parent] = await tx
+          .select({ id: noteFolders.id })
+          .from(noteFolders)
+          .where(
+            and(
+              eq(noteFolders.id, input.parentId),
+              eq(noteFolders.userId, userId),
+              isNull(noteFolders.archivedAt)
+            )
+          )
+          .limit(1);
+
+        if (!parent) {
+          throw errors.NOT_FOUND({
+            message: "Folder not found.",
+            data: { id: input.parentId },
+          });
+        }
+
+        const subtreeRows = await tx.execute<{ id: string }>(sql`
+          WITH RECURSIVE folder_subtree(id) AS (
+            SELECT id
+            FROM note_folders
+            WHERE id = ${input.id} AND user_id = ${userId}
+            UNION ALL
+            SELECT child.id
+            FROM note_folders child
+            INNER JOIN folder_subtree parent ON child.parent_id = parent.id
+            WHERE child.user_id = ${userId}
+          )
+          SELECT id FROM folder_subtree
+        `);
+        const subtreeIds = new Set(subtreeRows.rows.map((row) => row.id));
+
+        if (subtreeIds.has(input.parentId)) {
+          throw errors.BAD_REQUEST({
+            message: "Folder cannot be moved into itself or its descendants.",
+          });
+        }
+      }
+
+      return tx
+        .update(noteFolders)
+        .set({ parentId: input.parentId ?? null, updatedAt: new Date() })
         .where(
           and(
-            eq(noteFolders.id, input.parentId),
+            eq(noteFolders.id, input.id),
             eq(noteFolders.userId, userId),
             isNull(noteFolders.archivedAt)
           )
         )
-        .limit(1);
-
-      if (!parent) {
-        throw errors.NOT_FOUND({
-          message: "Folder not found.",
-          data: { id: input.parentId },
-        });
-      }
-
-      const folders = await db
-        .select({ id: noteFolders.id, parentId: noteFolders.parentId })
-        .from(noteFolders)
-        .where(eq(noteFolders.userId, userId));
-      const subtreeIds = new Set<string>([input.id]);
-      let changed = true;
-
-      while (changed) {
-        changed = false;
-
-        for (const child of folders) {
-          if (
-            child.parentId &&
-            subtreeIds.has(child.parentId) &&
-            !subtreeIds.has(child.id)
-          ) {
-            subtreeIds.add(child.id);
-            changed = true;
-          }
-        }
-      }
-
-      if (subtreeIds.has(input.parentId)) {
-        throw errors.BAD_REQUEST({
-          message: "Folder cannot be moved into itself or its descendants.",
-        });
-      }
-    }
-
-    const [moved] = await db
-      .update(noteFolders)
-      .set({ parentId: input.parentId ?? null, updatedAt: new Date() })
-      .where(and(eq(noteFolders.id, input.id), eq(noteFolders.userId, userId)))
-      .returning();
+        .returning();
+    });
 
     if (!moved) {
       throw errors.NOT_FOUND({

@@ -1,6 +1,6 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Collapsible,
@@ -32,9 +32,13 @@ interface NavigationMenuItemProps {
 
 function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
   const { isMobile, setOpenMobile } = useSidebar();
-  const [open, setOpen] = useState(
-    !!item.isActive || !!item.subItems?.some((i) => !!i.isActive)
-  );
+  const shouldOpen =
+    !!item.isActive || !!item.subItems?.some((i) => !!i.isActive);
+  const [open, setOpen] = useState(shouldOpen);
+
+  useEffect(() => {
+    setOpen(shouldOpen);
+  }, [shouldOpen]);
 
   const closeMobileSheet = () => {
     if (isMobile) {

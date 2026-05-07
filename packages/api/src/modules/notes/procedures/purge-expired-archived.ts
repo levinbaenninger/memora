@@ -5,6 +5,7 @@ import { db } from "@memora/db";
 import { noteFolders, notes } from "@memora/db/schema";
 
 import { authorized } from "../../../procedures/authorized";
+import { getSubtreeFolderIds } from "../../folders/subtree";
 
 export const purgeExpiredArchivedResponseDtoSchema = z.object({
   deletedFolderIds: z.array(z.string()),
@@ -16,77 +17,66 @@ export const purgeExpiredArchived = authorized
   .handler(async ({ context }) => {
     const userId = context.user.id;
     const now = new Date();
-    const expiredFolders = await db
-      .select({ id: noteFolders.id })
-      .from(noteFolders)
-      .where(
-        and(
-          eq(noteFolders.userId, userId),
-          isNotNull(noteFolders.archivedAt),
-          sql`${noteFolders.archiveExpiresAt} <= ${now}`
-        )
-      );
-    const expiredFolderIds = expiredFolders.map((folder) => folder.id);
-    const folders = await db
-      .select({ id: noteFolders.id, parentId: noteFolders.parentId })
-      .from(noteFolders)
-      .where(eq(noteFolders.userId, userId));
-    const expiredFolderSubtreeIds = new Set<string>();
-
-    for (const folderId of expiredFolderIds) {
-      expiredFolderSubtreeIds.add(folderId);
-      let changed = true;
-
-      while (changed) {
-        changed = false;
-
-        for (const child of folders) {
-          if (
-            child.parentId &&
-            expiredFolderSubtreeIds.has(child.parentId) &&
-            !expiredFolderSubtreeIds.has(child.id)
-          ) {
-            expiredFolderSubtreeIds.add(child.id);
-            changed = true;
-          }
-        }
-      }
-    }
-
-    const folderIds = [...expiredFolderSubtreeIds];
-    const deletedFolderNotes =
-      folderIds.length > 0
-        ? await db
-            .delete(notes)
-            .where(
-              and(
-                eq(notes.userId, userId),
-                isNotNull(notes.archivedAt),
-                inArray(notes.folderId, folderIds)
-              )
+    const { deletedFolderNotes, deletedFolders, deletedNotes } =
+      await db.transaction(async (tx) => {
+        const expiredFolders = await tx
+          .select({ id: noteFolders.id })
+          .from(noteFolders)
+          .where(
+            and(
+              eq(noteFolders.userId, userId),
+              isNotNull(noteFolders.archivedAt),
+              sql`${noteFolders.archiveExpiresAt} <= ${now}`
             )
-            .returning({ id: notes.id })
-        : [];
-    const deletedNotes = await db
-      .delete(notes)
-      .where(
-        and(
-          eq(notes.userId, userId),
-          isNotNull(notes.archivedAt),
-          sql`${notes.archiveExpiresAt} <= ${now}`
-        )
-      )
-      .returning({ id: notes.id });
-    const deletedFolders = await db
-      .delete(noteFolders)
-      .where(
-        and(
-          eq(noteFolders.userId, userId),
-          isNotNull(noteFolders.archivedAt),
-          sql`${noteFolders.archiveExpiresAt} <= ${now}`
-        )
-      )
-      .returning({ id: noteFolders.id });
+          );
+        const expiredFolderIds = expiredFolders.map((folder) => folder.id);
+        const folders = await tx
+          .select({ id: noteFolders.id, parentId: noteFolders.parentId })
+          .from(noteFolders)
+          .where(eq(noteFolders.userId, userId));
+        const folderIds = [
+          ...new Set(
+            expiredFolderIds.flatMap((folderId) =>
+              getSubtreeFolderIds(folderId, folders)
+            )
+          ),
+        ];
+        const deletedFolderNotes =
+          folderIds.length > 0
+            ? await tx
+                .delete(notes)
+                .where(
+                  and(
+                    eq(notes.userId, userId),
+                    isNotNull(notes.archivedAt),
+                    inArray(notes.folderId, folderIds)
+                  )
+                )
+                .returning({ id: notes.id })
+            : [];
+        const deletedNotes = await tx
+          .delete(notes)
+          .where(
+            and(
+              eq(notes.userId, userId),
+              isNotNull(notes.archivedAt),
+              sql`${notes.archiveExpiresAt} <= ${now}`
+            )
+          )
+          .returning({ id: notes.id });
+        const deletedFolders = await tx
+          .delete(noteFolders)
+          .where(
+            and(
+              eq(noteFolders.userId, userId),
+              isNotNull(noteFolders.archivedAt),
+              sql`${noteFolders.archiveExpiresAt} <= ${now}`
+            )
+          )
+          .returning({ id: noteFolders.id });
+
+        return { deletedFolderNotes, deletedFolders, deletedNotes };
+      });
 
     return purgeExpiredArchivedResponseDtoSchema.parse({
       deletedNoteIds: [

@@ -87,7 +87,7 @@ export const createNote = authorized
       }
     }
 
-    let noteId: string | undefined;
+    let createdNote: typeof notes.$inferSelect | undefined;
 
     await db.transaction(async (tx) => {
       const [created] = await tx
@@ -110,7 +110,7 @@ export const createNote = authorized
       }
 
       const createdNoteId = created.id;
-      noteId = createdNoteId;
+      createdNote = created;
 
       const tagValues = new Map<string, { name: string; slug: string }>();
 
@@ -160,8 +160,6 @@ export const createNote = authorized
               )
           : [];
 
-      await tx.delete(notesToTags).where(eq(notesToTags.noteId, createdNoteId));
-
       if (tags.length > 0) {
         await tx.insert(notesToTags).values(
           tags.map((tag) => ({
@@ -170,10 +168,6 @@ export const createNote = authorized
           }))
         );
       }
-
-      await tx
-        .delete(noteLinks)
-        .where(eq(noteLinks.sourceNoteId, createdNoteId));
 
       if (linkedNoteIds.length > 0) {
         await tx.insert(noteLinks).values(
@@ -186,22 +180,9 @@ export const createNote = authorized
       }
     });
 
-    if (!noteId) {
+    if (!createdNote) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Internal server error.",
-      });
-    }
-
-    const [note] = await db
-      .select()
-      .from(notes)
-      .where(and(eq(notes.id, noteId), eq(notes.userId, userId)))
-      .limit(1);
-
-    if (!note) {
-      throw errors.NOT_FOUND({
-        message: "Note not found.",
-        data: { id: noteId },
       });
     }
 
@@ -213,9 +194,11 @@ export const createNote = authorized
       })
       .from(notesToTags)
       .innerJoin(noteTags, eq(noteTags.id, notesToTags.tagId))
-      .where(and(eq(notesToTags.noteId, note.id), eq(noteTags.userId, userId)));
+      .where(
+        and(eq(notesToTags.noteId, createdNote.id), eq(noteTags.userId, userId))
+      );
 
-    const [folder] = note.folderId
+    const [folder] = createdNote.folderId
       ? await db
           .select({
             id: noteFolders.id,
@@ -225,7 +208,7 @@ export const createNote = authorized
           .from(noteFolders)
           .where(
             and(
-              eq(noteFolders.id, note.folderId),
+              eq(noteFolders.id, createdNote.folderId),
               eq(noteFolders.userId, userId)
             )
           )
@@ -233,18 +216,18 @@ export const createNote = authorized
       : [];
 
     return createNoteResponseDtoSchema.parse({
-      id: note.id,
-      userId: note.userId,
-      folderId: note.folderId,
-      title: note.title,
-      content: note.content,
+      id: createdNote.id,
+      userId: createdNote.userId,
+      folderId: createdNote.folderId,
+      title: createdNote.title,
+      content: createdNote.content,
       folder: folder ?? null,
       tags,
-      pinned: note.pinned,
-      favorite: note.favorite,
-      archivedAt: note.archivedAt,
-      archiveExpiresAt: note.archiveExpiresAt,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
+      pinned: createdNote.pinned,
+      favorite: createdNote.favorite,
+      archivedAt: createdNote.archivedAt,
+      archiveExpiresAt: createdNote.archiveExpiresAt,
+      createdAt: createdNote.createdAt,
+      updatedAt: createdNote.updatedAt,
     });
   });

@@ -20,7 +20,7 @@ export const updateTag = authorized
   .errors({ BAD_REQUEST: {}, NOT_FOUND: {} })
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
-    const name = input.name.trim().replace(/\s+/g, " ");
+    const name = input.name.replace(/\s+/g, " ");
     const slug = name
       .toLowerCase()
       .normalize("NFKD")

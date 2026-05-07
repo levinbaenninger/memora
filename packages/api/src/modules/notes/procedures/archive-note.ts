@@ -20,9 +20,29 @@ export const archiveNoteResponseDtoSchema = z.object({
 export const archiveNote = authorized
   .input(archiveNoteRequestDtoSchema)
   .output(archiveNoteResponseDtoSchema)
-  .errors({ NOT_FOUND: {} })
+  .errors({ NOT_FOUND: {}, BAD_REQUEST: {} })
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
+    const [note] = await db
+      .select({ id: notes.id, archivedAt: notes.archivedAt })
+      .from(notes)
+      .where(and(eq(notes.id, input.id), eq(notes.userId, userId)))
+      .limit(1);
+
+    if (!note) {
+      throw errors.NOT_FOUND({
+        message: "Note not found.",
+        data: { id: input.id },
+      });
+    }
+
+    if (note.archivedAt) {
+      throw errors.BAD_REQUEST({
+        message: "Note is already archived.",
+        data: { id: input.id },
+      });
+    }
+
     const now = new Date();
     const archiveExpiresAt = new Date(
       now.getTime() + ARCHIVE_RETENTION_DAYS * 24 * 60 * 60 * 1000

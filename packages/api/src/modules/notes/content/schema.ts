@@ -80,7 +80,11 @@ export function getNoteContentText(content: JSONContent) {
 
 export function normalizeNoteContent(content: unknown) {
   try {
-    if (JSON.stringify(content).length > MAX_CONTENT_BYTES) {
+    const contentBytes = new TextEncoder().encode(
+      JSON.stringify(content)
+    ).byteLength;
+
+    if (contentBytes > MAX_CONTENT_BYTES) {
       throw new Error("Content too large.");
     }
 

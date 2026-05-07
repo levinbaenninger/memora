@@ -17,5 +17,5 @@ export const listTags = authorized
       .where(eq(noteTags.userId, context.user.id))
       .orderBy(noteTags.name);
 
-    return listTagsResponseDtoSchema.parse(tags);
+    return tags;
   });

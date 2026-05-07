@@ -37,10 +37,16 @@ export const notes = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
-      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .$onUpdate(() => new Date())
       .notNull(),
   },
   (table) => [
+    index("notes_user_archived_pinned_updated_idx").on(
+      table.userId,
+      table.archivedAt,
+      table.pinned.desc(),
+      table.updatedAt.desc()
+    ),
     index("notes_user_archived_updated_idx").on(
       table.userId,
       table.archivedAt,
@@ -55,5 +61,8 @@ export const notes = pgTable(
       "gin",
       sql`to_tsvector('simple', coalesce(${table.title}, '') || ' ' || coalesce(${table.contentText}, ''))`
     ),
+    index("notes_archive_expires_at_idx")
+      .on(table.archiveExpiresAt)
+      .where(sql`${table.archiveExpiresAt} IS NOT NULL`),
   ]
 );

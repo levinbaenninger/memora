@@ -140,7 +140,11 @@ export const getOutboundLinks = authorized
         userId: note.userId,
         folderId: note.folderId,
         title: note.title,
-        snippet: note.contentText.replace(/\s+/g, " ").trim().slice(0, 240),
+        snippet: note.contentText
+          .slice(0, 1024)
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 240),
         folder: note.folderId ? (foldersById.get(note.folderId) ?? null) : null,
         tags: tagsByNoteId.get(note.id) ?? [],
         pinned: note.pinned,

@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -55,32 +55,25 @@ export const restoreFolder = authorized
       }
     }
 
-    const folders = await db
-      .select({ id: noteFolders.id, parentId: noteFolders.parentId })
-      .from(noteFolders)
-      .where(eq(noteFolders.userId, userId));
-    const subtreeIds = new Set<string>([input.id]);
-    let changed = true;
-
-    while (changed) {
-      changed = false;
-
-      for (const child of folders) {
-        if (
-          child.parentId &&
-          subtreeIds.has(child.parentId) &&
-          !subtreeIds.has(child.id)
-        ) {
-          subtreeIds.add(child.id);
-          changed = true;
-        }
-      }
-    }
-
-    const restoredFolderIds = [...subtreeIds];
     const now = new Date();
+    let restoredFolderIds: string[] = [];
 
     await db.transaction(async (tx) => {
+      const subtreeRows = await tx.execute<{ id: string }>(sql`
+        WITH RECURSIVE folder_subtree(id) AS (
+          SELECT id
+          FROM note_folders
+          WHERE id = ${input.id} AND user_id = ${userId}
+          UNION ALL
+          SELECT child.id
+          FROM note_folders child
+          INNER JOIN folder_subtree parent ON child.parent_id = parent.id
+          WHERE child.user_id = ${userId}
+        )
+        SELECT id FROM folder_subtree
+      `);
+      restoredFolderIds = subtreeRows.rows.map((row) => row.id);
+
       await tx
         .update(noteFolders)
         .set({

@@ -20,7 +20,7 @@ export const updateNoteRequestDtoSchema = z.object({
   id: z.nanoid(),
   title: z.string().trim().min(1).max(200).optional(),
   content: noteContentSchema.optional(),
-  folderId: z.nanoid().nullish().optional(),
+  folderId: z.nanoid().nullish(),
   tagNames: z.array(z.string().trim().min(1).max(60)).max(25).optional(),
   pinned: z.boolean().optional(),
   favorite: z.boolean().optional(),

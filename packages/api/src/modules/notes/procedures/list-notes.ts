@@ -69,7 +69,19 @@ export const listNotes = authorized
     }
 
     const foundNotes = await db
-      .select()
+      .select({
+        id: notes.id,
+        userId: notes.userId,
+        folderId: notes.folderId,
+        title: notes.title,
+        contentText: notes.contentText,
+        pinned: notes.pinned,
+        favorite: notes.favorite,
+        archivedAt: notes.archivedAt,
+        archiveExpiresAt: notes.archiveExpiresAt,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+      })
       .from(notes)
       .where(and(...where))
       .orderBy(desc(notes.pinned), desc(notes.updatedAt))

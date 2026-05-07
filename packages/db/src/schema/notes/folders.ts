@@ -1,5 +1,11 @@
-import type { AnyPgColumn } from "drizzle-orm/pg-core";
-import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  foreignKey,
+  index,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
 import { user } from "../auth";
@@ -13,9 +19,7 @@ export const noteFolders = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    parentId: text("parent_id").references((): AnyPgColumn => noteFolders.id, {
-      onDelete: "cascade",
-    }),
+    parentId: text("parent_id"),
     name: text("name").notNull(),
     archivedAt: timestamp("archived_at"),
     archiveExpiresAt: timestamp("archive_expires_at"),
@@ -23,10 +27,15 @@ export const noteFolders = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
-      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .$onUpdate(() => new Date())
       .notNull(),
   },
   (table) => [
+    uniqueIndex("note_folders_user_id_unique").on(table.userId, table.id),
+    foreignKey({
+      columns: [table.userId, table.parentId],
+      foreignColumns: [table.userId, table.id],
+    }).onDelete("cascade"),
     index("note_folders_user_archived_updated_idx").on(
       table.userId,
       table.archivedAt,

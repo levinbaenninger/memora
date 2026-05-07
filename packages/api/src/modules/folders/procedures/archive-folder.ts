@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -37,35 +37,28 @@ export const archiveFolder = authorized
       });
     }
 
-    const folders = await db
-      .select({ id: noteFolders.id, parentId: noteFolders.parentId })
-      .from(noteFolders)
-      .where(eq(noteFolders.userId, userId));
-    const subtreeIds = new Set<string>([input.id]);
-    let changed = true;
-
-    while (changed) {
-      changed = false;
-
-      for (const child of folders) {
-        if (
-          child.parentId &&
-          subtreeIds.has(child.parentId) &&
-          !subtreeIds.has(child.id)
-        ) {
-          subtreeIds.add(child.id);
-          changed = true;
-        }
-      }
-    }
-
-    const archivedFolderIds = [...subtreeIds];
     const now = new Date();
     const archiveExpiresAt = new Date(
       now.getTime() + ARCHIVE_RETENTION_DAYS * 24 * 60 * 60 * 1000
     );
+    let archivedFolderIds: string[] = [];
 
     await db.transaction(async (tx) => {
+      const subtreeRows = await tx.execute<{ id: string }>(sql`
+        WITH RECURSIVE folder_subtree(id) AS (
+          SELECT id
+          FROM note_folders
+          WHERE id = ${input.id} AND user_id = ${userId}
+          UNION ALL
+          SELECT child.id
+          FROM note_folders child
+          INNER JOIN folder_subtree parent ON child.parent_id = parent.id
+          WHERE child.user_id = ${userId}
+        )
+        SELECT id FROM folder_subtree
+      `);
+      const subtreeIds = subtreeRows.rows.map((row) => row.id);
+
       await tx
         .update(notes)
         .set({
@@ -78,12 +71,12 @@ export const archiveFolder = authorized
           and(
             eq(notes.userId, userId),
             isNull(notes.archivedAt),
-            inArray(notes.folderId, archivedFolderIds)
+            inArray(notes.folderId, subtreeIds)
           )
         )
         .returning({ id: notes.id });
 
-      await tx
+      const archivedFolders = await tx
         .update(noteFolders)
         .set({
           archivedAt: now,
@@ -95,10 +88,12 @@ export const archiveFolder = authorized
           and(
             eq(noteFolders.userId, userId),
             isNull(noteFolders.archivedAt),
-            inArray(noteFolders.id, archivedFolderIds)
+            inArray(noteFolders.id, subtreeIds)
           )
         )
         .returning({ id: noteFolders.id });
+
+      archivedFolderIds = archivedFolders.map((folder) => folder.id);
     });
 
     return archiveFolderResponseDtoSchema.parse({

@@ -1,4 +1,5 @@
-import { and, eq } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -11,6 +12,7 @@ import { noteSchema } from "../schemas";
 
 export const getNoteRequestDtoSchema = z.object({
   id: z.nanoid(),
+  includeArchived: z.boolean().default(false),
 });
 
 export const getNoteResponseDtoSchema = noteSchema.extend({
@@ -33,10 +35,16 @@ export const getNote = authorized
   })
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
+    const where: SQL[] = [eq(notes.id, input.id), eq(notes.userId, userId)];
+
+    if (!input.includeArchived) {
+      where.push(isNull(notes.archivedAt));
+    }
+
     const [note] = await db
       .select()
       .from(notes)
-      .where(and(eq(notes.id, input.id), eq(notes.userId, userId)))
+      .where(and(...where))
       .limit(1);
 
     if (!note) {

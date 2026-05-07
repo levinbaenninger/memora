@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -25,7 +25,8 @@ export const updateFolder = authorized
       .where(
         and(
           eq(noteFolders.id, input.id),
-          eq(noteFolders.userId, context.user.id)
+          eq(noteFolders.userId, context.user.id),
+          isNull(noteFolders.archivedAt)
         )
       )
       .returning();

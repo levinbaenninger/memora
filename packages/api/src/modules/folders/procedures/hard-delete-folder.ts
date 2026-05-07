@@ -5,6 +5,7 @@ import { db } from "@memora/db";
 import { noteFolders, notes } from "@memora/db/schema";
 
 import { authorized } from "../../../procedures/authorized";
+import { getSubtreeFolderIds } from "../subtree";
 
 export const hardDeleteFolderRequestDtoSchema = z.object({
   id: z.nanoid(),
@@ -38,25 +39,8 @@ export const hardDeleteFolder = authorized
       .select({ id: noteFolders.id, parentId: noteFolders.parentId })
       .from(noteFolders)
       .where(eq(noteFolders.userId, userId));
-    const subtreeIds = new Set<string>([input.id]);
-    let changed = true;
-
-    while (changed) {
-      changed = false;
-
-      for (const child of folders) {
-        if (
-          child.parentId &&
-          subtreeIds.has(child.parentId) &&
-          !subtreeIds.has(child.id)
-        ) {
-          subtreeIds.add(child.id);
-          changed = true;
-        }
-      }
-    }
-
-    const deletedFolderIds = [...subtreeIds];
+    const subtreeIds = getSubtreeFolderIds(input.id, folders);
+    let deletedFolderIds: string[] = [];
 
     await db.transaction(async (tx) => {
       await tx
@@ -65,21 +49,23 @@ export const hardDeleteFolder = authorized
           and(
             eq(notes.userId, userId),
             isNotNull(notes.archivedAt),
-            inArray(notes.folderId, deletedFolderIds)
+            inArray(notes.folderId, subtreeIds)
           )
         )
         .returning({ id: notes.id });
 
-      await tx
+      const deletedFolders = await tx
         .delete(noteFolders)
         .where(
           and(
             eq(noteFolders.userId, userId),
             isNotNull(noteFolders.archivedAt),
-            inArray(noteFolders.id, deletedFolderIds)
+            inArray(noteFolders.id, subtreeIds)
           )
         )
         .returning({ id: noteFolders.id });
+
+      deletedFolderIds = deletedFolders.map((folder) => folder.id);
     });
 
     return hardDeleteFolderResponseDtoSchema.parse({
