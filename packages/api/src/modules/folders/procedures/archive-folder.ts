@@ -4,11 +4,11 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteFolders, notes } from "@memora/db/schema";
 
-import { ARCHIVE_RETENTION_DAYS } from "../../notes/constants";
 import { authorized } from "../../../procedures/authorized";
+import { ARCHIVE_RETENTION_DAYS } from "../../notes/constants";
 
 export const archiveFolderRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
 });
 
 export const archiveFolderResponseDtoSchema = z.object({

@@ -7,7 +7,7 @@ import { notes } from "@memora/db/schema";
 import { authorized } from "../../../procedures/authorized";
 
 export const hardDeleteNoteRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
 });
 
 export const hardDeleteNoteResponseDtoSchema = z.object({

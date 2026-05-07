@@ -35,7 +35,7 @@ export const createTag = authorized
 
     await db
       .insert(noteTags)
-      .values({ id: crypto.randomUUID(), userId, name, slug })
+      .values({ userId, name, slug })
       .onConflictDoUpdate({
         target: [noteTags.userId, noteTags.slug],
         set: { updatedAt: new Date() },

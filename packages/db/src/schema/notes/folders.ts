@@ -1,12 +1,15 @@
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 import { user } from "../auth";
 
 export const noteFolders = pgTable(
   "note_folders",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

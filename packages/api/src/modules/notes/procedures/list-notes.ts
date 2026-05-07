@@ -5,14 +5,14 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteFolders, notes, notesToTags, noteTags } from "@memora/db/schema";
 
+import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../../folders/schemas";
 import { paginationSchema } from "../../shared/pagination";
 import { tagSchema } from "../../tags/schemas";
-import { authorized } from "../../../procedures/authorized";
 import { noteSchema } from "../schemas";
 
 export const listNotesRequestDtoSchema = paginationSchema.extend({
-  folderId: z.uuid().nullish(),
+  folderId: z.nanoid().nullish(),
   includeArchived: z.boolean().default(false),
 });
 

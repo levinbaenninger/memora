@@ -8,7 +8,7 @@ import { authorized } from "../../../procedures/authorized";
 import { ARCHIVE_RETENTION_DAYS } from "../constants";
 
 export const archiveNoteRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
 });
 
 export const archiveNoteResponseDtoSchema = z.object({

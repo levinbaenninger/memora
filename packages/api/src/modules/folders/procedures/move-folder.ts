@@ -10,8 +10,8 @@ import { folderSchema } from "../schemas";
 export const moveFolderResponseDtoSchema = folderSchema;
 
 export const moveFolderRequestDtoSchema = z.object({
-  id: z.uuid(),
-  parentId: z.uuid().nullish(),
+  id: z.nanoid(),
+  parentId: z.nanoid().nullish(),
 });
 
 export const moveFolder = authorized

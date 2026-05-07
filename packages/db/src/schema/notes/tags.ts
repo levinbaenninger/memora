@@ -6,6 +6,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 import { user } from "../auth";
 import { notes } from "./notes";
@@ -13,7 +14,9 @@ import { notes } from "./notes";
 export const noteTags = pgTable(
   "note_tags",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

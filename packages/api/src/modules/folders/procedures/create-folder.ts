@@ -9,7 +9,7 @@ import { folderSchema } from "../schemas";
 
 export const createFolderRequestDtoSchema = z.object({
   name: z.string().trim().min(1).max(120),
-  parentId: z.uuid().nullish(),
+  parentId: z.nanoid().nullish(),
 });
 
 export const createFolderResponseDtoSchema = folderSchema;
@@ -45,7 +45,6 @@ export const createFolder = authorized
     const [folder] = await db
       .insert(noteFolders)
       .values({
-        id: crypto.randomUUID(),
         userId,
         parentId: input.parentId ?? null,
         name: input.name,

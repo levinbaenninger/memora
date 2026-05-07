@@ -10,16 +10,16 @@ import {
   noteTags,
 } from "@memora/db/schema";
 
+import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../../folders/schemas";
 import { tagSchema } from "../../tags/schemas";
-import { authorized } from "../../../procedures/authorized";
 import { normalizeNoteContent, noteContentSchema } from "../content/schema";
 import { noteSchema } from "../schemas";
 
 export const createNoteRequestDtoSchema = z.object({
   title: z.string().trim().min(1).max(200),
   content: noteContentSchema,
-  folderId: z.uuid().nullish(),
+  folderId: z.nanoid().nullish(),
   tagNames: z.array(z.string().trim().min(1).max(60)).max(25).default([]),
   pinned: z.boolean().default(false),
   favorite: z.boolean().default(false),
@@ -64,7 +64,6 @@ export const createNote = authorized
       }
     }
 
-    const noteId = crypto.randomUUID();
     const normalized = normalizeNoteContent(input.content);
     const linkedNoteIds = [...new Set(normalized.linkedNoteIds)];
 
@@ -88,11 +87,12 @@ export const createNote = authorized
       }
     }
 
+    let noteId: string | undefined;
+
     await db.transaction(async (tx) => {
       const [created] = await tx
         .insert(notes)
         .values({
-          id: noteId,
           userId,
           folderId: input.folderId ?? null,
           title: input.title,
@@ -109,10 +109,10 @@ export const createNote = authorized
         });
       }
 
-      const tagValues = new Map<
-        string,
-        { id: string; name: string; slug: string }
-      >();
+      const createdNoteId = created.id;
+      noteId = createdNoteId;
+
+      const tagValues = new Map<string, { name: string; slug: string }>();
 
       for (const tagName of input.tagNames) {
         const name = tagName.trim().replace(/\s+/g, " ");
@@ -129,7 +129,7 @@ export const createNote = authorized
           });
         }
 
-        tagValues.set(slug, { id: crypto.randomUUID(), name, slug });
+        tagValues.set(slug, { name, slug });
       }
 
       const tagRows = [...tagValues.values()];
@@ -160,29 +160,37 @@ export const createNote = authorized
               )
           : [];
 
-      await tx.delete(notesToTags).where(eq(notesToTags.noteId, noteId));
+      await tx.delete(notesToTags).where(eq(notesToTags.noteId, createdNoteId));
 
       if (tags.length > 0) {
         await tx.insert(notesToTags).values(
           tags.map((tag) => ({
-            noteId,
+            noteId: createdNoteId,
             tagId: tag.id,
           }))
         );
       }
 
-      await tx.delete(noteLinks).where(eq(noteLinks.sourceNoteId, noteId));
+      await tx
+        .delete(noteLinks)
+        .where(eq(noteLinks.sourceNoteId, createdNoteId));
 
       if (linkedNoteIds.length > 0) {
         await tx.insert(noteLinks).values(
           linkedNoteIds.map((targetNoteId) => ({
             userId,
-            sourceNoteId: noteId,
+            sourceNoteId: createdNoteId,
             targetNoteId,
           }))
         );
       }
     });
+
+    if (!noteId) {
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "Internal server error.",
+      });
+    }
 
     const [note] = await db
       .select()

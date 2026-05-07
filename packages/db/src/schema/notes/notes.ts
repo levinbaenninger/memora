@@ -7,6 +7,7 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 import { user } from "../auth";
 import { noteFolders } from "./folders";
@@ -16,7 +17,9 @@ export type NoteContent = Record<string, unknown>;
 export const notes = pgTable(
   "notes",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

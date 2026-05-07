@@ -8,7 +8,7 @@ import { authorized } from "../../../procedures/authorized";
 import { tagSchema } from "../schemas";
 
 export const updateTagRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
   name: z.string().trim().min(1).max(60),
 });
 

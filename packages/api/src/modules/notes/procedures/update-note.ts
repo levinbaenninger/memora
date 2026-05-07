@@ -10,17 +10,17 @@ import {
   noteTags,
 } from "@memora/db/schema";
 
+import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../../folders/schemas";
 import { tagSchema } from "../../tags/schemas";
-import { authorized } from "../../../procedures/authorized";
 import { normalizeNoteContent, noteContentSchema } from "../content/schema";
 import { noteSchema } from "../schemas";
 
 export const updateNoteRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
   title: z.string().trim().min(1).max(200).optional(),
   content: noteContentSchema.optional(),
-  folderId: z.uuid().nullish().optional(),
+  folderId: z.nanoid().nullish().optional(),
   tagNames: z.array(z.string().trim().min(1).max(60)).max(25).optional(),
   pinned: z.boolean().optional(),
   favorite: z.boolean().optional(),
@@ -100,13 +100,10 @@ export const updateNote = authorized
       }
     }
 
-    const tagRows: { id: string; name: string; slug: string }[] = [];
+    const tagRows: { name: string; slug: string }[] = [];
 
     if (input.tagNames !== undefined) {
-      const tagValues = new Map<
-        string,
-        { id: string; name: string; slug: string }
-      >();
+      const tagValues = new Map<string, { name: string; slug: string }>();
 
       for (const tagName of input.tagNames) {
         const name = tagName.trim().replace(/\s+/g, " ");
@@ -123,7 +120,7 @@ export const updateNote = authorized
           });
         }
 
-        tagValues.set(slug, { id: crypto.randomUUID(), name, slug });
+        tagValues.set(slug, { name, slug });
       }
 
       tagRows.push(...tagValues.values());

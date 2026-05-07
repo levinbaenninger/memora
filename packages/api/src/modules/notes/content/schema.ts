@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import type { NoteContent } from "@memora/db/schema";
 
-export const INTERNAL_NOTE_HREF_RE = /^memora:\/\/note\/([0-9a-f-]{36})$/i;
+export const INTERNAL_NOTE_HREF_RE = /^memora:\/\/note\/([A-Za-z0-9_-]{21})$/;
 
 const jsonPrimitiveSchema = z.union([
   z.string(),

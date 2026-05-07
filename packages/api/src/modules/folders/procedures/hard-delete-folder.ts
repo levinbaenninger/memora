@@ -7,7 +7,7 @@ import { noteFolders, notes } from "@memora/db/schema";
 import { authorized } from "../../../procedures/authorized";
 
 export const hardDeleteFolderRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
 });
 
 export const hardDeleteFolderResponseDtoSchema = z.object({

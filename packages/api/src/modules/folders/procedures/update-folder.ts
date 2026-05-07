@@ -8,7 +8,7 @@ import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../schemas";
 
 export const updateFolderRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
   name: z.string().trim().min(1).max(120),
 });
 

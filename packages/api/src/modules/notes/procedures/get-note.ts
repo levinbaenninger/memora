@@ -4,13 +4,13 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteFolders, notes, notesToTags, noteTags } from "@memora/db/schema";
 
+import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../../folders/schemas";
 import { tagSchema } from "../../tags/schemas";
-import { authorized } from "../../../procedures/authorized";
 import { noteSchema } from "../schemas";
 
 export const getNoteRequestDtoSchema = z.object({
-  id: z.uuid(),
+  id: z.nanoid(),
 });
 
 export const getNoteResponseDtoSchema = noteSchema.extend({
