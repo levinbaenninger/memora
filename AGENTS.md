@@ -4,19 +4,6 @@ Memora is a Bun + Turborepo monorepo for a TanStack React Start web app with sha
 
 **Package manager:** `bun` — always use `bun`/`bunx`, never `npm`/`npx`/`pnpm`.
 
-**Key commands:**
-
-| Task | Command |
-|---|---|
-| Dev server (all) | `bun dev` |
-| Build | `bun run build` |
-| Typecheck | `bun run check-types` |
-| Lint (report) | `bun run check` |
-| Lint (fix) | `bun run fix` |
-| DB migrate | `bun run db:migrate` |
-| DB generate schema | `bun run db:generate` |
-| DB studio | `bun run db:studio` |
-
 <!-- intent-skills:start -->
 ## Skill Loading
 
@@ -26,3 +13,17 @@ Before substantial work:
 - Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
 - Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
 <!-- intent-skills:end -->
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`gh` CLI). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role vocabulary (no overrides). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout — `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
