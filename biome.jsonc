@@ -3,7 +3,8 @@
   "extends": ["ultracite/biome/core", "ultracite/biome/react"],
   "files": {
     "includes": [
-      "!.agents",
+      "!.agents/skills",
+      "!.claude/skills",
       "!packages/ui/src/components",
       "!packages/ui/src/hooks",
       "!packages/ui/src/lib/utils.ts"
