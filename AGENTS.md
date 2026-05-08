@@ -4,19 +4,6 @@ Memora is a Bun + Turborepo monorepo for a TanStack React Start web app with sha
 
 **Package manager:** `bun` — always use `bun`/`bunx`, never `npm`/`npx`/`pnpm`.
 
-**Key commands:**
-
-| Task | Command |
-|---|---|
-| Dev server (all) | `bun dev` |
-| Build | `bun run build` |
-| Typecheck | `bun run check-types` |
-| Lint (report) | `bun run check` |
-| Lint (fix) | `bun run fix` |
-| DB migrate | `bun run db:migrate` |
-| DB generate schema | `bun run db:generate` |
-| DB studio | `bun run db:studio` |
-
 <!-- intent-skills:start -->
 ## Skill Loading
 
