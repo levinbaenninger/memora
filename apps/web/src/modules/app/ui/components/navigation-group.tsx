@@ -33,7 +33,9 @@ interface NavigationMenuItemProps {
 function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
   const { isMobile, setOpenMobile } = useSidebar();
   const shouldOpen =
-    !!item.isActive || !!item.subItems?.some((i) => !!i.isActive);
+    !!item.isActive ||
+    !!item.subItems?.some((i) => !!i.isActive) ||
+    !!item.contextualContent;
   const [open, setOpen] = useState(shouldOpen);
 
   useEffect(() => {
@@ -54,10 +56,17 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
       open={open}
       render={<SidebarMenuItem />}
     >
-      {item.subItems?.length ? (
+      {item.subItems?.length || item.contextualContent ? (
         <>
           <CollapsibleTrigger
-            render={<SidebarMenuButton isActive={item.isActive} />}
+            render={
+              <SidebarMenuButton
+                isActive={item.isActive}
+                render={
+                  item.path ? renderLink(item.path, item.params) : undefined
+                }
+              />
+            }
           >
             {item.icon}
             <span>{item.title}</span>
@@ -68,24 +77,31 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
             />
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <SidebarMenuSub>
-              {item.subItems?.map((subItem) => (
-                <SidebarMenuSubItem key={subItem.title}>
-                  <SidebarMenuSubButton
-                    isActive={subItem.isActive}
-                    onClick={closeMobileSheet}
-                    render={
-                      subItem.path
-                        ? renderLink(subItem.path, subItem.params)
-                        : undefined
-                    }
-                  >
-                    {subItem.icon}
-                    <span>{subItem.title}</span>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
-            </SidebarMenuSub>
+            {item.subItems?.length ? (
+              <SidebarMenuSub>
+                {item.subItems.map((subItem) => (
+                  <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubButton
+                      isActive={subItem.isActive}
+                      onClick={closeMobileSheet}
+                      render={
+                        subItem.path
+                          ? renderLink(
+                              subItem.path,
+                              subItem.params,
+                              subItem.search
+                            )
+                          : undefined
+                      }
+                    >
+                      {subItem.icon}
+                      <span>{subItem.title}</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            ) : null}
+            {item.contextualContent}
           </CollapsibleContent>
         </>
       ) : (

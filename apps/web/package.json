@@ -21,6 +21,13 @@
     "@orpc/zod": "catalog:",
     "@orpc/contract": "catalog:",
     "@sentry/tanstackstart-react": "catalog:",
+    "@tiptap/core": "catalog:",
+    "@tiptap/extension-link": "catalog:",
+    "@tiptap/extension-task-item": "catalog:",
+    "@tiptap/extension-task-list": "catalog:",
+    "@tiptap/extension-placeholder": "catalog:",
+    "@tiptap/react": "catalog:",
+    "@tiptap/starter-kit": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-hotkeys": "catalog:",
@@ -47,7 +54,8 @@
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "vite-tsconfig-paths": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "catalog:",

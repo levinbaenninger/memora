@@ -15,9 +15,11 @@ import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
 import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
 import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
 import { Route as AppDashboardRouteRouteImport } from './routes/_app/dashboard/route'
+import { Route as AppNotesIndexRouteImport } from './routes/_app/notes/index'
 import { Route as ApiRpcSplatRouteRouteImport } from './routes/api/rpc/$/route'
 import { Route as ApiAuthSplatRouteRouteImport } from './routes/api/auth/$/route'
 import { Route as AppSettingsPathRouteRouteImport } from './routes/_app/settings/$path/route'
+import { Route as AppNotesNoteIdRouteRouteImport } from './routes/_app/notes/$noteId/route'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
@@ -48,6 +50,11 @@ const AppDashboardRouteRoute = AppDashboardRouteRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppNotesIndexRoute = AppNotesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
 const ApiRpcSplatRouteRoute = ApiRpcSplatRouteRouteImport.update({
   id: '/api/rpc/$',
   path: '/api/rpc/$',
@@ -63,38 +70,48 @@ const AppSettingsPathRouteRoute = AppSettingsPathRouteRouteImport.update({
   path: '/settings/$path',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppNotesNoteIdRouteRoute = AppNotesNoteIdRouteRouteImport.update({
+  id: '/$noteId',
+  path: '/$noteId',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRouteRoute
-  '/notes': typeof AppNotesRouteRoute
+  '/notes': typeof AppNotesRouteRouteWithChildren
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
   '/api/rpc/$': typeof ApiRpcSplatRouteRoute
+  '/notes/': typeof AppNotesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRouteRoute
-  '/notes': typeof AppNotesRouteRoute
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
   '/api/rpc/$': typeof ApiRpcSplatRouteRoute
+  '/notes': typeof AppNotesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRouteRoute
-  '/_app/notes': typeof AppNotesRouteRoute
+  '/_app/notes': typeof AppNotesRouteRouteWithChildren
   '/_app/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/_app/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/_app/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
   '/api/rpc/$': typeof ApiRpcSplatRouteRoute
+  '/_app/notes/': typeof AppNotesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -104,19 +121,22 @@ export interface FileRouteTypes {
     | '/notes'
     | '/tasks'
     | '/auth/$path'
+    | '/notes/$noteId'
     | '/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/notes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
-    | '/notes'
     | '/tasks'
     | '/auth/$path'
+    | '/notes/$noteId'
     | '/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/notes'
   id:
     | '__root__'
     | '/'
@@ -125,9 +145,11 @@ export interface FileRouteTypes {
     | '/_app/notes'
     | '/_app/tasks'
     | '/auth/$path'
+    | '/_app/notes/$noteId'
     | '/_app/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/_app/notes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/notes/': {
+      id: '/_app/notes/'
+      path: '/'
+      fullPath: '/notes/'
+      preLoaderRoute: typeof AppNotesIndexRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
     '/api/rpc/$': {
       id: '/api/rpc/$'
       path: '/api/rpc/$'
@@ -203,19 +232,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsPathRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/notes/$noteId': {
+      id: '/_app/notes/$noteId'
+      path: '/$noteId'
+      fullPath: '/notes/$noteId'
+      preLoaderRoute: typeof AppNotesNoteIdRouteRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
   }
 }
 
+interface AppNotesRouteRouteChildren {
+  AppNotesNoteIdRouteRoute: typeof AppNotesNoteIdRouteRoute
+  AppNotesIndexRoute: typeof AppNotesIndexRoute
+}
+
+const AppNotesRouteRouteChildren: AppNotesRouteRouteChildren = {
+  AppNotesNoteIdRouteRoute: AppNotesNoteIdRouteRoute,
+  AppNotesIndexRoute: AppNotesIndexRoute,
+}
+
+const AppNotesRouteRouteWithChildren = AppNotesRouteRoute._addFileChildren(
+  AppNotesRouteRouteChildren,
+)
+
 interface AppRouteRouteChildren {
   AppDashboardRouteRoute: typeof AppDashboardRouteRoute
-  AppNotesRouteRoute: typeof AppNotesRouteRoute
+  AppNotesRouteRoute: typeof AppNotesRouteRouteWithChildren
   AppTasksRouteRoute: typeof AppTasksRouteRoute
   AppSettingsPathRouteRoute: typeof AppSettingsPathRouteRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDashboardRouteRoute: AppDashboardRouteRoute,
-  AppNotesRouteRoute: AppNotesRouteRoute,
+  AppNotesRouteRoute: AppNotesRouteRouteWithChildren,
   AppTasksRouteRoute: AppTasksRouteRoute,
   AppSettingsPathRouteRoute: AppSettingsPathRouteRoute,
 }

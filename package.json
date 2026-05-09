@@ -28,7 +28,15 @@
       "@react-email/components": "1.0.12",
       "@react-email/render": "2.0.7",
       "@sentry/tanstackstart-react": "10.51.0",
+      "@tiptap/core": "3.22.4",
+      "@tiptap/extension-link": "3.22.4",
+      "@tiptap/extension-task-item": "3.22.4",
+      "@tiptap/extension-task-list": "3.22.4",
+      "@tiptap/extension-placeholder": "3.22.4",
+      "@tiptap/react": "3.22.4",
+      "@tiptap/starter-kit": "3.22.4",
       "@t3-oss/env-core": "0.13.11",
+      "@tailwindcss/typography": "0.5.19",
       "@tailwindcss/vite": "4.2.4",
       "@tanstack/react-form": "1.29.1",
       "@tanstack/react-hotkeys": "0.9.1",
@@ -74,7 +82,8 @@
       "vite": "8.0.10",
       "vite-tsconfig-paths": "6.1.1",
       "web-vitals": "5.2.0",
-      "zod": "4.3.6"
+      "zod": "4.3.6",
+      "zustand": "5.0.5"
     }
   },
   "type": "module",
