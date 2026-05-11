@@ -130,6 +130,11 @@ export function TagList() {
             <AlertDialogAction
               onClick={() => {
                 if (tagToDelete) {
+                  if (search.tag === tagToDelete.id) {
+                    navigate({
+                      search: (prev) => ({ ...prev, tag: undefined }),
+                    });
+                  }
                   deleteTag.mutate(tagToDelete.id);
                 }
                 setTagToDelete(null);

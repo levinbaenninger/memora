@@ -338,7 +338,16 @@ function FolderRow({ folder }: { folder: FolderNode }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteFolder.mutate(folder.id)}>
+            <AlertDialogAction
+              onClick={() => {
+                if (search.folder === folder.id) {
+                  navigate({
+                    search: (prev) => ({ ...prev, folder: undefined }),
+                  });
+                }
+                deleteFolder.mutate(folder.id);
+              }}
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

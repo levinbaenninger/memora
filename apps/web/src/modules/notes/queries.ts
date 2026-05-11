@@ -17,12 +17,13 @@ export interface NotesListParams {
 export function useNotesList(params: NotesListParams) {
   const { folderId, tagId, view, q, limit = 50, offset = 0 } = params;
   const isArchived = view === "archived";
-  const hasQuery = !!q && q.trim().length > 0;
+  const normalizedQ = q?.trim() ?? "";
+  const hasQuery = normalizedQ.length > 0;
 
   const searchResult = useQuery({
     ...orpc.notes.search.queryOptions({
       input: {
-        query: q ?? "",
+        query: normalizedQ,
         folderId: folderId ?? undefined,
         tagIds: tagId ? [tagId] : [],
         includeArchived: isArchived,

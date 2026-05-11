@@ -68,6 +68,7 @@ export function useUpdateNote() {
         inv.invalidateList();
         inv.invalidateSearch();
         inv.invalidateNote(note.id);
+        inv.invalidateLinks(note.id);
       },
       onError: () => {
         setSaveStatus("error");
@@ -178,6 +179,7 @@ export function useArchiveFolder() {
     onSuccess: () => {
       inv.invalidateFolders();
       inv.invalidateList();
+      inv.invalidateSearch();
       toast.success("Folder archived");
     },
     onError: () => toast.error("Failed to archive folder"),
@@ -189,12 +191,17 @@ export function useDeleteFolder() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await client.notes.folders.archive({ id });
+      try {
+        await client.notes.folders.archive({ id });
+      } catch {
+        // already archived — proceed to hard delete
+      }
       return client.notes.folders.hardDelete({ id });
     },
     onSuccess: () => {
       inv.invalidateFolders();
       inv.invalidateList();
+      inv.invalidateSearch();
       toast.success("Folder deleted");
     },
     onError: () => toast.error("Failed to delete folder"),
@@ -208,6 +215,8 @@ export function useUpdateTag() {
     orpc.notes.tags.update.mutationOptions({
       onSuccess: () => {
         inv.invalidateTags();
+        inv.invalidateList();
+        inv.invalidateSearch();
       },
     })
   );
@@ -221,6 +230,7 @@ export function useDeleteTag() {
     onSuccess: () => {
       inv.invalidateTags();
       inv.invalidateList();
+      inv.invalidateSearch();
       toast.success("Tag deleted");
     },
     onError: () => toast.error("Failed to delete tag"),

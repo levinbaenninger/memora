@@ -11,19 +11,23 @@ import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
 
 import { useCreateNote } from "@/modules/notes/mutations";
-import { useNotesList } from "@/modules/notes/queries";
+import {
+  useFoldersList,
+  useNotesList,
+  useTagsList,
+} from "@/modules/notes/queries";
 import { NoteListItem } from "./note-list-item";
 
 function getListTitle(
   view: string,
-  folder: string | undefined,
-  tag: string | undefined
+  folder: { id: string; name: string } | undefined,
+  tag: { id: string; name: string } | undefined
 ): string {
   if (folder) {
-    return "Folder";
+    return folder.name;
   }
   if (tag) {
-    return "Tag";
+    return tag.name;
   }
   if (view === "pinned") {
     return "Pinned";
@@ -49,6 +53,9 @@ export function NoteListPanel({ className }: { className?: string }) {
     q: search.q,
   });
 
+  const { data: folders } = useFoldersList();
+  const { data: allTags } = useTagsList();
+
   const handleSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       navigate({
@@ -66,7 +73,9 @@ export function NoteListPanel({ className }: { className?: string }) {
     });
   };
 
-  const title = getListTitle(search.view ?? "all", search.folder, search.tag);
+  const currentFolder = folders?.find((f) => f.id === search.folder);
+  const currentTag = allTags?.find((t) => t.id === search.tag);
+  const title = getListTitle(search.view ?? "all", currentFolder, currentTag);
 
   return (
     <div className={cn("flex flex-col", className)}>

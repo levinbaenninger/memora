@@ -115,14 +115,20 @@ function LinkPopover({ editor }: LinkPopoverProps) {
   const [url, setUrl] = useState("");
 
   const handleInsert = () => {
-    if (!url.trim()) {
+    const trimmed = url.trim();
+    if (!trimmed) {
+      return;
+    }
+    try {
+      new URL(trimmed);
+    } catch {
       return;
     }
     editor
       .chain()
       .focus()
       .extendMarkRange("link")
-      .setLink({ href: url.trim() })
+      .setLink({ href: trimmed })
       .run();
     setUrl("");
     setOpen(false);
