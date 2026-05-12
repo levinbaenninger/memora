@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { orpc } from "@/utils/orpc";
@@ -34,17 +34,16 @@ export function useNotesList(params: NotesListParams) {
     enabled: hasQuery,
   });
 
-  const listResult = useQuery({
-    ...orpc.notes.list.queryOptions({
+  const listResult = useSuspenseQuery(
+    orpc.notes.list.queryOptions({
       input: {
         folderId: folderId ?? undefined,
         includeArchived: isArchived,
         limit,
         offset,
       },
-    }),
-    enabled: !hasQuery,
-  });
+    })
+  );
 
   const raw = hasQuery ? searchResult.data : listResult.data;
 
@@ -70,27 +69,26 @@ export function useNotesList(params: NotesListParams) {
 
   return {
     notes,
-    isPending: hasQuery ? searchResult.isPending : listResult.isPending,
-    isError: hasQuery ? searchResult.isError : listResult.isError,
-    error: hasQuery ? searchResult.error : listResult.error,
+    isPending: hasQuery ? searchResult.isPending : false,
+    isError: hasQuery ? searchResult.isError : false,
+    error: hasQuery ? searchResult.error : null,
   };
 }
 
 export function useNote(id: string) {
-  return useQuery({
-    ...orpc.notes.get.queryOptions({
+  return useSuspenseQuery(
+    orpc.notes.get.queryOptions({
       input: { id, includeArchived: true },
-    }),
-    enabled: !!id,
-  });
+    })
+  );
 }
 
 export function useFoldersList() {
-  return useQuery(orpc.notes.folders.list.queryOptions({ input: {} }));
+  return useSuspenseQuery(orpc.notes.folders.list.queryOptions({ input: {} }));
 }
 
 export function useTagsList() {
-  return useQuery(orpc.notes.tags.list.queryOptions());
+  return useSuspenseQuery(orpc.notes.tags.list.queryOptions());
 }
 
 export function useNoteOutboundLinks(id: string) {

@@ -25,11 +25,10 @@ import {
   TipTapEditor,
   useNoteEditor,
 } from "../components/note-editor/tiptap-editor";
-import { NotesLoadingView } from "./notes-loading-view";
 
 export function NoteEditorView() {
   const { noteId } = useParams({ from: "/_app/notes/$noteId" });
-  const { data: note, isPending, isError } = useNote(noteId);
+  const { data: note } = useNote(noteId);
   const updateNote = useUpdateNote();
   const restoreNote = useRestoreNote();
   const deleteNote = useDeleteNote();
@@ -51,10 +50,10 @@ export function NoteEditorView() {
     { wait: 500 }
   );
 
-  const isArchived = !!note?.archivedAt;
+  const isArchived = !!note.archivedAt;
 
   const editor = useNoteEditor({
-    content: (note?.content as never) ?? { type: "doc", content: [] },
+    content: note.content as never,
     editable: !isArchived,
     noteId,
     onUpdate: (content) => {
@@ -65,27 +64,10 @@ export function NoteEditorView() {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset title only when navigating to different note
   useEffect(() => {
-    if (titleRef.current && note) {
+    if (titleRef.current) {
       titleRef.current.value = note.title;
     }
-  }, [note?.id]);
-
-  if (isPending) {
-    return <NotesLoadingView />;
-  }
-  if (isError) {
-    return (
-      <div className="flex h-full items-center justify-center p-8">
-        <Alert className="max-w-md" variant="destructive">
-          <AlertTitle>Failed to load note</AlertTitle>
-          <AlertDescription>Try refreshing the page.</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-  if (!note) {
-    return null;
-  }
+  }, [note.id]);
 
   return (
     <div className="flex min-h-full flex-col">

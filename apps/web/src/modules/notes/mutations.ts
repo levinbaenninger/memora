@@ -67,6 +67,7 @@ export function useUpdateNote() {
         setSaveStatus("saved");
         inv.invalidateList();
         inv.invalidateSearch();
+        inv.invalidateTags();
         inv.invalidateNote(note.id);
         inv.invalidateLinks(note.id);
       },

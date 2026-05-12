@@ -42,7 +42,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@memora/ui/components/sidebar";
-import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
 
 import {
@@ -358,9 +357,9 @@ function FolderRow({ folder }: { folder: FolderNode }) {
 }
 
 export function FolderTree() {
-  const { data: folders, isPending } = useFoldersList();
+  const { data: folders } = useFoldersList();
   const [isCreating, setIsCreating] = useState(false);
-  const tree = buildFolderTree(folders ?? []);
+  const tree = buildFolderTree(folders);
 
   return (
     <div>
@@ -380,25 +379,16 @@ export function FolderTree() {
         </Button>
       </div>
       <SidebarMenuSub>
-        {isPending && (
-          <>
-            <SidebarMenuSubItem>
-              <Skeleton className="h-6 w-full rounded-md" />
-            </SidebarMenuSubItem>
-            <SidebarMenuSubItem>
-              <Skeleton className="h-6 w-3/4 rounded-md" />
-            </SidebarMenuSubItem>
-          </>
-        )}
-        {!(isPending || isCreating) && tree.length === 0 && (
+        {!isCreating && tree.length === 0 && (
           <SidebarMenuSubItem>
             <span className="px-2 py-1 text-sidebar-foreground/50 text-xs">
               No folders yet
             </span>
           </SidebarMenuSubItem>
         )}
-        {!isPending &&
-          tree.map((folder) => <FolderRow folder={folder} key={folder.id} />)}
+        {tree.map((folder) => (
+          <FolderRow folder={folder} key={folder.id} />
+        ))}
         {isCreating && (
           <SidebarMenuSubItem>
             <InlineFolderForm onDone={() => setIsCreating(false)} />
