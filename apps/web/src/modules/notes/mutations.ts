@@ -71,7 +71,17 @@ export function useUpdateNote() {
         inv.invalidateNote(note.id);
         inv.invalidateLinks(note.id);
       },
-      onError: () => {
+      onError: (error) => {
+        // Note hard-deleted between debounce and mutation — silently drop.
+        if (
+          error &&
+          typeof error === "object" &&
+          "code" in error &&
+          (error as { code?: string }).code === "NOT_FOUND"
+        ) {
+          setSaveStatus("idle");
+          return;
+        }
         setSaveStatus("error");
         toast.error("Failed to save note");
       },

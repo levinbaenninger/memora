@@ -2,25 +2,13 @@
 
 import {
   ArchiveIcon,
-  CheckListIcon,
-  CodeIcon,
   Delete01Icon,
   FavouriteIcon,
-  Heading01Icon,
-  Heading02Icon,
-  Heading03Icon,
-  LeftToRightListBulletIcon,
-  LeftToRightListNumberIcon,
-  Link01Icon,
   MoreHorizontalIcon,
   PinIcon,
   PinOffIcon,
-  TextBoldIcon,
-  TextItalicIcon,
-  TextStrikethroughIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { Editor } from "@tiptap/react";
 import { useState } from "react";
 
 import {
@@ -33,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@memora/ui/components/alert-dialog";
-import { Button, buttonVariants } from "@memora/ui/components/button";
+import { buttonVariants } from "@memora/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,12 +29,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@memora/ui/components/dropdown-menu";
-import { Input } from "@memora/ui/components/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@memora/ui/components/popover";
 import { cn } from "@memora/ui/lib/utils";
 
 import {
@@ -56,35 +38,6 @@ import {
 } from "@/modules/notes/mutations";
 import type { SaveStatus } from "@/modules/notes/store";
 import { useNotesStore } from "@/modules/notes/store";
-
-interface ToolbarButtonProps {
-  active?: boolean;
-  disabled?: boolean;
-  icon: React.ComponentProps<typeof HugeiconsIcon>["icon"];
-  label: string;
-  onClick: () => void;
-}
-
-function ToolbarButton({
-  active,
-  disabled,
-  icon,
-  label,
-  onClick,
-}: ToolbarButtonProps) {
-  return (
-    <Button
-      className={cn("size-7", active && "bg-accent text-accent-foreground")}
-      disabled={disabled}
-      onClick={onClick}
-      size="icon"
-      title={label}
-      variant="ghost"
-    >
-      <HugeiconsIcon className="size-3.5" icon={icon} strokeWidth={2} />
-    </Button>
-  );
-}
 
 function SaveIndicator({ status }: { status: SaveStatus }) {
   if (status === "idle") {
@@ -106,77 +59,13 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
   );
 }
 
-interface LinkPopoverProps {
-  editor: Editor;
-}
-
-function LinkPopover({ editor }: LinkPopoverProps) {
-  const [open, setOpen] = useState(false);
-  const [url, setUrl] = useState("");
-
-  const handleInsert = () => {
-    const trimmed = url.trim();
-    if (!trimmed) {
-      return;
-    }
-    try {
-      new URL(trimmed);
-    } catch {
-      return;
-    }
-    editor
-      .chain()
-      .focus()
-      .extendMarkRange("link")
-      .setLink({ href: trimmed })
-      .run();
-    setUrl("");
-    setOpen(false);
-  };
-
-  return (
-    <Popover onOpenChange={setOpen} open={open}>
-      <PopoverTrigger
-        className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-        title="Insert link"
-      >
-        <HugeiconsIcon className="size-3.5" icon={Link01Icon} strokeWidth={2} />
-      </PopoverTrigger>
-      <PopoverContent className="w-72 p-2">
-        <div className="flex gap-2">
-          <Input
-            autoFocus
-            className="h-8 text-sm"
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleInsert();
-              }
-              if (e.key === "Escape") {
-                setOpen(false);
-              }
-            }}
-            placeholder="https://… or memora://note/…"
-            value={url}
-          />
-          <Button className="h-8 px-3" onClick={handleInsert} size="sm">
-            Add
-          </Button>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
 interface EditorToolbarProps {
-  editor: Editor | null;
   favorite: boolean;
   noteId: string;
   pinned: boolean;
 }
 
 export function EditorToolbar({
-  editor,
   noteId,
   pinned,
   favorite,
@@ -190,90 +79,7 @@ export function EditorToolbar({
   return (
     <>
       <div className="border-b">
-        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-0.5 px-3 py-2">
-          {editor && (
-            <>
-              <ToolbarButton
-                active={editor.isActive("bold")}
-                icon={TextBoldIcon}
-                label="Bold"
-                onClick={() => editor.chain().focus().toggleBold().run()}
-              />
-              <ToolbarButton
-                active={editor.isActive("italic")}
-                icon={TextItalicIcon}
-                label="Italic"
-                onClick={() => editor.chain().focus().toggleItalic().run()}
-              />
-              <ToolbarButton
-                active={editor.isActive("strike")}
-                icon={TextStrikethroughIcon}
-                label="Strikethrough"
-                onClick={() => editor.chain().focus().toggleStrike().run()}
-              />
-              <ToolbarButton
-                active={editor.isActive("code")}
-                icon={CodeIcon}
-                label="Inline code"
-                onClick={() => editor.chain().focus().toggleCode().run()}
-              />
-
-              <div className="mx-1 h-4 w-px shrink-0 self-center bg-border" />
-
-              <ToolbarButton
-                active={editor.isActive("heading", { level: 1 })}
-                icon={Heading01Icon}
-                label="Heading 1"
-                onClick={() =>
-                  editor.chain().focus().toggleHeading({ level: 1 }).run()
-                }
-              />
-              <ToolbarButton
-                active={editor.isActive("heading", { level: 2 })}
-                icon={Heading02Icon}
-                label="Heading 2"
-                onClick={() =>
-                  editor.chain().focus().toggleHeading({ level: 2 }).run()
-                }
-              />
-              <ToolbarButton
-                active={editor.isActive("heading", { level: 3 })}
-                icon={Heading03Icon}
-                label="Heading 3"
-                onClick={() =>
-                  editor.chain().focus().toggleHeading({ level: 3 }).run()
-                }
-              />
-
-              <div className="mx-1 h-4 w-px shrink-0 self-center bg-border" />
-
-              <ToolbarButton
-                active={editor.isActive("bulletList")}
-                icon={LeftToRightListBulletIcon}
-                label="Bullet list"
-                onClick={() => editor.chain().focus().toggleBulletList().run()}
-              />
-              <ToolbarButton
-                active={editor.isActive("orderedList")}
-                icon={LeftToRightListNumberIcon}
-                label="Ordered list"
-                onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              />
-              <ToolbarButton
-                active={editor.isActive("taskList")}
-                icon={CheckListIcon}
-                label="Task list"
-                onClick={() => editor.chain().focus().toggleTaskList().run()}
-              />
-
-              <div className="mx-1 h-4 w-px shrink-0 self-center bg-border" />
-
-              <LinkPopover editor={editor} />
-
-              <div className="mx-1 h-4 w-px shrink-0 self-center bg-border" />
-            </>
-          )}
-
+        <div className="mx-auto flex w-full max-w-3xl items-center gap-2 py-2">
           <SaveIndicator status={saveStatus} />
 
           <div className="ml-auto">

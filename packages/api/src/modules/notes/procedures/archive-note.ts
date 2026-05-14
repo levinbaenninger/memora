@@ -24,7 +24,11 @@ export const archiveNote = authorized
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
     const [note] = await db
-      .select({ id: notes.id, archivedAt: notes.archivedAt })
+      .select({
+        id: notes.id,
+        archivedAt: notes.archivedAt,
+        archiveExpiresAt: notes.archiveExpiresAt,
+      })
       .from(notes)
       .where(and(eq(notes.id, input.id), eq(notes.userId, userId)))
       .limit(1);
@@ -36,10 +40,11 @@ export const archiveNote = authorized
       });
     }
 
-    if (note.archivedAt) {
-      throw errors.BAD_REQUEST({
-        message: "Note is already archived.",
-        data: { id: input.id },
+    if (note.archivedAt && note.archiveExpiresAt) {
+      return archiveNoteResponseDtoSchema.parse({
+        id: input.id,
+        archivedAt: note.archivedAt,
+        archiveExpiresAt: note.archiveExpiresAt,
       });
     }
 

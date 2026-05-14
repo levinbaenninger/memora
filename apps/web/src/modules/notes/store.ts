@@ -6,6 +6,7 @@ export type MobilePanel = "nav" | "list" | "editor";
 interface NotesStore {
   activeMobilePanel: MobilePanel;
   expandedFolderIds: Set<string>;
+  expandFolder: (id: string) => void;
   saveStatus: SaveStatus;
   setActiveMobilePanel: (p: MobilePanel) => void;
   setSaveStatus: (s: SaveStatus) => void;
@@ -24,6 +25,15 @@ export const useNotesStore = create<NotesStore>((set) => ({
       } else {
         next.add(id);
       }
+      return { expandedFolderIds: next };
+    }),
+  expandFolder: (id) =>
+    set((s) => {
+      if (s.expandedFolderIds.has(id)) {
+        return s;
+      }
+      const next = new Set(s.expandedFolderIds);
+      next.add(id);
       return { expandedFolderIds: next };
     }),
   activeMobilePanel: "list",

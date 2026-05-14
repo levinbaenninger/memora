@@ -1,5 +1,6 @@
 "use client";
 
+import type { PartialBlock } from "@blocknote/core";
 import { useDebouncedCallback } from "@tanstack/react-pacer";
 import { useParams } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
@@ -18,13 +19,9 @@ import {
 } from "@/modules/notes/mutations";
 import { useNote } from "@/modules/notes/queries";
 import { useNotesStore } from "@/modules/notes/store";
-import { BacklinksPanel } from "../components/note-editor/backlinks-panel";
+import { BlockNoteEditorView } from "../components/note-editor/blocknote-editor";
 import { EditorToolbar } from "../components/note-editor/editor-toolbar";
-import { NoteProperties } from "../components/note-editor/note-properties";
-import {
-  TipTapEditor,
-  useNoteEditor,
-} from "../components/note-editor/tiptap-editor";
+import { NoteMetadataStrip } from "../components/note-editor/note-metadata-strip";
 
 export function NoteEditorView() {
   const { noteId } = useParams({ from: "/_app/notes/$noteId" });
@@ -37,7 +34,7 @@ export function NoteEditorView() {
   const titleRef = useRef<HTMLInputElement>(null);
 
   const debouncedUpdateContent = useDebouncedCallback(
-    (content: object) => {
+    (content: PartialBlock[]) => {
       updateNote.mutate({ id: noteId, content: content as never });
     },
     { wait: 1000 }
@@ -51,16 +48,7 @@ export function NoteEditorView() {
   );
 
   const isArchived = !!note.archivedAt;
-
-  const editor = useNoteEditor({
-    content: note.content as never,
-    editable: !isArchived,
-    noteId,
-    onUpdate: (content) => {
-      setSaveStatus("saving");
-      debouncedUpdateContent(content);
-    },
-  });
+  const initialContent = (note.content ?? []) as PartialBlock[];
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset title only when navigating to different note
   useEffect(() => {
@@ -72,13 +60,12 @@ export function NoteEditorView() {
   return (
     <div className="flex min-h-full flex-col">
       <EditorToolbar
-        editor={editor}
         favorite={note.favorite}
         noteId={noteId}
         pinned={note.pinned}
       />
 
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
         {isArchived && (
           <div className="pt-4">
             <Alert>
@@ -106,9 +93,9 @@ export function NoteEditorView() {
           </div>
         )}
 
-        <div className="pt-4">
+        <div className="pt-6">
           <input
-            className="w-full bg-transparent font-bold text-2xl outline-none placeholder:text-muted-foreground"
+            className="w-full bg-transparent font-bold text-3xl outline-none placeholder:text-muted-foreground"
             defaultValue={note.title}
             disabled={isArchived}
             onChange={(e) => {
@@ -120,18 +107,25 @@ export function NoteEditorView() {
           />
         </div>
 
-        <div className="flex-1">
-          <TipTapEditor className="[&_.ProseMirror]:px-0" editor={editor} />
+        <NoteMetadataStrip
+          disabled={isArchived}
+          folderId={note.folderId}
+          noteId={noteId}
+          tags={note.tags}
+        />
+
+        <div className="flex-1 border-t pt-4">
+          <BlockNoteEditorView
+            content={initialContent}
+            editable={!isArchived}
+            noteId={noteId}
+            onUpdate={(content) => {
+              setSaveStatus("saving");
+              debouncedUpdateContent(content);
+            }}
+          />
         </div>
       </div>
-
-      <NoteProperties
-        folderId={note.folderId}
-        noteId={noteId}
-        tags={note.tags}
-      />
-
-      <BacklinksPanel noteId={noteId} />
     </div>
   );
 }

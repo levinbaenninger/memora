@@ -68,7 +68,7 @@ export function NoteListPanel({ className }: { className?: string }) {
   const handleCreate = () => {
     createNote.mutate({
       title: "Untitled",
-      content: { type: "doc", content: [] },
+      content: [],
       folderId: search.folder ?? undefined,
     });
   };

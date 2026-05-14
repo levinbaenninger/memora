@@ -190,7 +190,7 @@ function RenameFolderForm({
 function FolderRow({ folder }: { folder: FolderNode }) {
   const navigate = useNavigate({ from: "/notes" });
   const search = useSearch({ from: "/_app/notes" });
-  const { expandedFolderIds, toggleFolder } = useNotesStore();
+  const { expandedFolderIds, toggleFolder, expandFolder } = useNotesStore();
   const archiveFolder = useArchiveFolder();
   const deleteFolder = useDeleteFolder();
 
@@ -266,7 +266,12 @@ function FolderRow({ folder }: { folder: FolderNode }) {
               />
               Rename
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => setIsCreatingChild(true)}>
+            <ContextMenuItem
+              onClick={() => {
+                expandFolder(folder.id);
+                setIsCreatingChild(true);
+              }}
+            >
               <HugeiconsIcon
                 className="size-4"
                 icon={Add01Icon}

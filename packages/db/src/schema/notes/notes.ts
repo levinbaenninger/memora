@@ -12,7 +12,7 @@ import { nanoid } from "nanoid";
 import { user } from "../auth";
 import { noteFolders } from "./folders";
 
-export type NoteContent = Record<string, unknown>;
+export type NoteContent = Record<string, unknown>[];
 
 export const notes = pgTable(
   "notes",

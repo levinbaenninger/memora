@@ -31,7 +31,7 @@ export function NotesEmptyView() {
         onClick={() =>
           createNote.mutate({
             title: "Untitled",
-            content: { type: "doc", content: [] },
+            content: [],
             folderId: search.folder ?? undefined,
           })
         }

@@ -18,11 +18,6 @@
     "@orpc/client": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
-    "@tiptap/core": "catalog:",
-    "@tiptap/extension-link": "catalog:",
-    "@tiptap/extension-task-item": "catalog:",
-    "@tiptap/extension-task-list": "catalog:",
-    "@tiptap/starter-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "zod": "catalog:"
   },
