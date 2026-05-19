@@ -10,7 +10,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useForm } from "@tanstack/react-form";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import {
@@ -188,8 +188,8 @@ function RenameFolderForm({
 }
 
 function FolderRow({ folder }: { folder: FolderNode }) {
-  const navigate = useNavigate({ from: "/notes" });
-  const search = useSearch({ from: "/_app/notes" });
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { expandedFolderIds, toggleFolder, expandFolder } = useNotesStore();
   const archiveFolder = useArchiveFolder();
   const deleteFolder = useDeleteFolder();
@@ -198,18 +198,15 @@ function FolderRow({ folder }: { folder: FolderNode }) {
   const [isCreatingChild, setIsCreatingChild] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  const folderPath = `/notes/folder/${folder.id}`;
   const isExpanded = expandedFolderIds.has(folder.id);
-  const isActive = search.folder === folder.id && !search.tag;
+  const isActive = pathname === folderPath;
   const hasChildren = folder.children.length > 0 || isCreatingChild;
 
   const handleNavigate = () => {
     navigate({
-      search: (prev) => ({
-        ...prev,
-        folder: folder.id,
-        tag: undefined,
-        view: "all",
-      }),
+      to: "/notes/folder/$folderId",
+      params: { folderId: folder.id },
     });
   };
 
@@ -283,10 +280,8 @@ function FolderRow({ folder }: { folder: FolderNode }) {
             <ContextMenuItem
               onClick={() => {
                 archiveFolder.mutate(folder.id);
-                if (search.folder === folder.id) {
-                  navigate({
-                    search: (prev) => ({ ...prev, folder: undefined }),
-                  });
+                if (isActive) {
+                  navigate({ to: "/notes" });
                 }
               }}
             >
@@ -344,10 +339,8 @@ function FolderRow({ folder }: { folder: FolderNode }) {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (search.folder === folder.id) {
-                  navigate({
-                    search: (prev) => ({ ...prev, folder: undefined }),
-                  });
+                if (isActive) {
+                  navigate({ to: "/notes" });
                 }
                 deleteFolder.mutate(folder.id);
               }}

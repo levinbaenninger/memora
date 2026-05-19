@@ -46,7 +46,6 @@ export function useCreateNote() {
         navigate({
           to: "/notes/$noteId",
           params: { noteId: note.id },
-          search: (prev) => ({ ...prev, view: prev.view ?? "all" }),
         });
       },
       onError: () => toast.error("Failed to create note"),
@@ -99,10 +98,7 @@ export function useArchiveNote() {
       inv.invalidateList();
       inv.invalidateSearch();
       inv.invalidateNote(id);
-      navigate({
-        to: "/notes",
-        search: (prev) => ({ ...prev, view: prev.view ?? "all" }),
-      });
+      navigate({ to: "/notes" });
       toast.success("Note archived");
     },
     onError: () => toast.error("Failed to archive note"),
@@ -123,7 +119,6 @@ export function useRestoreNote() {
       navigate({
         to: "/notes/$noteId",
         params: { noteId: id },
-        search: (prev) => ({ ...prev, view: "all" }),
       });
     },
     onError: () => toast.error("Failed to restore note"),
@@ -146,10 +141,7 @@ export function useDeleteNote() {
     onSuccess: () => {
       inv.invalidateList();
       inv.invalidateSearch();
-      navigate({
-        to: "/notes",
-        search: (prev) => ({ ...prev, view: prev.view ?? "all" }),
-      });
+      navigate({ to: "/notes" });
       toast.success("Note deleted");
     },
     onError: () => toast.error("Failed to delete note"),

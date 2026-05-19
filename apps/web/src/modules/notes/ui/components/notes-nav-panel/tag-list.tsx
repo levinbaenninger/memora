@@ -1,6 +1,6 @@
-import { Delete01Icon } from "@hugeicons/core-free-icons";
+import { Delete01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import {
@@ -17,8 +17,10 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@memora/ui/components/context-menu";
+import { Input } from "@memora/ui/components/input";
 import {
   SidebarGroupLabel,
   SidebarMenuSub,
@@ -27,30 +29,51 @@ import {
 } from "@memora/ui/components/sidebar";
 import { cn } from "@memora/ui/lib/utils";
 
-import { useDeleteTag } from "@/modules/notes/mutations";
+import { useDeleteTag, useUpdateTag } from "@/modules/notes/mutations";
 import { useTagsList } from "@/modules/notes/queries";
 
 export function TagList() {
   const { data: tags } = useTagsList();
-  const navigate = useNavigate({ from: "/notes" });
-  const search = useSearch({ from: "/_app/notes" });
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const deleteTag = useDeleteTag();
+  const updateTag = useUpdateTag();
   const [tagToDelete, setTagToDelete] = useState<{
     id: string;
     name: string;
   } | null>(null);
+  const [tagToRename, setTagToRename] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
-  if (!tags.length) {
-    return null;
-  }
+  const commitRename = () => {
+    if (
+      tagToRename &&
+      renameValue.trim() &&
+      renameValue.trim() !== tagToRename.name
+    ) {
+      updateTag.mutate({ id: tagToRename.id, name: renameValue.trim() });
+    }
+    setTagToRename(null);
+  };
 
   return (
     <>
       <div>
         <SidebarGroupLabel>Tags</SidebarGroupLabel>
         <SidebarMenuSub>
+          {tags.length === 0 && (
+            <SidebarMenuSubItem>
+              <span className="px-2 py-1 text-sidebar-foreground/50 text-xs">
+                No tags yet
+              </span>
+            </SidebarMenuSubItem>
+          )}
           {tags.map((tag) => {
-            const isActive = search.tag === tag.id;
+            const tagPath = `/notes/tag/${tag.id}`;
+            const isActive = pathname === tagPath;
             return (
               <SidebarMenuSubItem key={tag.id}>
                 <ContextMenu>
@@ -65,13 +88,12 @@ export function TagList() {
                     <SidebarMenuSubButton
                       isActive={isActive}
                       onClick={() =>
-                        navigate({
-                          search: (prev) => ({
-                            ...prev,
-                            tag: prev.tag === tag.id ? undefined : tag.id,
-                            folder: undefined,
-                          }),
-                        })
+                        isActive
+                          ? navigate({ to: "/notes" })
+                          : navigate({
+                              to: "/notes/tag/$tagId",
+                              params: { tagId: tag.id },
+                            })
                       }
                     >
                       <span className="text-muted-foreground">#</span>
@@ -79,6 +101,20 @@ export function TagList() {
                     </SidebarMenuSubButton>
                   </ContextMenuTrigger>
                   <ContextMenuContent>
+                    <ContextMenuItem
+                      onClick={() => {
+                        setRenameValue(tag.name);
+                        setTagToRename({ id: tag.id, name: tag.name });
+                      }}
+                    >
+                      <HugeiconsIcon
+                        className="size-4"
+                        icon={Edit01Icon}
+                        strokeWidth={2}
+                      />
+                      Rename
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
                     <ContextMenuItem
                       onClick={() =>
                         setTagToDelete({ id: tag.id, name: tag.name })
@@ -101,6 +137,39 @@ export function TagList() {
       </div>
 
       <AlertDialog
+        onOpenChange={(open) => !open && setTagToRename(null)}
+        open={!!tagToRename}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rename tag</AlertDialogTitle>
+          </AlertDialogHeader>
+          <Input
+            autoFocus
+            onChange={(e) => setRenameValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                commitRename();
+              }
+            }}
+            placeholder="Tag name"
+            value={renameValue}
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={
+                !renameValue.trim() || renameValue.trim() === tagToRename?.name
+              }
+              onClick={commitRename}
+            >
+              Rename
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
         onOpenChange={(open) => !open && setTagToDelete(null)}
         open={!!tagToDelete}
       >
@@ -118,10 +187,8 @@ export function TagList() {
             <AlertDialogAction
               onClick={() => {
                 if (tagToDelete) {
-                  if (search.tag === tagToDelete.id) {
-                    navigate({
-                      search: (prev) => ({ ...prev, tag: undefined }),
-                    });
+                  if (pathname === `/notes/tag/${tagToDelete.id}`) {
+                    navigate({ to: "/notes" });
                   }
                   deleteTag.mutate(tagToDelete.id);
                 }

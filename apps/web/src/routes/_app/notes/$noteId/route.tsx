@@ -1,12 +1,19 @@
 import { isDefinedError, ORPCError } from "@orpc/client";
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { z } from "zod";
 
 import { NoteEditorView } from "@/modules/notes/ui/views/note-editor-view";
 import { NotesErrorView } from "@/modules/notes/ui/views/notes-error-view";
 import { NotesLoadingView } from "@/modules/notes/ui/views/notes-loading-view";
 import { NotesNotFoundView } from "@/modules/notes/ui/views/notes-not-found-view";
 
+const noteDetailSearchSchema = z.object({
+  from: z.string().optional(),
+});
+
 export const Route = createFileRoute("/_app/notes/$noteId")({
+  validateSearch: (search: Record<string, unknown>) =>
+    noteDetailSearchSchema.parse(search),
   loader: async ({ context, params }) => {
     try {
       await context.queryClient.ensureQueryData(

@@ -9,6 +9,7 @@ import {
 import { AppHeader } from "@/modules/app/ui/components/app-header";
 import { AppSidebar } from "@/modules/app/ui/components/app-sidebar";
 import type { UserButtonProps } from "@/modules/app/ui/components/user/user-button";
+import { useNotesBreadcrumbs } from "@/modules/notes/hooks/use-notes-breadcrumbs";
 import { NotesNavPanel } from "@/modules/notes/ui/components/notes-nav-panel";
 
 interface AppShellProps {
@@ -26,7 +27,9 @@ export function AppShell({
   renderLink,
   user,
 }: AppShellProps) {
-  const breadcrumbItems = getBreadcrumbItems(pathname);
+  const baseBreadcrumbItems = getBreadcrumbItems(pathname);
+  const notesBreadcrumbs = useNotesBreadcrumbs(pathname);
+  const breadcrumbItems = [...baseBreadcrumbItems, ...notesBreadcrumbs];
   const footerNavLinks = getFooterNavLinks(pathname);
   const isNotes = pathname.startsWith("/notes");
 
@@ -49,21 +52,17 @@ export function AppShell({
         navGroups={navGroups}
         renderLink={renderLink}
       />
-      <SidebarInset className={isNotes ? "overflow-hidden" : "p-4 md:p-6"}>
-        {isNotes ? (
-          <div className="flex h-full overflow-hidden">{children}</div>
-        ) : (
-          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col">
-            <AppHeader
-              breadcrumbItems={breadcrumbItems}
-              renderLink={renderLink}
-              user={user}
-            />
-            <div className="flex flex-1 flex-col gap-4 overflow-hidden">
-              {children}
-            </div>
+      <SidebarInset className="min-w-0 px-16 py-4 md:py-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col">
+          <AppHeader
+            breadcrumbItems={breadcrumbItems}
+            renderLink={renderLink}
+            user={user}
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-hidden">
+            {children}
           </div>
-        )}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

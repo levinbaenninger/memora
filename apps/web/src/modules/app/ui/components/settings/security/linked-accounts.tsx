@@ -4,7 +4,7 @@ import { useAuth, useListAccounts } from "@better-auth-ui/react";
 
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Separator } from "@memora/ui/components/separator";
-import { Skeleton } from "@memora/ui/components/skeleton";
+import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
 import { LinkedAccount } from "./linked-account";
@@ -52,40 +52,21 @@ export function LinkedAccounts({ className }: LinkedAccountsProps) {
 
       <Card className={cn("p-0", className)}>
         <CardContent className="p-0">
-          {isPending
-            ? socialProviders?.map((provider, index) => (
-                <div key={provider}>
-                  {index > 0 && <Separator />}
-                  <AccountRowSkeleton />
-                </div>
-              ))
-            : allRows.map((row, index) => (
-                <div key={row.key}>
-                  {index > 0 && <Separator />}
+          {isPending ? (
+            <div className="flex justify-center p-6">
+              <Spinner className="size-5" />
+            </div>
+          ) : (
+            allRows.map((row, index) => (
+              <div key={row.key}>
+                {index > 0 && <Separator />}
 
-                  <LinkedAccount
-                    account={row.account}
-                    provider={row.provider}
-                  />
-                </div>
-              ))}
+                <LinkedAccount account={row.account} provider={row.provider} />
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function AccountRowSkeleton() {
-  return (
-    <Card className="border-0 bg-transparent shadow-none ring-0">
-      <CardContent className="flex items-center gap-3">
-        <Skeleton className="size-10 rounded-md" />
-
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-3 w-32" />
-        </div>
-      </CardContent>
-    </Card>
   );
 }

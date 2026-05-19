@@ -45,7 +45,6 @@ export const noteMentionSpec = createReactInlineContentSpec(
         router.navigate({
           to: "/notes/$noteId",
           params: { noteId },
-          search: (prev) => ({ ...prev, view: prev.view ?? "all" }),
         });
       };
 

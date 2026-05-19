@@ -20,7 +20,7 @@ import {
 import { useNote } from "@/modules/notes/queries";
 import { useNotesStore } from "@/modules/notes/store";
 import { BlockNoteEditorView } from "../components/note-editor/blocknote-editor";
-import { EditorToolbar } from "../components/note-editor/editor-toolbar";
+import { NoteActionsMenu } from "../components/note-editor/note-actions-menu";
 import { NoteMetadataStrip } from "../components/note-editor/note-metadata-strip";
 
 export function NoteEditorView() {
@@ -58,14 +58,8 @@ export function NoteEditorView() {
   }, [note.id]);
 
   return (
-    <div className="flex min-h-full flex-col">
-      <EditorToolbar
-        favorite={note.favorite}
-        noteId={noteId}
-        pinned={note.pinned}
-      />
-
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
+    <div className="flex min-h-full min-w-0 flex-col">
+      <div className="flex w-full min-w-0 flex-1 flex-col">
         {isArchived && (
           <div className="pt-4">
             <Alert>
@@ -93,9 +87,9 @@ export function NoteEditorView() {
           </div>
         )}
 
-        <div className="pt-6">
+        <div className="flex items-center justify-between gap-2 pt-6">
           <input
-            className="w-full bg-transparent font-bold text-3xl outline-none placeholder:text-muted-foreground"
+            className="min-w-0 flex-1 bg-transparent font-bold text-3xl outline-none placeholder:text-muted-foreground"
             defaultValue={note.title}
             disabled={isArchived}
             onChange={(e) => {
@@ -104,6 +98,11 @@ export function NoteEditorView() {
             }}
             placeholder="Untitled"
             ref={titleRef}
+          />
+          <NoteActionsMenu
+            favorite={note.favorite}
+            noteId={noteId}
+            pinned={note.pinned}
           />
         </div>
 

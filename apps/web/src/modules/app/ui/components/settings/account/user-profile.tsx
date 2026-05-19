@@ -21,7 +21,6 @@ import {
   InputGroupInput,
 } from "@memora/ui/components/input-group";
 import { Label } from "@memora/ui/components/label";
-import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
@@ -178,9 +177,7 @@ export function UserProfile({ className }: UserProfileProps) {
                     )}
                   </InputGroup>
                 ) : (
-                  <Skeleton>
-                    <Input className="invisible" />
-                  </Skeleton>
+                  <Input disabled />
                 )}
 
                 <FieldError>
@@ -222,9 +219,7 @@ export function UserProfile({ className }: UserProfileProps) {
                   required
                 />
               ) : (
-                <Skeleton>
-                  <Input className="invisible" />
-                </Skeleton>
+                <Input disabled />
               )}
 
               <FieldError>{fieldErrors.name}</FieldError>

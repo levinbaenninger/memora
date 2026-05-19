@@ -7,7 +7,6 @@ import { Card, CardContent, CardFooter } from "@memora/ui/components/card";
 import { Field, FieldError } from "@memora/ui/components/field";
 import { Input } from "@memora/ui/components/input";
 import { Label } from "@memora/ui/components/label";
-import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
@@ -85,9 +84,7 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
                   type="email"
                 />
               ) : (
-                <Skeleton>
-                  <Input className="invisible" />
-                </Skeleton>
+                <Input disabled />
               )}
 
               <FieldError>{fieldErrors.email}</FieldError>

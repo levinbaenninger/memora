@@ -10,7 +10,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@memora/ui/components/avatar";
-import { Skeleton } from "@memora/ui/components/skeleton";
+import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
 interface UserAvatarProps {
@@ -43,7 +43,16 @@ export function UserAvatar({
   });
 
   if ((isPending || sessionPending) && !user) {
-    return <Skeleton className={cn("size-8 rounded-full", className)} />;
+    return (
+      <div
+        className={cn(
+          "flex size-8 items-center justify-center rounded-full bg-muted",
+          className
+        )}
+      >
+        <Spinner className="size-4" />
+      </div>
+    );
   }
 
   const resolvedUser = user ?? session?.user;

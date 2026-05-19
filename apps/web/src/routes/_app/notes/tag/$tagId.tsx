@@ -1,0 +1,40 @@
+import { Tag01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute } from "@tanstack/react-router";
+
+import { useTagsList } from "@/modules/notes/queries";
+import {
+  TagActionsProvider,
+  TagMenuItems,
+} from "@/modules/notes/ui/components/tag-actions";
+import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
+
+export const Route = createFileRoute("/_app/notes/tag/$tagId")({
+  head: () => ({ meta: [{ title: "Tag" }] }),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(
+      context.orpc.notes.list.queryOptions({
+        input: { includeArchived: false, limit: 50, offset: 0 },
+      })
+    ),
+  component: TagView,
+});
+
+function TagView() {
+  const { tagId } = Route.useParams();
+  const { data: tags } = useTagsList();
+  const tag = tags.find((t) => t.id === tagId);
+  const name = tag?.name ?? "Tag";
+
+  return (
+    <TagActionsProvider tagId={tagId} tagName={name}>
+      <NoteGridView
+        contextActions={<TagMenuItems />}
+        tagId={tagId}
+        title={name}
+        titleIcon={<HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />}
+        view="all"
+      />
+    </TagActionsProvider>
+  );
+}

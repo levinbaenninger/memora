@@ -35,6 +35,12 @@
   overflow: visible;
 }
 
+/* Side menu (drag/plus handles) floats outside editor flow.
+ * Raise z-index so it stays above sidebar inset chrome. */
+.bn-side-menu {
+  z-index: 50;
+}
+
 /* Heading sizes: smaller + no extra top padding so side menu aligns.
  * Browser default h1 is 2em — override with !important on both the
  * block-content container and the actual <hN> elements. */

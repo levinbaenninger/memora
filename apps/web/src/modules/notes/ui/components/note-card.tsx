@@ -7,7 +7,7 @@ import {
   PinOffIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Link, useParams } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import {
@@ -37,9 +37,10 @@ import {
   useUpdateNote,
 } from "@/modules/notes/mutations";
 
-interface NoteListItemProps {
+interface NoteCardProps {
   favorite: boolean;
   folderName?: string | null;
+  fromPath?: string;
   id: string;
   isArchived: boolean;
   pinned: boolean;
@@ -69,7 +70,7 @@ function relativeDate(date: Date): string {
   return date.toLocaleDateString();
 }
 
-export function NoteListItem({
+export function NoteCard({
   id,
   title,
   snippet,
@@ -79,9 +80,8 @@ export function NoteListItem({
   updatedAt,
   tags,
   folderName,
-}: NoteListItemProps) {
-  const params = useParams({ strict: false });
-  const isActive = params.noteId === id;
+  fromPath,
+}: NoteCardProps) {
   const updateNote = useUpdateNote();
   const archiveNote = useArchiveNote();
   const restoreNote = useRestoreNote();
@@ -98,18 +98,15 @@ export function NoteListItem({
           )}
         >
           <Link
-            className={cn(
-              "block rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-accent/50",
-              isActive && "bg-accent"
-            )}
+            className="flex h-44 flex-col rounded-lg border bg-card p-4 text-left transition-colors hover:border-accent-foreground/30 hover:bg-accent/40"
             params={{ noteId: id }}
-            search={(prev) => ({ ...prev, view: prev.view ?? "all" })}
+            search={fromPath ? { from: fromPath } : undefined}
             to="/notes/$noteId"
           >
-            <div className="flex items-start justify-between gap-1">
+            <div className="flex items-start justify-between gap-2">
               <span
                 className={cn(
-                  "flex-1 truncate font-medium text-sm leading-tight",
+                  "line-clamp-2 flex-1 font-medium text-sm leading-tight",
                   !title && "text-muted-foreground italic"
                 )}
               >
@@ -118,14 +115,14 @@ export function NoteListItem({
               <div className="flex shrink-0 items-center gap-1">
                 {pinned && (
                   <HugeiconsIcon
-                    className="size-3 text-muted-foreground"
+                    className="size-3.5 text-muted-foreground"
                     icon={PinIcon}
                     strokeWidth={2}
                   />
                 )}
                 {favorite && (
                   <HugeiconsIcon
-                    className="size-3 text-muted-foreground"
+                    className="size-3.5 text-muted-foreground"
                     icon={FavouriteIcon}
                     strokeWidth={2}
                   />
@@ -133,13 +130,16 @@ export function NoteListItem({
               </div>
             </div>
 
-            {snippet && (
-              <p className="mt-0.5 line-clamp-2 text-muted-foreground text-xs">
-                {snippet}
-              </p>
-            )}
+            <p
+              className={cn(
+                "mt-2 line-clamp-4 flex-1 text-muted-foreground text-xs",
+                !snippet && "italic"
+              )}
+            >
+              {snippet || "No content yet"}
+            </p>
 
-            <div className="mt-1.5 flex flex-wrap items-center gap-1">
+            <div className="mt-auto flex flex-wrap items-center gap-1 pt-2">
               <span className="text-muted-foreground text-xs">
                 {relativeDate(updatedAt)}
               </span>

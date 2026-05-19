@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       tailwindcss(),
-      tanstackStart(),
+      tanstackStart({ spa: { enabled: true } }),
       sentryTanstackStart({
         authToken: env.SENTRY_AUTH_TOKEN,
         org: env.VITE_SENTRY_ORG,

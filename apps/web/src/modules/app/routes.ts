@@ -2,6 +2,7 @@ import {
   ArchiveIcon,
   DashboardSquare01Icon,
   FavouriteIcon,
+  Notebook01Icon,
   NoteIcon,
   PinIcon,
   Settings01Icon,
@@ -16,6 +17,7 @@ type AppRouteParams = LinkProps["params"];
 
 export interface SidebarNavItem {
   contextualContent?: ReactNode;
+  exact?: boolean;
   icon?: ReactNode;
   isActive?: boolean;
   matchPaths?: string[];
@@ -55,30 +57,27 @@ const navGroups: SidebarNavGroup[] = [
       {
         title: "Notes",
         path: "/notes",
-        icon: routeIcon(NoteIcon),
+        icon: routeIcon(Notebook01Icon),
         subItems: [
           {
             title: "All Notes",
             path: "/notes",
-            search: { view: "all", folder: undefined, tag: undefined },
+            exact: true,
             icon: routeIcon(NoteIcon),
           },
           {
             title: "Pinned",
-            path: "/notes",
-            search: { view: "pinned", folder: undefined, tag: undefined },
+            path: "/notes/pinned",
             icon: routeIcon(PinIcon),
           },
           {
             title: "Favorites",
-            path: "/notes",
-            search: { view: "favorites", folder: undefined, tag: undefined },
+            path: "/notes/favorites",
             icon: routeIcon(FavouriteIcon),
           },
           {
             title: "Archive",
-            path: "/notes",
-            search: { view: "archived", folder: undefined, tag: undefined },
+            path: "/notes/archived",
             icon: routeIcon(ArchiveIcon),
           },
         ],
@@ -111,8 +110,10 @@ function isNavItemActive(
     (path): path is string => path != null && path !== ""
   );
 
-  const pathMatch = matchPaths.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  const pathMatch = matchPaths.some((path) =>
+    item.exact
+      ? pathname === path
+      : pathname === path || pathname.startsWith(`${path}/`)
   );
 
   if (!pathMatch) {
@@ -145,6 +146,9 @@ function getActiveNavBreadcrumb(pathname: string) {
       const subItem = getActiveSubItem(item, pathname);
 
       if (subItem) {
+        if (subItem.path === item.path) {
+          return [item];
+        }
         return [item, subItem];
       }
 
