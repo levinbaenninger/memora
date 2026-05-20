@@ -19,7 +19,7 @@ export function AppHeader({
 }) {
   return (
     <header className="mb-6 flex items-center justify-between gap-2">
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         <CustomSidebarTrigger className="md:hidden" />
         <Separator
           className="mr-2 h-4 data-[orientation=vertical]:self-center md:hidden"
@@ -27,7 +27,7 @@ export function AppHeader({
         />
         <AppBreadcrumbs items={breadcrumbItems} renderLink={renderLink} />
       </div>
-      <UserButton size="icon" user={user} />
+      <UserButton className="shrink-0" size="icon" user={user} />
     </header>
   );
 }

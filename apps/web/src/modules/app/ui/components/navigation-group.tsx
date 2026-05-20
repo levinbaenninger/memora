@@ -71,12 +71,12 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
             {item.icon}
             <span>{item.title}</span>
             <HugeiconsIcon
-              className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90"
+              className="ml-auto transition-transform duration-200 group-data-[collapsible=icon]:hidden group-data-open/collapsible:rotate-90"
               icon={ArrowRight01Icon}
               strokeWidth={2}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent>
+          <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
             {item.subItems?.length ? (
               <SidebarMenuSub>
                 {item.subItems.map((subItem) => (
