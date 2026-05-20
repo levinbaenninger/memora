@@ -23,8 +23,10 @@ export type CommandMenuPage =
 interface CommandMenuContextValue {
   open: boolean;
   page: CommandMenuPage;
+  query: string;
   setOpen: (open: boolean) => void;
   setPage: (page: CommandMenuPage) => void;
+  setQuery: (query: string) => void;
   toggle: () => void;
 }
 
@@ -33,11 +35,12 @@ const CommandMenuContext = createContext<CommandMenuContextValue | null>(null);
 export function CommandMenuProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState<CommandMenuPage>("root");
+  const [query, setQuery] = useState("");
   const toggle = useCallback(() => setOpen((prev) => !prev), []);
 
   const value = useMemo(
-    () => ({ open, setOpen, toggle, page, setPage }),
-    [open, toggle, page]
+    () => ({ open, setOpen, toggle, page, setPage, query, setQuery }),
+    [open, toggle, page, query]
   );
 
   return (

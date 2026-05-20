@@ -24,7 +24,7 @@ import { useHotkey } from "@tanstack/react-hotkeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import type { KeyboardEvent } from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 import {
@@ -90,9 +90,8 @@ const PAGE_TITLES = {
 } as const;
 
 export function CommandMenu() {
-  const { open, setOpen, page, setPage } = useCommandMenu();
+  const { open, setOpen, page, setPage, query, setQuery } = useCommandMenu();
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
 
   useHotkey("Mod+K", (event) => {
     event.preventDefault();
@@ -104,7 +103,7 @@ export function CommandMenu() {
       setQuery("");
       setPage("root");
     }
-  }, [open, setPage]);
+  }, [open, setPage, setQuery]);
 
   const goToPage = (next: ReturnType<typeof useCommandMenu>["page"]) => {
     setQuery("");
