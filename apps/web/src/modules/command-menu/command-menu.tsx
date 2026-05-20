@@ -353,80 +353,29 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
         </CommandItem>
       </CommandGroup>
       {showNotes ? (
-        <CommandGroup forceMount heading="Notes" value="notes">
-          {noteSearch.isFetching && notes.length === 0 ? (
-            <div className="flex items-center justify-center px-2 py-3 text-muted-foreground text-xs">
-              <Spinner className="size-3" />
-            </div>
-          ) : null}
-          {notes.map((note) => (
-            <CommandItem
-              forceMount
-              key={note.id}
-              onSelect={() =>
-                closeAndRun(() =>
-                  navigate({
-                    to: "/notes/$noteId",
-                    params: { noteId: note.id },
-                  })
-                )
-              }
-              value={`note-${note.id}`}
-            >
-              <HugeiconsIcon icon={NoteIcon} strokeWidth={2} />
-              <span className="truncate">{note.title || "Untitled"}</span>
-              {note.folder ? (
-                <span className="ml-auto truncate text-muted-foreground text-xs">
-                  {note.folder.name}
-                </span>
-              ) : null}
-            </CommandItem>
-          ))}
-        </CommandGroup>
+        <NotesGroup
+          closeAndRun={closeAndRun}
+          isFetching={noteSearch.isFetching}
+          navigate={navigate}
+          notes={notes}
+          query={trimmed}
+        />
       ) : null}
-      {showEntities && folders.length > 0 ? (
-        <CommandGroup heading="Folders">
-          {folders.map((folder) => (
-            <CommandItem
-              key={folder.id}
-              keywords={[folder.name]}
-              onSelect={() =>
-                closeAndRun(() =>
-                  navigate({
-                    to: "/notes/folder/$folderId",
-                    params: { folderId: folder.id },
-                  })
-                )
-              }
-              value={`folder ${folder.name}`}
-            >
-              <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} />
-              <span className="truncate">{folder.name}</span>
-            </CommandItem>
-          ))}
-        </CommandGroup>
+      {showEntities ? (
+        <FoldersGroup
+          closeAndRun={closeAndRun}
+          folders={folders}
+          navigate={navigate}
+          query={trimmed}
+        />
       ) : null}
-      {showEntities && tags.length > 0 ? (
-        <CommandGroup heading="Tags">
-          {tags.map((tag) => (
-            <CommandItem
-              key={tag.id}
-              keywords={[tag.name, tag.slug]}
-              onSelect={() =>
-                closeAndRun(() =>
-                  navigate({
-                    to: "/notes/tag/$tagId",
-                    params: { tagId: tag.id },
-                  })
-                )
-              }
-              value={`tag ${tag.name} ${tag.slug}`}
-            >
-              <HugeiconsIcon icon={HashtagIcon} strokeWidth={2} />
-              <span className="truncate">{tag.name}</span>
-            </CommandItem>
-          ))}
-        </CommandGroup>
+      {showEntities ? (
+        <TagsGroup
+          closeAndRun={closeAndRun}
+          navigate={navigate}
+          query={trimmed}
+          tags={tags}
+        />
       ) : null}
     </>
   );
@@ -1047,6 +996,158 @@ function AddTagPage() {
           </CommandItem>
         );
       })}
+    </CommandGroup>
+  );
+}
+
+type FoldersList = ReturnType<typeof useFoldersForPalette>["data"];
+type TagsList = ReturnType<typeof useTagsForPalette>["data"];
+type NotesList = ReturnType<typeof useNoteSearch>["data"];
+
+function EmptyRow({ message }: { message: string }) {
+  return (
+    <div
+      className="px-2 py-3 text-center text-muted-foreground text-xs italic"
+      data-slot="command-empty-row"
+    >
+      {message}
+    </div>
+  );
+}
+
+function NotesGroup({
+  closeAndRun,
+  isFetching,
+  navigate,
+  notes,
+  query,
+}: {
+  closeAndRun: (action: () => void) => void;
+  isFetching: boolean;
+  navigate: NavigateFn;
+  notes: NonNullable<NotesList>;
+  query: string;
+}) {
+  const noResults = !isFetching && notes.length === 0;
+
+  return (
+    <CommandGroup forceMount heading="Notes" value="notes">
+      {isFetching && notes.length === 0 ? (
+        <div className="flex items-center justify-center px-2 py-3 text-muted-foreground text-xs">
+          <Spinner className="size-3" />
+        </div>
+      ) : null}
+      {noResults ? <EmptyRow message={`No notes match “${query}”`} /> : null}
+      {notes.map((note) => (
+        <CommandItem
+          forceMount
+          key={note.id}
+          onSelect={() =>
+            closeAndRun(() =>
+              navigate({
+                to: "/notes/$noteId",
+                params: { noteId: note.id },
+              })
+            )
+          }
+          value={`note-${note.id}`}
+        >
+          <HugeiconsIcon icon={NoteIcon} strokeWidth={2} />
+          <span className="truncate">{note.title || "Untitled"}</span>
+          {note.folder ? (
+            <span className="ml-auto truncate text-muted-foreground text-xs">
+              {note.folder.name}
+            </span>
+          ) : null}
+        </CommandItem>
+      ))}
+    </CommandGroup>
+  );
+}
+
+function FoldersGroup({
+  closeAndRun,
+  folders,
+  navigate,
+  query,
+}: {
+  closeAndRun: (action: () => void) => void;
+  folders: NonNullable<FoldersList>;
+  navigate: NavigateFn;
+  query: string;
+}) {
+  const q = query.toLowerCase();
+  const matches = folders.filter((folder) =>
+    folder.name.toLowerCase().includes(q)
+  );
+
+  return (
+    <CommandGroup forceMount heading="Folders" value="folders">
+      {matches.length === 0 ? (
+        <EmptyRow message={`No folders match “${query}”`} />
+      ) : null}
+      {matches.map((folder) => (
+        <CommandItem
+          forceMount
+          key={folder.id}
+          onSelect={() =>
+            closeAndRun(() =>
+              navigate({
+                to: "/notes/folder/$folderId",
+                params: { folderId: folder.id },
+              })
+            )
+          }
+          value={`folder-${folder.id}`}
+        >
+          <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} />
+          <span className="truncate">{folder.name}</span>
+        </CommandItem>
+      ))}
+    </CommandGroup>
+  );
+}
+
+function TagsGroup({
+  closeAndRun,
+  navigate,
+  query,
+  tags,
+}: {
+  closeAndRun: (action: () => void) => void;
+  navigate: NavigateFn;
+  query: string;
+  tags: NonNullable<TagsList>;
+}) {
+  const q = query.toLowerCase();
+  const matches = tags.filter(
+    (tag) =>
+      tag.name.toLowerCase().includes(q) || tag.slug.toLowerCase().includes(q)
+  );
+
+  return (
+    <CommandGroup forceMount heading="Tags" value="tags">
+      {matches.length === 0 ? (
+        <EmptyRow message={`No tags match “${query}”`} />
+      ) : null}
+      {matches.map((tag) => (
+        <CommandItem
+          forceMount
+          key={tag.id}
+          onSelect={() =>
+            closeAndRun(() =>
+              navigate({
+                to: "/notes/tag/$tagId",
+                params: { tagId: tag.id },
+              })
+            )
+          }
+          value={`tag-${tag.id}`}
+        >
+          <HugeiconsIcon icon={HashtagIcon} strokeWidth={2} />
+          <span className="truncate">{tag.name}</span>
+        </CommandItem>
+      ))}
     </CommandGroup>
   );
 }
