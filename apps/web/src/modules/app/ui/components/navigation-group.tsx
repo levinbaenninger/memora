@@ -64,7 +64,9 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
               <SidebarMenuButton
                 isActive={item.isActive}
                 render={
-                  item.path ? renderLink(item.path, item.params) : undefined
+                  item.path
+                    ? renderLink(item.path, item.params, item.search)
+                    : undefined
                 }
               />
             }
@@ -109,7 +111,11 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
         <SidebarMenuButton
           isActive={item.isActive}
           onClick={closeMobileSheet}
-          render={item.path ? renderLink(item.path, item.params) : undefined}
+          render={
+            item.path
+              ? renderLink(item.path, item.params, item.search)
+              : undefined
+          }
         >
           {item.icon}
           <span>{item.title}</span>

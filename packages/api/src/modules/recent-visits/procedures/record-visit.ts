@@ -1,4 +1,4 @@
-import { and, desc, eq, lt, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "@memora/db";
 import { recentVisits } from "@memora/db/schema";
@@ -29,25 +29,36 @@ export const recordVisit = authorized
         set: { visitedAt: sql`now()` },
       });
 
-    const cutoffRows = await db
-      .select({ visitedAt: recentVisits.visitedAt })
+    const orderedRows = await db
+      .select({
+        entityType: recentVisits.entityType,
+        entityId: recentVisits.entityId,
+      })
       .from(recentVisits)
       .where(eq(recentVisits.userId, userId))
-      .orderBy(desc(recentVisits.visitedAt))
+      .orderBy(
+        desc(recentVisits.visitedAt),
+        recentVisits.entityType,
+        recentVisits.entityId
+      )
       .limit(MAX_ROWS_PER_USER + 1);
 
-    if (cutoffRows.length > MAX_ROWS_PER_USER) {
-      const cutoff = cutoffRows[MAX_ROWS_PER_USER]?.visitedAt;
-      if (cutoff) {
-        await db
-          .delete(recentVisits)
-          .where(
-            and(
-              eq(recentVisits.userId, userId),
-              lt(recentVisits.visitedAt, cutoff)
-            )
-          );
-      }
+    if (orderedRows.length > MAX_ROWS_PER_USER) {
+      const keepRows = orderedRows.slice(0, MAX_ROWS_PER_USER);
+      const keepTuples = sql.join(
+        keepRows.map(
+          (row) => sql`(${row.entityType}::text, ${row.entityId}::text)`
+        ),
+        sql`, `
+      );
+      await db
+        .delete(recentVisits)
+        .where(
+          and(
+            eq(recentVisits.userId, userId),
+            sql`(${recentVisits.entityType}, ${recentVisits.entityId}) NOT IN (${keepTuples})`
+          )
+        );
     }
 
     return { ok: true } as const;

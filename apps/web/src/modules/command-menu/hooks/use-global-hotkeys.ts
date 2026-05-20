@@ -39,7 +39,15 @@ export function useGlobalHotkeys() {
   const update = useMutation({
     mutationFn: (input: { pinned?: boolean; favorite?: boolean }) =>
       client.notes.update({ id: noteId ?? "", ...input }),
-    onSuccess: invalidateNote,
+    onSuccess: (_data, variables) => {
+      invalidateNote();
+      if (variables.favorite !== undefined) {
+        toast.success(variables.favorite ? "Favorited" : "Unfavorited");
+      }
+      if (variables.pinned !== undefined) {
+        toast.success(variables.pinned ? "Pinned" : "Unpinned");
+      }
+    },
     onError: () => toast.error("Failed to update note"),
   });
 
@@ -88,7 +96,6 @@ export function useGlobalHotkeys() {
       }
       event.preventDefault();
       update.mutate({ favorite: !note.favorite });
-      toast.success(note.favorite ? "Unfavorited" : "Favorited");
     },
     { ...OPTS, enabled: !!note }
   );
@@ -101,7 +108,6 @@ export function useGlobalHotkeys() {
       }
       event.preventDefault();
       update.mutate({ pinned: !note.pinned });
-      toast.success(note.pinned ? "Unpinned" : "Pinned");
     },
     { ...OPTS, enabled: !!note }
   );

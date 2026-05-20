@@ -273,10 +273,13 @@ function FolderRow({ folder }: { folder: FolderNode }) {
             <ContextMenuSeparator />
             <ContextMenuItem
               onClick={() => {
-                archiveFolder.mutate(folder.id);
-                if (isActive) {
-                  navigate({ to: "/notes" });
-                }
+                archiveFolder.mutate(folder.id, {
+                  onSuccess: () => {
+                    if (isActive) {
+                      navigate({ to: "/notes" });
+                    }
+                  },
+                });
               }}
             >
               <HugeiconsIcon
@@ -333,10 +336,13 @@ function FolderRow({ folder }: { folder: FolderNode }) {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (isActive) {
-                  navigate({ to: "/notes" });
-                }
-                deleteFolder.mutate(folder.id);
+                deleteFolder.mutate(folder.id, {
+                  onSuccess: () => {
+                    if (isActive) {
+                      navigate({ to: "/notes" });
+                    }
+                  },
+                });
               }}
             >
               Delete

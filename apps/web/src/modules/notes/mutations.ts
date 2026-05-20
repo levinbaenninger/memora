@@ -133,8 +133,13 @@ export function useDeleteNote() {
     mutationFn: async (id: string) => {
       try {
         await client.notes.archive({ id });
-      } catch {
-        // already archived — proceed to hard delete
+      } catch (e) {
+        // NOT_FOUND means already archived or never existed — proceed to hard delete.
+        // Anything else (auth/network/server) bubbles up.
+        const code = (e as { code?: string } | null)?.code;
+        if (code !== "NOT_FOUND") {
+          throw e;
+        }
       }
       return client.notes.hardDelete({ id });
     },
@@ -196,8 +201,11 @@ export function useDeleteFolder() {
     mutationFn: async (id: string) => {
       try {
         await client.notes.folders.archive({ id });
-      } catch {
-        // already archived — proceed to hard delete
+      } catch (e) {
+        const code = (e as { code?: string } | null)?.code;
+        if (code !== "NOT_FOUND") {
+          throw e;
+        }
       }
       return client.notes.folders.hardDelete({ id });
     },

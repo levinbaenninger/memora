@@ -177,9 +177,12 @@ export function FolderActionsProvider({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                archiveFolder.mutate(folderId);
-                setConfirmArchive(false);
-                navigate({ to: "/notes" });
+                archiveFolder.mutate(folderId, {
+                  onSuccess: () => {
+                    setConfirmArchive(false);
+                    navigate({ to: "/notes" });
+                  },
+                });
               }}
             >
               Archive
@@ -200,9 +203,12 @@ export function FolderActionsProvider({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                deleteFolder.mutate(folderId);
-                setConfirmDelete(false);
-                navigate({ to: "/notes" });
+                deleteFolder.mutate(folderId, {
+                  onSuccess: () => {
+                    setConfirmDelete(false);
+                    navigate({ to: "/notes" });
+                  },
+                });
               }}
             >
               Delete

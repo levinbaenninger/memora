@@ -53,6 +53,20 @@ export const archiveNote = authorized
       now.getTime() + ARCHIVE_RETENTION_DAYS * 24 * 60 * 60 * 1000
     );
 
+    // Data-integrity recovery: archivedAt set but archiveExpiresAt missing.
+    // Backfill expiry from now so the row becomes idempotently archive-able.
+    if (note.archivedAt && !note.archiveExpiresAt) {
+      await db
+        .update(notes)
+        .set({ archiveExpiresAt, updatedAt: now })
+        .where(and(eq(notes.id, input.id), eq(notes.userId, userId)));
+      return archiveNoteResponseDtoSchema.parse({
+        id: input.id,
+        archivedAt: note.archivedAt,
+        archiveExpiresAt,
+      });
+    }
+
     const [archived] = await db
       .update(notes)
       .set({

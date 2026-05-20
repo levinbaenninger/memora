@@ -980,6 +980,9 @@ function AddTagPage() {
   }
 
   const toggle = (tagName: string) => {
+    if (update.isPending) {
+      return;
+    }
     const next = new Set(noteTagNames);
     if (next.has(tagName)) {
       next.delete(tagName);

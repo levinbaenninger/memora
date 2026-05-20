@@ -19,7 +19,12 @@ export const Route = createFileRoute("/_app/notes/tag/$tagId")({
       ),
       context.queryClient.ensureQueryData(
         context.orpc.notes.list.queryOptions({
-          input: { includeArchived: false, limit: 50, offset: 0 },
+          input: {
+            includeArchived: false,
+            limit: 50,
+            offset: 0,
+            tagId: params.tagId,
+          },
         })
       ),
     ]);

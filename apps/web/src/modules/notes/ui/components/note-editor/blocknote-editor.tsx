@@ -114,7 +114,10 @@ function ClientBlockNoteEditor({
   });
 
   const [linkNoteOpen, setLinkNoteOpen] = useState(false);
-  const previousNoteIdRef = useRef(noteId);
+  const lastAppliedRef = useRef({
+    noteId,
+    hasContent: !!(content && content.length > 0),
+  });
   const { theme } = useTheme();
   const [systemDark, setSystemDark] = useState(false);
 
@@ -137,15 +140,21 @@ function ClientBlockNoteEditor({
   }
 
   useEffect(() => {
-    if (previousNoteIdRef.current === noteId) {
+    const noteChanged = lastAppliedRef.current.noteId !== noteId;
+    const contentLoaded =
+      !lastAppliedRef.current.hasContent && !!(content && content.length > 0);
+    if (!(noteChanged || contentLoaded)) {
       return;
     }
-    previousNoteIdRef.current = noteId;
     const next =
       content && content.length > 0
         ? content
         : [{ type: "paragraph" } as PartialBlock];
     editor.replaceBlocks(editor.document, next as never);
+    lastAppliedRef.current = {
+      noteId,
+      hasContent: !!(content && content.length > 0),
+    };
   }, [content, editor, noteId]);
 
   const persistEditorContent = useCallback(() => {

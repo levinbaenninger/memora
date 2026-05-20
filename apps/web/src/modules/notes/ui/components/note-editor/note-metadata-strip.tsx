@@ -62,6 +62,9 @@ export function NoteMetadataStrip({
   };
 
   const handleTagToggle = (tagName: string) => {
+    if (updateNote.isPending) {
+      return;
+    }
     const next = currentTagNames.includes(tagName)
       ? currentTagNames.filter((n) => n !== tagName)
       : [...currentTagNames, tagName];
@@ -70,7 +73,7 @@ export function NoteMetadataStrip({
 
   const handleCreateTag = () => {
     const name = tagInput.trim();
-    if (!name) {
+    if (!name || updateNote.isPending) {
       return;
     }
     updateNote.mutate({

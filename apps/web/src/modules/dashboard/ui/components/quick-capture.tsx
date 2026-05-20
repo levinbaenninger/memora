@@ -18,8 +18,10 @@ export function QuickCapture() {
     if (!trimmed || createNote.isPending) {
       return;
     }
-    createNote.mutate({ title: trimmed, content: [] });
-    setTitle("");
+    createNote.mutate(
+      { title: trimmed, content: [] },
+      { onSuccess: () => setTitle("") }
+    );
   };
 
   return (

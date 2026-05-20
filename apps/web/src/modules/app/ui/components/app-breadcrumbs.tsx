@@ -13,7 +13,7 @@ import type { AppLinkRenderer, SidebarNavItem } from "@/modules/app/routes";
 
 type AppBreadcrumbPage = Pick<
   SidebarNavItem,
-  "icon" | "params" | "path" | "title"
+  "icon" | "params" | "path" | "search" | "title"
 >;
 
 export function AppBreadcrumbs({
@@ -46,7 +46,7 @@ export function AppBreadcrumbs({
                 ) : (
                   <BreadcrumbLink
                     className="flex min-w-0 items-center gap-2 [&>svg]:size-3.5"
-                    render={renderLink(item.path, item.params)}
+                    render={renderLink(item.path, item.params, item.search)}
                   >
                     {item.icon}
                     <span className="min-w-0 truncate">{item.title}</span>

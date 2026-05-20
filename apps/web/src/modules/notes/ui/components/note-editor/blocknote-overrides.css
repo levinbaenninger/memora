@@ -140,11 +140,13 @@
   margin-left: -80px;
 }
 
-/* Hide broken Radix tooltip arrow + add breathing room since arrow is gone */
-[data-slot="tooltip-content"] svg {
+/* Hide broken Radix tooltip arrow + add breathing room since arrow is gone.
+ * Scoped to Radix's popper wrapper so it only affects BlockNote tooltips
+ * (Radix) and not the app's Base UI tooltips, which share the same data-slot. */
+:where([data-radix-popper-content-wrapper]) [data-slot="tooltip-content"] svg {
   display: none !important;
 }
-[data-slot="tooltip-content"] {
+:where([data-radix-popper-content-wrapper]) [data-slot="tooltip-content"] {
   margin-top: 8px;
   margin-bottom: 8px;
 }

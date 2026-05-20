@@ -112,9 +112,12 @@ export function TagActionsProvider({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                deleteTag.mutate(tagId);
-                setConfirmDelete(false);
-                navigate({ to: "/notes" });
+                deleteTag.mutate(tagId, {
+                  onSuccess: () => {
+                    setConfirmDelete(false);
+                    navigate({ to: "/notes" });
+                  },
+                });
               }}
             >
               Delete
