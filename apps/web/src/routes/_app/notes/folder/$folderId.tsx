@@ -11,19 +11,35 @@ import {
 import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/folder/$folderId")({
-  head: () => ({ meta: [{ title: "Folder" }] }),
-  loader: ({ context, params }) => {
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${
+          (loaderData as { folderName?: string } | undefined)?.folderName ??
+          "Folder"
+        } | Memora`,
+      },
+    ],
+  }),
+  loader: async ({ context, params }) => {
     recordVisit("folder", params.folderId);
-    return context.queryClient.ensureQueryData(
-      context.orpc.notes.list.queryOptions({
-        input: {
-          folderId: params.folderId,
-          includeArchived: false,
-          limit: 50,
-          offset: 0,
-        },
-      })
-    );
+    const [folders] = await Promise.all([
+      context.queryClient.ensureQueryData(
+        context.orpc.notes.folders.list.queryOptions({ input: {} })
+      ),
+      context.queryClient.ensureQueryData(
+        context.orpc.notes.list.queryOptions({
+          input: {
+            folderId: params.folderId,
+            includeArchived: false,
+            limit: 50,
+            offset: 0,
+          },
+        })
+      ),
+    ]);
+    const folder = folders.find((f) => f.id === params.folderId);
+    return { folderName: folder?.name ?? "Folder" };
   },
   component: FolderView,
 });

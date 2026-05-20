@@ -11,14 +11,29 @@ import {
 import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/tag/$tagId")({
-  head: () => ({ meta: [{ title: "Tag" }] }),
-  loader: ({ context, params }) => {
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${
+          (loaderData as { tagName?: string } | undefined)?.tagName ?? "Tag"
+        } | Memora`,
+      },
+    ],
+  }),
+  loader: async ({ context, params }) => {
     recordVisit("tag", params.tagId);
-    return context.queryClient.ensureQueryData(
-      context.orpc.notes.list.queryOptions({
-        input: { includeArchived: false, limit: 50, offset: 0 },
-      })
-    );
+    const [tags] = await Promise.all([
+      context.queryClient.ensureQueryData(
+        context.orpc.notes.tags.list.queryOptions()
+      ),
+      context.queryClient.ensureQueryData(
+        context.orpc.notes.list.queryOptions({
+          input: { includeArchived: false, limit: 50, offset: 0 },
+        })
+      ),
+    ]);
+    const tag = tags.find((t) => t.id === params.tagId);
+    return { tagName: tag?.name ?? "Tag" };
   },
   component: TagView,
 });

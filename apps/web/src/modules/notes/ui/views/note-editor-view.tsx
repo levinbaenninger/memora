@@ -57,6 +57,10 @@ export function NoteEditorView() {
     }
   }, [note.id]);
 
+  useEffect(() => {
+    document.title = `${note.title || "Untitled"} | Memora`;
+  }, [note.title]);
+
   return (
     <div className="flex min-h-full min-w-0 flex-col">
       <div className="flex w-full min-w-0 flex-1 flex-col">

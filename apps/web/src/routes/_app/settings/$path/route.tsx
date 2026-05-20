@@ -5,7 +5,7 @@ import { Settings } from "@/modules/app/ui/views/settings/settings";
 
 export const Route = createFileRoute("/_app/settings/$path")({
   head: () => ({
-    meta: [{ title: "Settings" }],
+    meta: [{ title: "Settings | Memora" }],
   }),
   beforeLoad({ params: { path } }) {
     if (!Object.values(viewPaths.settings).includes(path)) {

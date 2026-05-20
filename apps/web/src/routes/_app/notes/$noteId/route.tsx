@@ -15,14 +15,22 @@ const noteDetailSearchSchema = z.object({
 export const Route = createFileRoute("/_app/notes/$noteId")({
   validateSearch: (search: Record<string, unknown>) =>
     noteDetailSearchSchema.parse(search),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${(loaderData as { title?: string } | undefined)?.title || "Untitled"} | Memora`,
+      },
+    ],
+  }),
   loader: async ({ context, params }) => {
     recordVisit("note", params.noteId);
     try {
-      await context.queryClient.ensureQueryData(
+      const note = await context.queryClient.ensureQueryData(
         context.orpc.notes.get.queryOptions({
           input: { id: params.noteId, includeArchived: true },
         })
       );
+      return { title: note.title };
     } catch (e) {
       if (
         e instanceof ORPCError &&

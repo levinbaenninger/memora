@@ -15,7 +15,9 @@ const authPathTitles: Record<string, string> = {
 
 export const Route = createFileRoute("/auth/$path")({
   head: ({ params }) => ({
-    meta: [{ title: authPathTitles[params.path] ?? "Authentication" }],
+    meta: [
+      { title: `${authPathTitles[params.path] ?? "Authentication"} | Memora` },
+    ],
   }),
   ssr: false,
   async beforeLoad({ params: { path } }) {

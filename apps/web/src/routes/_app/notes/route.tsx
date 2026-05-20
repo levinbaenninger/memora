@@ -4,7 +4,7 @@ import { NotesErrorView } from "@/modules/notes/ui/views/notes-error-view";
 
 export const Route = createFileRoute("/_app/notes")({
   head: () => ({
-    meta: [{ title: "Notes" }],
+    meta: [{ title: "Notes | Memora" }],
   }),
   loader: ({ context }) =>
     Promise.all([
