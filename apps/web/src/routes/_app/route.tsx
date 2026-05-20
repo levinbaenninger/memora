@@ -1,15 +1,28 @@
 import { useAuthenticate } from "@better-auth-ui/react";
+import { viewPaths } from "@better-auth-ui/react/core";
 import {
   createFileRoute,
   Link,
   Outlet,
+  redirect,
   useLocation,
   useSearch,
 } from "@tanstack/react-router";
 
 import { AppShell } from "@/modules/app/ui/views/app-shell";
+import { authClient } from "@/modules/auth/client";
 
 export const Route = createFileRoute("/_app")({
+  async beforeLoad() {
+    const { data: session } = await authClient.getSession();
+    if (!session) {
+      throw redirect({
+        params: { path: viewPaths.auth.signIn },
+        replace: true,
+        to: "/auth/$path",
+      });
+    }
+  },
   loader: ({ context }) =>
     Promise.all([
       context.queryClient.ensureQueryData(
