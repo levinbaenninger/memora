@@ -2,16 +2,23 @@
 
 import {
   Add01Icon,
+  ArchiveIcon,
   ArrowLeft01Icon,
+  FavouriteIcon,
   Folder01Icon,
   FolderAddIcon,
   HashtagIcon,
+  HeartRemoveIcon,
   NoteAddIcon,
   NoteIcon,
+  PinIcon,
+  PinOffIcon,
   Tag01Icon,
+  UndoIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useHotkey } from "@tanstack/react-hotkeys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import type { KeyboardEvent } from "react";
 import { useEffect, useState } from "react";
@@ -33,6 +40,7 @@ import {
   useCreateNote,
   useCreateTag,
 } from "@/modules/notes/mutations";
+import { client, orpc } from "@/utils/orpc";
 import { useCommandMenu } from "./context";
 import {
   useFoldersForPalette,
@@ -264,6 +272,12 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
           </CommandItem>
         ))}
       </CommandGroup>
+      {routeCtx.noteId ? (
+        <NoteContextActions
+          closeAndRun={closeAndRun}
+          noteId={routeCtx.noteId}
+        />
+      ) : null}
       <CommandGroup heading="Create">
         <CommandItem
           keywords={["new", "create"]}
@@ -367,6 +381,119 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
         </CommandGroup>
       ) : null}
     </>
+  );
+}
+
+function NoteContextActions({
+  closeAndRun,
+  noteId,
+}: {
+  closeAndRun: (action: () => void) => void;
+  noteId: string;
+}) {
+  const queryClient = useQueryClient();
+  const noteQuery = useQuery({
+    ...orpc.notes.get.queryOptions({
+      input: { id: noteId, includeArchived: true },
+    }),
+    enabled: !!noteId,
+  });
+  const note = noteQuery.data;
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({
+      queryKey: orpc.notes.get.key({ input: { id: noteId } }),
+    });
+    queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+    queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+  };
+
+  const update = useMutation({
+    mutationFn: (input: { pinned?: boolean; favorite?: boolean }) =>
+      client.notes.update({ id: noteId, ...input }),
+    onSuccess: invalidate,
+    onError: () => toast.error("Failed to update note"),
+  });
+
+  const archive = useMutation({
+    mutationFn: () => client.notes.archive({ id: noteId }),
+    onSuccess: () => {
+      invalidate();
+      toast.success("Note archived", {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            client.notes
+              .restore({ id: noteId })
+              .then(() => {
+                invalidate();
+                toast.success("Note restored");
+              })
+              .catch(() => toast.error("Failed to restore note"));
+          },
+        },
+      });
+    },
+    onError: () => toast.error("Failed to archive note"),
+  });
+
+  const restore = useMutation({
+    mutationFn: () => client.notes.restore({ id: noteId }),
+    onSuccess: () => {
+      invalidate();
+      toast.success("Note restored");
+    },
+    onError: () => toast.error("Failed to restore note"),
+  });
+
+  if (!note) {
+    return null;
+  }
+
+  const isArchived = !!note.archivedAt;
+
+  return (
+    <CommandGroup heading="Note actions">
+      <CommandItem
+        keywords={["pin", "unpin"]}
+        onSelect={() =>
+          closeAndRun(() => update.mutate({ pinned: !note.pinned }))
+        }
+        value="note-pin"
+      >
+        <HugeiconsIcon
+          icon={note.pinned ? PinOffIcon : PinIcon}
+          strokeWidth={2}
+        />
+        <span>{note.pinned ? "Unpin note" : "Pin note"}</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["favorite", "favourite", "star", "unfavorite"]}
+        onSelect={() =>
+          closeAndRun(() => update.mutate({ favorite: !note.favorite }))
+        }
+        value="note-favorite"
+      >
+        <HugeiconsIcon
+          icon={note.favorite ? HeartRemoveIcon : FavouriteIcon}
+          strokeWidth={2}
+        />
+        <span>{note.favorite ? "Unfavorite note" : "Favorite note"}</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["archive", "restore", "delete", "trash"]}
+        onSelect={() =>
+          closeAndRun(() => (isArchived ? restore.mutate() : archive.mutate()))
+        }
+        value="note-archive"
+      >
+        <HugeiconsIcon
+          icon={isArchived ? UndoIcon : ArchiveIcon}
+          strokeWidth={2}
+        />
+        <span>{isArchived ? "Restore note" : "Archive note"}</span>
+      </CommandItem>
+    </CommandGroup>
   );
 }
 
