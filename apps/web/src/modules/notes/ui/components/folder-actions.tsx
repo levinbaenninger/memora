@@ -72,7 +72,7 @@ export function FolderActionsProvider({
   const [subfolderOpen, setSubfolderOpen] = useState(false);
   const [subfolderName, setSubfolderName] = useState("");
   const [renameOpen, setRenameOpen] = useState(false);
-  const [newName, setNewName] = useState(folderName);
+  const [newName, setNewName] = useState("");
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 

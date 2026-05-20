@@ -397,7 +397,7 @@ function NoteContextActions({
   });
   const note = noteQuery.data;
 
-  const invalidate = () => {
+  const invalidateNoteCaches = () => {
     queryClient.invalidateQueries({
       queryKey: orpc.notes.get.key({ input: { id: noteId } }),
     });
@@ -408,14 +408,24 @@ function NoteContextActions({
   const update = useMutation({
     mutationFn: (input: { pinned?: boolean; favorite?: boolean }) =>
       client.notes.update({ id: noteId, ...input }),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.get.key({ input: { id: noteId } }),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+    },
     onError: () => toast.error("Failed to update note"),
   });
 
   const archive = useMutation({
     mutationFn: () => client.notes.archive({ id: noteId }),
     onSuccess: () => {
-      invalidate();
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.get.key({ input: { id: noteId } }),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
       toast.success("Note archived", {
         action: {
           label: "Undo",
@@ -423,7 +433,7 @@ function NoteContextActions({
             client.notes
               .restore({ id: noteId })
               .then(() => {
-                invalidate();
+                invalidateNoteCaches();
                 toast.success("Note restored");
               })
               .catch(() => toast.error("Failed to restore note"));
@@ -437,7 +447,11 @@ function NoteContextActions({
   const restore = useMutation({
     mutationFn: () => client.notes.restore({ id: noteId }),
     onSuccess: () => {
-      invalidate();
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.get.key({ input: { id: noteId } }),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
       toast.success("Note restored");
     },
     onError: () => toast.error("Failed to restore note"),

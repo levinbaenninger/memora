@@ -24,7 +24,13 @@ import { BlockNoteView } from "@blocknote/shadcn";
 import { offset } from "@floating-ui/react";
 import { Delete01Icon, Link01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import { useTheme } from "@memora/ui/components/theme-provider";
 import { cn } from "@memora/ui/lib/utils";
@@ -70,14 +76,22 @@ interface BlockNoteEditorViewProps {
   onUpdate: (blocks: PartialBlock[]) => void;
 }
 
+const subscribeNoop = () => {
+  return () => {
+    // no-op: client/server snapshot never changes after hydration
+  };
+};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function BlockNoteEditorView(props: BlockNoteEditorViewProps) {
-  const [mounted, setMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    subscribeNoop,
+    getClientSnapshot,
+    getServerSnapshot
+  );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
+  if (!isClient) {
     return <div className={cn("min-h-[200px]", props.className)} />;
   }
 
@@ -134,7 +148,7 @@ function ClientBlockNoteEditor({
     editor.replaceBlocks(editor.document, next as never);
   }, [content, editor, noteId]);
 
-  const handleChange = useCallback(() => {
+  const persistEditorContent = useCallback(() => {
     onUpdate(editor.document as PartialBlock[]);
   }, [editor, onUpdate]);
 
@@ -182,7 +196,7 @@ function ClientBlockNoteEditor({
         editable={editable}
         editor={editor}
         formattingToolbar={false}
-        onChange={handleChange}
+        onChange={persistEditorContent}
         sideMenu={false}
         slashMenu={false}
         theme={resolvedTheme}

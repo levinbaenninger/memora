@@ -27,7 +27,7 @@ function NoteMention({ noteId, label }: { noteId: string; label: string }) {
     isDefinedError(existence.error) &&
     existence.error.code === "NOT_FOUND";
 
-  const handleClick = () => {
+  const navigateToNote = () => {
     if (!noteId || isMissing) {
       return;
     }
@@ -46,7 +46,7 @@ function NoteMention({ noteId, label }: { noteId: string; label: string }) {
           : "cursor-pointer bg-accent text-accent-foreground hover:bg-accent/80"
       )}
       disabled={isMissing}
-      onClick={handleClick}
+      onClick={navigateToNote}
       title={isMissing ? "Linked note was deleted" : undefined}
       type="button"
     >

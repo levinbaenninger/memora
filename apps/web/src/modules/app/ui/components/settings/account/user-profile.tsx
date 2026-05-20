@@ -8,7 +8,7 @@ import {
 } from "@better-auth-ui/react";
 import { useDebouncer } from "@tanstack/react-pacer";
 import { Check, X } from "lucide-react";
-import { type SyntheticEvent, useEffect, useState } from "react";
+import { type SyntheticEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@memora/ui/components/button";
@@ -64,10 +64,11 @@ export function UserProfile({ className }: UserProfileProps) {
       : session?.user?.username) || "";
 
   const [username, setUsername] = useState(currentUsername);
-
-  useEffect(() => {
+  const prevCurrentUsernameRef = useRef(currentUsername);
+  if (prevCurrentUsernameRef.current !== currentUsername) {
+    prevCurrentUsernameRef.current = currentUsername;
     setUsername(currentUsername);
-  }, [currentUsername]);
+  }
 
   const {
     mutate: isUsernameAvailable,

@@ -145,7 +145,6 @@ export function TagList() {
             <AlertDialogTitle>Rename tag</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
-            autoFocus
             onChange={(e) => setRenameValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {

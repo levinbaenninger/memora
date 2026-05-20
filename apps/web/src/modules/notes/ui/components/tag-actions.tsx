@@ -1,7 +1,7 @@
 import { Delete01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useNavigate } from "@tanstack/react-router";
-import { createContext, type ReactNode, useContext, useState } from "react";
+import { createContext, type ReactNode, use, useState } from "react";
 
 import {
   AlertDialog,
@@ -29,7 +29,7 @@ interface TagActionsContextValue {
 const TagActionsContext = createContext<TagActionsContextValue | null>(null);
 
 function useTagActions() {
-  const ctx = useContext(TagActionsContext);
+  const ctx = use(TagActionsContext);
   if (!ctx) {
     throw new Error("useTagActions must be used within TagActionsProvider");
   }
@@ -52,7 +52,7 @@ export function TagActionsProvider({
   const deleteTag = useDeleteTag();
 
   const [renameOpen, setRenameOpen] = useState(false);
-  const [newName, setNewName] = useState(tagName);
+  const [newName, setNewName] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const value: TagActionsContextValue = {
@@ -73,7 +73,6 @@ export function TagActionsProvider({
             <AlertDialogTitle>Rename tag</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
-            autoFocus
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && newName.trim()) {
