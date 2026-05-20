@@ -27,6 +27,7 @@ import {
   useTagsForPalette,
 } from "./hooks/use-eager-entities";
 import { useNoteSearch } from "./hooks/use-note-search";
+import { useRecents } from "./hooks/use-recents";
 import { jumpToItems } from "./jump-to-items";
 
 const MIN_QUERY_LENGTH = 2;
@@ -55,6 +56,30 @@ export function CommandMenu() {
   const folders = useFoldersForPalette().data ?? [];
   const tags = useTagsForPalette().data ?? [];
 
+  const showRecents = query.trim().length === 0;
+  const recents = useRecents(open && showRecents).data ?? [];
+
+  const recentIcon = {
+    note: NoteIcon,
+    folder: Folder01Icon,
+    tag: HashtagIcon,
+  } as const;
+
+  const navigateToRecent = (entity: (typeof recents)[number]) => {
+    if (entity.entityType === "note") {
+      navigate({ to: "/notes/$noteId", params: { noteId: entity.id } });
+      return;
+    }
+    if (entity.entityType === "folder") {
+      navigate({
+        to: "/notes/folder/$folderId",
+        params: { folderId: entity.id },
+      });
+      return;
+    }
+    navigate({ to: "/notes/tag/$tagId", params: { tagId: entity.id } });
+  };
+
   const run = (action: () => void) => {
     setOpen(false);
     action();
@@ -69,6 +94,28 @@ export function CommandMenu() {
       />
       <CommandList>
         <CommandEmpty>No matches.</CommandEmpty>
+        {showRecents && recents.length > 0 ? (
+          <CommandGroup heading="Recent">
+            {recents.map((entity) => (
+              <CommandItem
+                key={`${entity.entityType}-${entity.id}`}
+                onSelect={() => run(() => navigateToRecent(entity))}
+                value={`recent-${entity.entityType}-${entity.id}`}
+              >
+                <HugeiconsIcon
+                  icon={recentIcon[entity.entityType]}
+                  strokeWidth={2}
+                />
+                <span className="truncate">{entity.title}</span>
+                {entity.folderName ? (
+                  <span className="ml-auto truncate text-muted-foreground text-xs">
+                    {entity.folderName}
+                  </span>
+                ) : null}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        ) : null}
         <CommandGroup heading="Jump to">
           {jumpToItems.map((item) => (
             <CommandItem

@@ -9,6 +9,7 @@ import { notesToTags, noteTags } from "./tags";
 export * from "./folders";
 export * from "./links";
 export * from "./notes";
+export * from "./recent-visits";
 export * from "./tags";
 
 export const noteFolderRelations = relations(noteFolders, ({ one, many }) => ({

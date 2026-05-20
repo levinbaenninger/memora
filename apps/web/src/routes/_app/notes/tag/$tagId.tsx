@@ -2,6 +2,7 @@ import { Tag01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { recordVisit } from "@/modules/command-menu/recent-visits-client";
 import { useTagsList } from "@/modules/notes/queries";
 import {
   TagActionsProvider,
@@ -11,12 +12,14 @@ import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/tag/$tagId")({
   head: () => ({ meta: [{ title: "Tag" }] }),
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(
+  loader: ({ context, params }) => {
+    recordVisit("tag", params.tagId);
+    return context.queryClient.ensureQueryData(
       context.orpc.notes.list.queryOptions({
         input: { includeArchived: false, limit: 50, offset: 0 },
       })
-    ),
+    );
+  },
   component: TagView,
 });
 

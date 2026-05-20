@@ -2,6 +2,7 @@ import { FolderIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { recordVisit } from "@/modules/command-menu/recent-visits-client";
 import { useFoldersList } from "@/modules/notes/queries";
 import {
   FolderActionsProvider,
@@ -11,8 +12,9 @@ import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/folder/$folderId")({
   head: () => ({ meta: [{ title: "Folder" }] }),
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(
+  loader: ({ context, params }) => {
+    recordVisit("folder", params.folderId);
+    return context.queryClient.ensureQueryData(
       context.orpc.notes.list.queryOptions({
         input: {
           folderId: params.folderId,
@@ -21,7 +23,8 @@ export const Route = createFileRoute("/_app/notes/folder/$folderId")({
           offset: 0,
         },
       })
-    ),
+    );
+  },
   component: FolderView,
 });
 
