@@ -158,6 +158,10 @@ export function CommandMenu() {
         {page === "delete-tag" ? (
           <DeleteTagPage navigate={navigate} setOpen={setOpen} />
         ) : null}
+        {page === "move-to-folder" ? (
+          <MoveToFolderPage navigate={navigate} setOpen={setOpen} />
+        ) : null}
+        {page === "add-tag" ? <AddTagPage /> : null}
       </CommandList>
     </CommandDialog>
   );
@@ -304,6 +308,7 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
         <NoteContextActions
           closeAndRun={closeAndRun}
           noteId={routeCtx.noteId}
+          setPage={setPage}
         />
       ) : null}
       {routeCtx.folderId && !routeCtx.noteId ? (
@@ -429,9 +434,11 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
 function NoteContextActions({
   closeAndRun,
   noteId,
+  setPage,
 }: {
   closeAndRun: (action: () => void) => void;
   noteId: string;
+  setPage: (page: ReturnType<typeof useCommandMenu>["page"]) => void;
 }) {
   const queryClient = useQueryClient();
   const noteQuery = useQuery({
@@ -521,6 +528,22 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{note.favorite ? "Unfavorite note" : "Favorite note"}</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["move", "folder"]}
+        onSelect={() => setPage("move-to-folder")}
+        value="note-move"
+      >
+        <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} />
+        <span>Move to folder…</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["tag", "label"]}
+        onSelect={() => setPage("add-tag")}
+        value="note-add-tag"
+      >
+        <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
+        <span>Add tag…</span>
       </CommandItem>
       <CommandItem
         keywords={["archive", "restore", "delete", "trash"]}
@@ -899,6 +922,127 @@ function DeleteTagPage({ navigate, setOpen }: DeletePageProps) {
           {tag ? `Delete tag “${tag.name}” permanently` : "Confirm delete"}
         </span>
       </CommandItem>
+    </CommandGroup>
+  );
+}
+
+function MoveToFolderPage({ navigate, setOpen }: DeletePageProps) {
+  const { noteId } = useRouteEntityContext();
+  const folders = useFoldersForPalette().data ?? [];
+  const queryClient = useQueryClient();
+
+  const move = useMutation({
+    mutationFn: (folderId: string | null) =>
+      client.notes.update({ id: noteId ?? "", folderId }),
+    onSuccess: (_data, folderId) => {
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.get.key({ input: { id: noteId ?? "" } }),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+      setOpen(false);
+      toast.success("Note moved");
+      if (folderId) {
+        navigate({
+          to: "/notes/folder/$folderId",
+          params: { folderId },
+        });
+      }
+    },
+    onError: () => toast.error("Failed to move note"),
+  });
+
+  if (!noteId) {
+    return null;
+  }
+
+  return (
+    <CommandGroup forceMount heading="Folders" value="move-to-folder-list">
+      <CommandItem
+        keywords={["root", "none", "no folder"]}
+        onSelect={() => move.mutate(null)}
+        value="move-no-folder"
+      >
+        <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} />
+        <span className="text-muted-foreground italic">(No folder)</span>
+      </CommandItem>
+      {folders.map((folder) => (
+        <CommandItem
+          key={folder.id}
+          keywords={[folder.name]}
+          onSelect={() => move.mutate(folder.id)}
+          value={`move-${folder.id} ${folder.name}`}
+        >
+          <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} />
+          <span className="truncate">{folder.name}</span>
+        </CommandItem>
+      ))}
+    </CommandGroup>
+  );
+}
+
+function AddTagPage() {
+  const { noteId } = useRouteEntityContext();
+  const tags = useTagsForPalette().data ?? [];
+  const queryClient = useQueryClient();
+
+  const noteQuery = useQuery({
+    ...orpc.notes.get.queryOptions({
+      input: { id: noteId ?? "", includeArchived: true },
+    }),
+    enabled: !!noteId,
+  });
+  const noteTagNames = new Set(
+    (noteQuery.data?.tags ?? []).map((tag) => tag.name)
+  );
+
+  const update = useMutation({
+    mutationFn: (tagNames: string[]) =>
+      client.notes.update({ id: noteId ?? "", tagNames }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.get.key({ input: { id: noteId ?? "" } }),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.tags.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+    },
+    onError: () => toast.error("Failed to update tags"),
+  });
+
+  if (!noteId) {
+    return null;
+  }
+
+  const toggle = (tagName: string) => {
+    const next = new Set(noteTagNames);
+    if (next.has(tagName)) {
+      next.delete(tagName);
+    } else {
+      next.add(tagName);
+    }
+    update.mutate([...next]);
+  };
+
+  return (
+    <CommandGroup forceMount heading="Tags" value="add-tag-list">
+      {tags.map((tag) => {
+        const checked = noteTagNames.has(tag.name);
+        return (
+          <CommandItem
+            key={tag.id}
+            keywords={[tag.name, tag.slug]}
+            onSelect={() => toggle(tag.name)}
+            value={`tag-${tag.id} ${tag.name}`}
+          >
+            <HugeiconsIcon icon={HashtagIcon} strokeWidth={2} />
+            <span className="truncate">{tag.name}</span>
+            {checked ? (
+              <span className="ml-auto text-muted-foreground text-xs">✓</span>
+            ) : null}
+          </CommandItem>
+        );
+      })}
     </CommandGroup>
   );
 }
