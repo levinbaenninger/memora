@@ -13,6 +13,10 @@ export type CommandMenuPage =
   | "root"
   | "new-folder"
   | "new-tag"
+  | "rename-folder"
+  | "rename-tag"
+  | "delete-folder"
+  | "delete-tag"
   | "move-to-folder"
   | "add-tag";
 

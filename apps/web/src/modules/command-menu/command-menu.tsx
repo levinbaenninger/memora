@@ -2,8 +2,11 @@
 
 import {
   Add01Icon,
+  Alert02Icon,
   ArchiveIcon,
   ArrowLeft01Icon,
+  Delete02Icon,
+  Edit02Icon,
   FavouriteIcon,
   Folder01Icon,
   FolderAddIcon,
@@ -36,9 +39,14 @@ import {
 import { Spinner } from "@memora/ui/components/spinner";
 
 import {
+  useArchiveFolder,
   useCreateFolder,
   useCreateNote,
   useCreateTag,
+  useDeleteFolder,
+  useDeleteTag,
+  useUpdateFolder,
+  useUpdateTag,
 } from "@/modules/notes/mutations";
 import { client, orpc } from "@/utils/orpc";
 import { useCommandMenu } from "./context";
@@ -63,12 +71,20 @@ const PLACEHOLDERS = {
   root: "Search or jump to…",
   "new-folder": "Folder name…",
   "new-tag": "Tag name…",
+  "rename-folder": "New folder name…",
+  "rename-tag": "New tag name…",
+  "delete-folder": "Press Enter to delete…",
+  "delete-tag": "Press Enter to delete…",
   "move-to-folder": "Move to folder…",
   "add-tag": "Add tag…",
 } as const;
 
 const PAGE_TITLES = {
   "new-folder": "Create folder",
+  "rename-folder": "Rename folder",
+  "rename-tag": "Rename tag",
+  "delete-folder": "Delete folder",
+  "delete-tag": "Delete tag",
   "new-tag": "Create tag",
   "move-to-folder": "Move to folder",
   "add-tag": "Add tag",
@@ -129,6 +145,18 @@ export function CommandMenu() {
         ) : null}
         {page === "new-tag" ? (
           <NewTagPage navigate={navigate} query={query} setOpen={setOpen} />
+        ) : null}
+        {page === "rename-folder" ? (
+          <RenameFolderPage query={query} setOpen={setOpen} />
+        ) : null}
+        {page === "rename-tag" ? (
+          <RenameTagPage query={query} setOpen={setOpen} />
+        ) : null}
+        {page === "delete-folder" ? (
+          <DeleteFolderPage navigate={navigate} setOpen={setOpen} />
+        ) : null}
+        {page === "delete-tag" ? (
+          <DeleteTagPage navigate={navigate} setOpen={setOpen} />
         ) : null}
       </CommandList>
     </CommandDialog>
@@ -276,6 +304,20 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
         <NoteContextActions
           closeAndRun={closeAndRun}
           noteId={routeCtx.noteId}
+        />
+      ) : null}
+      {routeCtx.folderId && !routeCtx.noteId ? (
+        <FolderContextActions
+          closeAndRun={closeAndRun}
+          folderId={routeCtx.folderId}
+          setPage={setPage}
+        />
+      ) : null}
+      {routeCtx.tagId && !routeCtx.noteId ? (
+        <TagContextActions
+          closeAndRun={closeAndRun}
+          setPage={setPage}
+          tagId={routeCtx.tagId}
         />
       ) : null}
       <CommandGroup heading="Create">
@@ -573,6 +615,289 @@ function NewTagPage({ navigate, query, setOpen }: SubmitPageProps) {
       >
         <HugeiconsIcon icon={Add01Icon} strokeWidth={2} />
         <span>{trimmed ? `Create tag “${trimmed}”` : "Type a tag name"}</span>
+      </CommandItem>
+    </CommandGroup>
+  );
+}
+
+function FolderContextActions({
+  closeAndRun,
+  folderId,
+  setPage,
+}: {
+  closeAndRun: (action: () => void) => void;
+  folderId: string;
+  setPage: (page: ReturnType<typeof useCommandMenu>["page"]) => void;
+}) {
+  const folders = useFoldersForPalette().data ?? [];
+  const folder = folders.find((f) => f.id === folderId);
+  const queryClient = useQueryClient();
+  const archive = useArchiveFolder();
+
+  const isArchived = !!folder?.archivedAt;
+
+  const restore = useMutation({
+    mutationFn: () => client.notes.folders.restore({ id: folderId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.folders.list.key(),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      toast.success("Folder restored");
+    },
+    onError: () => toast.error("Failed to restore folder"),
+  });
+
+  if (!folder) {
+    return null;
+  }
+
+  return (
+    <CommandGroup heading="Folder actions">
+      <CommandItem
+        keywords={["rename", "edit"]}
+        onSelect={() => setPage("rename-folder")}
+        value="folder-rename"
+      >
+        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+        <span>Rename folder</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["archive", "restore"]}
+        onSelect={() =>
+          closeAndRun(() =>
+            isArchived ? restore.mutate() : archive.mutate(folderId)
+          )
+        }
+        value="folder-archive"
+      >
+        <HugeiconsIcon
+          icon={isArchived ? UndoIcon : ArchiveIcon}
+          strokeWidth={2}
+        />
+        <span>{isArchived ? "Restore folder" : "Archive folder"}</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["delete", "remove"]}
+        onSelect={() => setPage("delete-folder")}
+        value="folder-delete"
+      >
+        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+        <span>Delete folder…</span>
+      </CommandItem>
+    </CommandGroup>
+  );
+}
+
+function TagContextActions({
+  setPage,
+  tagId,
+}: {
+  closeAndRun: (action: () => void) => void;
+  setPage: (page: ReturnType<typeof useCommandMenu>["page"]) => void;
+  tagId: string;
+}) {
+  const tags = useTagsForPalette().data ?? [];
+  const tag = tags.find((t) => t.id === tagId);
+
+  if (!tag) {
+    return null;
+  }
+
+  return (
+    <CommandGroup heading="Tag actions">
+      <CommandItem
+        keywords={["rename", "edit"]}
+        onSelect={() => setPage("rename-tag")}
+        value="tag-rename"
+      >
+        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+        <span>Rename tag</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["delete", "remove"]}
+        onSelect={() => setPage("delete-tag")}
+        value="tag-delete"
+      >
+        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+        <span>Delete tag…</span>
+      </CommandItem>
+    </CommandGroup>
+  );
+}
+
+interface EntityPageProps {
+  query: string;
+  setOpen: (open: boolean) => void;
+}
+
+function RenameFolderPage({ query, setOpen }: EntityPageProps) {
+  const { folderId } = useRouteEntityContext();
+  const folders = useFoldersForPalette().data ?? [];
+  const folder = folders.find((f) => f.id === folderId);
+  const updateFolder = useUpdateFolder();
+  const trimmed = query.trim();
+  const canSubmit =
+    !!folderId && trimmed.length > 0 && trimmed !== folder?.name;
+
+  const handleSubmit = () => {
+    if (!(canSubmit && folderId)) {
+      return;
+    }
+    updateFolder.mutate(
+      { id: folderId, name: trimmed },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          toast.success("Folder renamed");
+        },
+      }
+    );
+  };
+
+  let label: string;
+  if (trimmed) {
+    label = `Rename to “${trimmed}”`;
+  } else if (folder) {
+    label = `Current name: ${folder.name}`;
+  } else {
+    label = "Type a new name";
+  }
+
+  return (
+    <CommandGroup forceMount value="rename-folder-actions">
+      <CommandItem
+        disabled={!canSubmit || updateFolder.isPending}
+        forceMount
+        onSelect={handleSubmit}
+        value="submit-rename-folder"
+      >
+        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+        <span>{label}</span>
+      </CommandItem>
+    </CommandGroup>
+  );
+}
+
+function RenameTagPage({ query, setOpen }: EntityPageProps) {
+  const { tagId } = useRouteEntityContext();
+  const tags = useTagsForPalette().data ?? [];
+  const tag = tags.find((t) => t.id === tagId);
+  const updateTag = useUpdateTag();
+  const trimmed = query.trim();
+  const canSubmit = !!tagId && trimmed.length > 0 && trimmed !== tag?.name;
+
+  const handleSubmit = () => {
+    if (!(canSubmit && tagId)) {
+      return;
+    }
+    updateTag.mutate(
+      { id: tagId, name: trimmed },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          toast.success("Tag renamed");
+        },
+      }
+    );
+  };
+
+  let label: string;
+  if (trimmed) {
+    label = `Rename to “${trimmed}”`;
+  } else if (tag) {
+    label = `Current name: ${tag.name}`;
+  } else {
+    label = "Type a new name";
+  }
+
+  return (
+    <CommandGroup forceMount value="rename-tag-actions">
+      <CommandItem
+        disabled={!canSubmit || updateTag.isPending}
+        forceMount
+        onSelect={handleSubmit}
+        value="submit-rename-tag"
+      >
+        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+        <span>{label}</span>
+      </CommandItem>
+    </CommandGroup>
+  );
+}
+
+interface DeletePageProps {
+  navigate: NavigateFn;
+  setOpen: (open: boolean) => void;
+}
+
+function DeleteFolderPage({ navigate, setOpen }: DeletePageProps) {
+  const { folderId } = useRouteEntityContext();
+  const folders = useFoldersForPalette().data ?? [];
+  const folder = folders.find((f) => f.id === folderId);
+  const deleteFolder = useDeleteFolder();
+
+  const handleConfirm = () => {
+    if (!folderId) {
+      return;
+    }
+    deleteFolder.mutate(folderId, {
+      onSuccess: () => {
+        setOpen(false);
+        navigate({ to: "/notes" });
+      },
+    });
+  };
+
+  return (
+    <CommandGroup forceMount value="delete-folder-actions">
+      <CommandItem
+        disabled={!folderId || deleteFolder.isPending}
+        forceMount
+        onSelect={handleConfirm}
+        value="confirm-delete-folder"
+      >
+        <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} />
+        <span>
+          {folder
+            ? `Delete folder “${folder.name}” permanently`
+            : "Confirm delete"}
+        </span>
+      </CommandItem>
+    </CommandGroup>
+  );
+}
+
+function DeleteTagPage({ navigate, setOpen }: DeletePageProps) {
+  const { tagId } = useRouteEntityContext();
+  const tags = useTagsForPalette().data ?? [];
+  const tag = tags.find((t) => t.id === tagId);
+  const deleteTag = useDeleteTag();
+
+  const handleConfirm = () => {
+    if (!tagId) {
+      return;
+    }
+    deleteTag.mutate(tagId, {
+      onSuccess: () => {
+        setOpen(false);
+        navigate({ to: "/notes" });
+      },
+    });
+  };
+
+  return (
+    <CommandGroup forceMount value="delete-tag-actions">
+      <CommandItem
+        disabled={!tagId || deleteTag.isPending}
+        forceMount
+        onSelect={handleConfirm}
+        value="confirm-delete-tag"
+      >
+        <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} />
+        <span>
+          {tag ? `Delete tag “${tag.name}” permanently` : "Confirm delete"}
+        </span>
       </CommandItem>
     </CommandGroup>
   );
