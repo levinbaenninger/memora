@@ -10,6 +10,15 @@ import {
 import { AppShell } from "@/modules/app/ui/views/app-shell";
 
 export const Route = createFileRoute("/_app")({
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(
+        context.orpc.notes.folders.list.queryOptions({ input: {} })
+      ),
+      context.queryClient.ensureQueryData(
+        context.orpc.notes.tags.list.queryOptions()
+      ),
+    ]),
   component: AppShellLayout,
 });
 
