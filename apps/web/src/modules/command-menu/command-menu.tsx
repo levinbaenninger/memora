@@ -333,6 +333,7 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
         >
           <HugeiconsIcon icon={NoteAddIcon} strokeWidth={2} />
           <span>New note</span>
+          <CommandShortcut>⌘N</CommandShortcut>
         </CommandItem>
         <CommandItem
           keywords={["new", "create"]}
@@ -515,6 +516,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{note.pinned ? "Unpin note" : "Pin note"}</span>
+        <CommandShortcut>⌘⇧P</CommandShortcut>
       </CommandItem>
       <CommandItem
         keywords={["favorite", "favourite", "star", "unfavorite"]}
@@ -528,6 +530,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{note.favorite ? "Unfavorite note" : "Favorite note"}</span>
+        <CommandShortcut>⌘⇧F</CommandShortcut>
       </CommandItem>
       <CommandItem
         keywords={["move", "folder"]}
@@ -557,6 +560,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{isArchived ? "Restore note" : "Archive note"}</span>
+        {isArchived ? null : <CommandShortcut>⌘⌫</CommandShortcut>}
       </CommandItem>
     </CommandGroup>
   );

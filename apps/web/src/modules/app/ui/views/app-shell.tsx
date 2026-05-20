@@ -11,6 +11,7 @@ import { AppSidebar } from "@/modules/app/ui/components/app-sidebar";
 import type { UserButtonProps } from "@/modules/app/ui/components/user/user-button";
 import { CommandMenu } from "@/modules/command-menu/command-menu";
 import { CommandMenuProvider } from "@/modules/command-menu/context";
+import { useGlobalHotkeys } from "@/modules/command-menu/hooks/use-global-hotkeys";
 import { useNotesBreadcrumbs } from "@/modules/notes/hooks/use-notes-breadcrumbs";
 import { NotesNavPanel } from "@/modules/notes/ui/components/notes-nav-panel";
 
@@ -68,7 +69,13 @@ export function AppShell({
           </div>
         </SidebarInset>
         <CommandMenu />
+        <GlobalHotkeysMount />
       </SidebarProvider>
     </CommandMenuProvider>
   );
+}
+
+function GlobalHotkeysMount() {
+  useGlobalHotkeys();
+  return null;
 }
