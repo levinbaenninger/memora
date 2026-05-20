@@ -211,6 +211,19 @@ export function useDeleteFolder() {
   });
 }
 
+export function useCreateTag() {
+  const inv = useNotesInvalidation();
+
+  return useMutation(
+    orpc.notes.tags.create.mutationOptions({
+      onSuccess: () => {
+        inv.invalidateTags();
+      },
+      onError: () => toast.error("Failed to create tag"),
+    })
+  );
+}
+
 export function useUpdateTag() {
   const inv = useNotesInvalidation();
 
