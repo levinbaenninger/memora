@@ -6,7 +6,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useNavigate } from "@tanstack/react-router";
-import { createContext, type ReactNode, useContext, useState } from "react";
+import { createContext, type ReactNode, use, useState } from "react";
 
 import {
   AlertDialog,
@@ -43,7 +43,7 @@ const FolderActionsContext = createContext<FolderActionsContextValue | null>(
 );
 
 function useFolderActions() {
-  const ctx = useContext(FolderActionsContext);
+  const ctx = use(FolderActionsContext);
   if (!ctx) {
     throw new Error(
       "useFolderActions must be used within FolderActionsProvider"
@@ -99,7 +99,6 @@ export function FolderActionsProvider({
             <AlertDialogTitle>New subfolder</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
-            autoFocus
             onChange={(e) => setSubfolderName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && subfolderName.trim()) {
@@ -139,7 +138,6 @@ export function FolderActionsProvider({
             <AlertDialogTitle>Rename folder</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
-            autoFocus
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && newName.trim()) {

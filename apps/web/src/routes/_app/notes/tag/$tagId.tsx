@@ -11,15 +11,6 @@ import {
 import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/tag/$tagId")({
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${
-          (loaderData as { tagName?: string } | undefined)?.tagName ?? "Tag"
-        } | Memora`,
-      },
-    ],
-  }),
   loader: async ({ context, params }) => {
     recordVisit("tag", params.tagId);
     const [tags] = await Promise.all([
@@ -35,6 +26,15 @@ export const Route = createFileRoute("/_app/notes/tag/$tagId")({
     const tag = tags.find((t) => t.id === params.tagId);
     return { tagName: tag?.name ?? "Tag" };
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${
+          (loaderData as { tagName?: string } | undefined)?.tagName ?? "Tag"
+        } | Memora`,
+      },
+    ],
+  }),
   component: TagView,
 });
 

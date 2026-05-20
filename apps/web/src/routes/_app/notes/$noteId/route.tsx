@@ -15,13 +15,6 @@ const noteDetailSearchSchema = z.object({
 export const Route = createFileRoute("/_app/notes/$noteId")({
   validateSearch: (search: Record<string, unknown>) =>
     noteDetailSearchSchema.parse(search),
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${(loaderData as { title?: string } | undefined)?.title || "Untitled"} | Memora`,
-      },
-    ],
-  }),
   loader: async ({ context, params }) => {
     recordVisit("note", params.noteId);
     try {
@@ -42,6 +35,13 @@ export const Route = createFileRoute("/_app/notes/$noteId")({
       throw e;
     }
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${(loaderData as { title?: string } | undefined)?.title || "Untitled"} | Memora`,
+      },
+    ],
+  }),
   component: NoteEditorView,
   pendingComponent: NotesLoadingView,
   errorComponent: NotesErrorView,

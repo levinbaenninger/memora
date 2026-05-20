@@ -50,7 +50,7 @@ export function DashboardView() {
   });
 
   return (
-    <div className="flex flex-col space-y-8">
+    <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-1">
         <h1 className="font-semibold text-2xl">
           {greeting(now)}

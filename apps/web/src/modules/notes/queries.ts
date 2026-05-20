@@ -1,5 +1,4 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 
 import { orpc } from "@/utils/orpc";
 
@@ -26,6 +25,8 @@ export function useNotesList(params: NotesListParams) {
         query: normalizedQ,
         folderId: folderId ?? undefined,
         tagIds: tagId ? [tagId] : [],
+        pinned: view === "pinned" ? true : undefined,
+        favorite: view === "favorites" ? true : undefined,
         includeArchived: isArchived,
         limit,
         offset,
@@ -38,6 +39,9 @@ export function useNotesList(params: NotesListParams) {
     orpc.notes.list.queryOptions({
       input: {
         folderId: folderId ?? undefined,
+        tagId: tagId ?? undefined,
+        pinned: view === "pinned" ? true : undefined,
+        favorite: view === "favorites" ? true : undefined,
         includeArchived: isArchived,
         limit,
         offset,
@@ -46,26 +50,7 @@ export function useNotesList(params: NotesListParams) {
   );
 
   const raw = hasQuery ? searchResult.data : listResult.data;
-
-  const notes = useMemo(() => {
-    if (!raw) {
-      return [];
-    }
-    let result = raw;
-    if (tagId && !hasQuery) {
-      result = result.filter((n) => n.tags.some((t) => t.id === tagId));
-    }
-    if (view === "pinned") {
-      result = result.filter((n) => n.pinned);
-    }
-    if (view === "favorites") {
-      result = result.filter((n) => n.favorite);
-    }
-    if (view === "archived") {
-      result = result.filter((n) => !!n.archivedAt);
-    }
-    return result;
-  }, [raw, tagId, view, hasQuery]);
+  const notes = raw ?? [];
 
   return {
     notes,

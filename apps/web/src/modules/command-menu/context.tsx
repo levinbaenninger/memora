@@ -3,8 +3,8 @@
 import {
   createContext,
   type ReactNode,
+  use,
   useCallback,
-  useContext,
   useMemo,
   useState,
 } from "react";
@@ -51,7 +51,7 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
 }
 
 export function useCommandMenu() {
-  const ctx = useContext(CommandMenuContext);
+  const ctx = use(CommandMenuContext);
   if (!ctx) {
     throw new Error("useCommandMenu must be used within a CommandMenuProvider");
   }

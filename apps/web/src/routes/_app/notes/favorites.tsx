@@ -3,12 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/favorites")({
-  head: () => ({ meta: [{ title: "Favorites | Memora" }] }),
   loader: ({ context }) =>
     context.queryClient.ensureQueryData(
       context.orpc.notes.list.queryOptions({
-        input: { includeArchived: false, limit: 50, offset: 0 },
+        input: { favorite: true, includeArchived: false, limit: 50, offset: 0 },
       })
     ),
+  head: () => ({ meta: [{ title: "Favorites | Memora" }] }),
   component: () => <NoteGridView title="Favorites" view="favorites" />,
 });

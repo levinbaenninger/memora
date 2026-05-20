@@ -11,16 +11,6 @@ import {
 import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/folder/$folderId")({
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${
-          (loaderData as { folderName?: string } | undefined)?.folderName ??
-          "Folder"
-        } | Memora`,
-      },
-    ],
-  }),
   loader: async ({ context, params }) => {
     recordVisit("folder", params.folderId);
     const [folders] = await Promise.all([
@@ -41,6 +31,16 @@ export const Route = createFileRoute("/_app/notes/folder/$folderId")({
     const folder = folders.find((f) => f.id === params.folderId);
     return { folderName: folder?.name ?? "Folder" };
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${
+          (loaderData as { folderName?: string } | undefined)?.folderName ??
+          "Folder"
+        } | Memora`,
+      },
+    ],
+  }),
   component: FolderView,
 });
 

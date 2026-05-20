@@ -23,24 +23,26 @@ export function QuickCapture() {
   };
 
   return (
-    <form
-      className="flex gap-2"
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit();
-      }}
-    >
+    <div className="flex gap-2">
       <Input
-        autoFocus
         className="flex-1"
         onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            submit();
+          }
+        }}
         placeholder="Capture a thought…"
         value={title}
       />
-      <Button disabled={!title.trim() || createNote.isPending} type="submit">
+      <Button
+        disabled={!title.trim() || createNote.isPending}
+        onClick={submit}
+        type="button"
+      >
         <HugeiconsIcon className="size-4" icon={Add01Icon} strokeWidth={2} />
         Create
       </Button>
-    </form>
+    </div>
   );
 }

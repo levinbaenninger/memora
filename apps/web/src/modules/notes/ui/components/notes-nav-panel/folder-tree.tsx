@@ -103,26 +103,24 @@ function InlineFolderForm({
   });
 
   return (
-    <form
-      className="px-1 py-0.5"
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-    >
+    <div className="px-1 py-0.5">
       <form.Field name="name">
         {(field) => (
           <Input
-            autoFocus
             className="h-6 text-xs"
             onBlur={() => {
-              if (!field.state.value.trim()) {
+              if (field.state.value.trim()) {
+                form.handleSubmit();
+              } else {
                 onDone();
               }
             }}
             onChange={(e) => field.handleChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Escape") {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                form.handleSubmit();
+              } else if (e.key === "Escape") {
                 onDone();
               }
             }}
@@ -131,7 +129,7 @@ function InlineFolderForm({
           />
         )}
       </form.Field>
-    </form>
+    </div>
   );
 }
 
@@ -160,22 +158,18 @@ function RenameFolderForm({
   });
 
   return (
-    <form
-      className="flex-1"
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-    >
+    <div className="flex-1">
       <form.Field name="name">
         {(field) => (
           <Input
-            autoFocus
             className="h-6 text-xs"
             onBlur={() => form.handleSubmit()}
             onChange={(e) => field.handleChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Escape") {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                form.handleSubmit();
+              } else if (e.key === "Escape") {
                 onDone();
               }
             }}
@@ -183,7 +177,7 @@ function RenameFolderForm({
           />
         )}
       </form.Field>
-    </form>
+    </div>
   );
 }
 

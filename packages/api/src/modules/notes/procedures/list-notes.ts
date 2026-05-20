@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, desc, eq, exists, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -13,6 +13,9 @@ import { noteSchema } from "../schemas";
 
 export const listNotesRequestDtoSchema = paginationSchema.extend({
   folderId: z.nanoid().nullish(),
+  tagId: z.nanoid().nullish(),
+  pinned: z.boolean().optional(),
+  favorite: z.boolean().optional(),
   includeArchived: z.boolean().default(false),
 });
 
@@ -65,6 +68,30 @@ export const listNotes = authorized
         input.folderId
           ? eq(notes.folderId, input.folderId)
           : isNull(notes.folderId)
+      );
+    }
+
+    if (input.pinned !== undefined) {
+      where.push(eq(notes.pinned, input.pinned));
+    }
+
+    if (input.favorite !== undefined) {
+      where.push(eq(notes.favorite, input.favorite));
+    }
+
+    if (input.tagId) {
+      where.push(
+        exists(
+          db
+            .select({ id: notesToTags.noteId })
+            .from(notesToTags)
+            .where(
+              and(
+                eq(notesToTags.noteId, notes.id),
+                eq(notesToTags.tagId, input.tagId)
+              )
+            )
+        )
       );
     }
 
