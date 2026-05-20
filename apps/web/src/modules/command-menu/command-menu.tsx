@@ -12,6 +12,7 @@ import {
   FolderAddIcon,
   HashtagIcon,
   HeartRemoveIcon,
+  Note01Icon,
   NoteAddIcon,
   NoteIcon,
   PinIcon,
@@ -61,7 +62,7 @@ import { jumpToItems } from "./jump-to-items";
 const MIN_QUERY_LENGTH = 2;
 
 const recentIcon = {
-  note: NoteIcon,
+  note: Note01Icon,
   folder: Folder01Icon,
   tag: HashtagIcon,
 } as const;
