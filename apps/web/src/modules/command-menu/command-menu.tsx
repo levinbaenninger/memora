@@ -29,7 +29,6 @@ import { toast } from "sonner";
 
 import {
   CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -257,7 +256,6 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
 
   return (
     <>
-      <CommandEmpty>No matches.</CommandEmpty>
       {showRecents && recents.length > 0 ? (
         <CommandGroup heading="Recent">
           {recents.map((entity) => (
