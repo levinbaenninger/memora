@@ -9,6 +9,8 @@ import {
 import { AppHeader } from "@/modules/app/ui/components/app-header";
 import { AppSidebar } from "@/modules/app/ui/components/app-sidebar";
 import type { UserButtonProps } from "@/modules/app/ui/components/user/user-button";
+import { CommandMenu } from "@/modules/command-menu/command-menu";
+import { CommandMenuProvider } from "@/modules/command-menu/context";
 import { useNotesBreadcrumbs } from "@/modules/notes/hooks/use-notes-breadcrumbs";
 import { NotesNavPanel } from "@/modules/notes/ui/components/notes-nav-panel";
 
@@ -46,24 +48,27 @@ export function AppShell({
   }));
 
   return (
-    <SidebarProvider>
-      <AppSidebar
-        footerNavLinks={footerNavLinks}
-        navGroups={navGroups}
-        renderLink={renderLink}
-      />
-      <SidebarInset className="min-w-0 px-16 py-4 md:py-6">
-        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col">
-          <AppHeader
-            breadcrumbItems={breadcrumbItems}
-            renderLink={renderLink}
-            user={user}
-          />
-          <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-hidden">
-            {children}
+    <CommandMenuProvider>
+      <SidebarProvider>
+        <AppSidebar
+          footerNavLinks={footerNavLinks}
+          navGroups={navGroups}
+          renderLink={renderLink}
+        />
+        <SidebarInset className="min-w-0 px-16 py-4 md:py-6">
+          <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col">
+            <AppHeader
+              breadcrumbItems={breadcrumbItems}
+              renderLink={renderLink}
+              user={user}
+            />
+            <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-hidden">
+              {children}
+            </div>
           </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+        <CommandMenu />
+      </SidebarProvider>
+    </CommandMenuProvider>
   );
 }

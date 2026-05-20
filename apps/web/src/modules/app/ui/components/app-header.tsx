@@ -5,6 +5,7 @@ import { Separator } from "@memora/ui/components/separator";
 import type { AppLinkRenderer, SidebarNavItem } from "@/modules/app/routes";
 import { AppBreadcrumbs } from "@/modules/app/ui/components/app-breadcrumbs";
 import { CustomSidebarTrigger } from "@/modules/app/ui/components/custom-sidebar-trigger";
+import { CommandMenuMobileTrigger } from "@/modules/command-menu/triggers";
 import type { UserButtonProps } from "./user/user-button";
 import { UserButton } from "./user/user-button";
 
@@ -27,7 +28,10 @@ export function AppHeader({
         />
         <AppBreadcrumbs items={breadcrumbItems} renderLink={renderLink} />
       </div>
-      <UserButton className="shrink-0" size="icon" user={user} />
+      <div className="flex shrink-0 items-center gap-1">
+        <CommandMenuMobileTrigger className="md:hidden" />
+        <UserButton size="icon" user={user} />
+      </div>
     </header>
   );
 }
