@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { client, orpc } from "@/utils/orpc";
@@ -172,11 +172,13 @@ export function useCreateFolder() {
 
 export function useUpdateFolder() {
   const inv = useNotesInvalidation();
+  const router = useRouter();
 
   return useMutation(
     orpc.notes.folders.update.mutationOptions({
       onSuccess: () => {
         inv.invalidateFolders();
+        router.invalidate();
       },
       onError: () => toast.error("Failed to rename folder"),
     })
@@ -242,6 +244,7 @@ export function useCreateTag() {
 
 export function useUpdateTag() {
   const inv = useNotesInvalidation();
+  const router = useRouter();
 
   return useMutation(
     orpc.notes.tags.update.mutationOptions({
@@ -249,6 +252,7 @@ export function useUpdateTag() {
         inv.invalidateTags();
         inv.invalidateList();
         inv.invalidateSearch();
+        router.invalidate();
       },
     })
   );
