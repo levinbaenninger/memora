@@ -67,4 +67,13 @@ const splashCss = `
 .memora-caption {
   animation: memora-caption 2.4s ease-in-out infinite;
 }
+@media (prefers-reduced-motion: reduce) {
+  .memora-logo,
+  .memora-halo,
+  .memora-halo-delay,
+  .memora-caption {
+    animation: none;
+    will-change: auto;
+  }
+}
 `;

@@ -18,7 +18,7 @@ Memora is a personal notes and tasks workspace. Write rich-text notes, organize 
 
 ## Repository Layout
 
-```
+```text
 apps/
   web/               TanStack Start web application
 packages/

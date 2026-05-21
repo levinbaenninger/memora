@@ -59,6 +59,8 @@ export function NoteMetadataStrip({
   // Mirror in a ref so rapid synchronous toggles can compose against the
   // latest list without waiting for React to commit the previous setState.
   const localTagNamesRef = useRef(localTagNames);
+  // Serialize tag mutations so out-of-order resolves can't overwrite a newer set.
+  const lastTagMutationRef = useRef<Promise<unknown>>(Promise.resolve());
   useEffect(() => {
     const next = tags.map((t) => t.name);
     localTagNamesRef.current = next;
@@ -83,7 +85,9 @@ export function NoteMetadataStrip({
       : [...prev, tagName];
     localTagNamesRef.current = next;
     setLocalTagNames(next);
-    updateNote.mutate({ id: noteId, tagNames: next });
+    lastTagMutationRef.current = lastTagMutationRef.current.then(() =>
+      updateNote.mutateAsync({ id: noteId, tagNames: next })
+    );
   };
 
   const handleCreateTag = () => {
@@ -100,7 +104,9 @@ export function NoteMetadataStrip({
     const next = [...prev, name];
     localTagNamesRef.current = next;
     setLocalTagNames(next);
-    updateNote.mutate({ id: noteId, tagNames: next });
+    lastTagMutationRef.current = lastTagMutationRef.current.then(() =>
+      updateNote.mutateAsync({ id: noteId, tagNames: next })
+    );
     setTagInput("");
     setTagPopoverOpen(false);
   };
