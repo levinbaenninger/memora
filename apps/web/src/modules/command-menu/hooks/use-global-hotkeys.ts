@@ -9,6 +9,7 @@ import { useTagsForPalette } from "./use-eager-entities";
 import { useRouteEntityContext } from "./use-route-context";
 
 const OPTS = { ignoreInputs: true } as const;
+const SEQUENCE_OPTS = { ignoreInputs: true, timeout: 1000 } as const;
 
 export function useGlobalHotkeys() {
   const navigate = useNavigate();
@@ -124,17 +125,29 @@ export function useGlobalHotkeys() {
     { ...OPTS, enabled: !!note }
   );
 
-  useHotkeySequence(["G", "N"], () => navigate({ to: "/notes" }), OPTS);
-  useHotkeySequence(["G", "P"], () => navigate({ to: "/notes/pinned" }), OPTS);
+  useHotkeySequence(
+    ["G", "N"],
+    () => navigate({ to: "/notes" }),
+    SEQUENCE_OPTS
+  );
+  useHotkeySequence(
+    ["G", "P"],
+    () => navigate({ to: "/notes/pinned" }),
+    SEQUENCE_OPTS
+  );
   useHotkeySequence(
     ["G", "F"],
     () => navigate({ to: "/notes/favorites" }),
-    OPTS
+    SEQUENCE_OPTS
   );
   useHotkeySequence(
     ["G", "A"],
     () => navigate({ to: "/notes/archived" }),
-    OPTS
+    SEQUENCE_OPTS
   );
-  useHotkeySequence(["G", "D"], () => navigate({ to: "/dashboard" }), OPTS);
+  useHotkeySequence(
+    ["G", "D"],
+    () => navigate({ to: "/dashboard" }),
+    SEQUENCE_OPTS
+  );
 }

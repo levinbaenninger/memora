@@ -83,6 +83,7 @@ export function NoteActionsMenu({
 
         <DropdownMenu>
           <DropdownMenuTrigger
+            aria-label="More actions"
             className={cn(
               buttonVariants({ variant: "ghost", size: "icon-sm" })
             )}

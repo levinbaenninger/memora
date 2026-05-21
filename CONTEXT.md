@@ -66,7 +66,7 @@ _Avoid_: Quick action, contextual command.
 
 > **Dev:** "If I pin a **Note** from the **Command Menu**, does it become a **Recent Visit**?"
 > **Domain expert:** "No — a **Recent Visit** records that you *opened* the **Note** (visited its **Detail** or filtered to its **Folder**/**Tag**). Pinning is a **Context Action**; it changes the **Note** but doesn't count as a visit."
-
+>
 > **Dev:** "Can I be in **Archive** and **Pinned** at the same time?"
 > **Domain expert:** "No. **Views** are mutually exclusive — one **View** per URL."
 

@@ -30,7 +30,7 @@ export function QuickCapture() {
         className="flex-1"
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && !e.nativeEvent.isComposing) {
             submit();
           }
         }}

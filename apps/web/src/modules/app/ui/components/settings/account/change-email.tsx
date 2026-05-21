@@ -84,7 +84,7 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
                   type="email"
                 />
               ) : (
-                <Input disabled />
+                <Input disabled id="email" />
               )}
 
               <FieldError>{fieldErrors.email}</FieldError>

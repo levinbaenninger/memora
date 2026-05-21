@@ -213,7 +213,7 @@ function ChangePasswordForm({
                   value={currentPassword}
                 />
               ) : (
-                <Input disabled />
+                <Input disabled id="currentPassword" />
               )}
 
               <FieldError>{fieldErrors.currentPassword}</FieldError>
@@ -274,7 +274,7 @@ function ChangePasswordForm({
                   </InputGroupAddon>
                 </InputGroup>
               ) : (
-                <Input disabled />
+                <Input disabled id="newPassword" />
               )}
 
               <FieldError>{fieldErrors.newPassword}</FieldError>
@@ -337,7 +337,7 @@ function ChangePasswordForm({
                     </InputGroupAddon>
                   </InputGroup>
                 ) : (
-                  <Input disabled />
+                  <Input disabled id="confirmPassword" />
                 )}
 
                 <FieldError>{fieldErrors.confirmPassword}</FieldError>

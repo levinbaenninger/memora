@@ -80,7 +80,9 @@ export function LinkNoteDialog({
             {notes.map((note) => (
               <CommandItem
                 key={note.id}
-                onSelect={() => onSelect({ id: note.id, title: note.title })}
+                onSelect={() =>
+                  onSelect({ id: note.id, title: note.title || "Untitled" })
+                }
                 value={note.id}
               >
                 <span className="truncate">{note.title || "Untitled"}</span>

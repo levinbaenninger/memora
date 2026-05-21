@@ -35,8 +35,8 @@ export function useNotesList(params: NotesListParams) {
     enabled: hasQuery,
   });
 
-  const listResult = useSuspenseQuery(
-    orpc.notes.list.queryOptions({
+  const listResult = useQuery({
+    ...orpc.notes.list.queryOptions({
       input: {
         folderId: folderId ?? undefined,
         tagId: tagId ?? undefined,
@@ -46,17 +46,18 @@ export function useNotesList(params: NotesListParams) {
         limit,
         offset,
       },
-    })
-  );
+    }),
+    enabled: !hasQuery,
+  });
 
   const raw = hasQuery ? searchResult.data : listResult.data;
   const notes = raw ?? [];
 
   return {
     notes,
-    isPending: hasQuery ? searchResult.isPending : false,
-    isError: hasQuery ? searchResult.isError : false,
-    error: hasQuery ? searchResult.error : null,
+    isPending: hasQuery ? searchResult.isPending : listResult.isPending,
+    isError: hasQuery ? searchResult.isError : listResult.isError,
+    error: hasQuery ? searchResult.error : listResult.error,
   };
 }
 

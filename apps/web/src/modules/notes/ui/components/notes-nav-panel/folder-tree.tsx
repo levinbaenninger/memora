@@ -11,7 +11,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useForm } from "@tanstack/react-form";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   AlertDialog,
@@ -86,6 +86,7 @@ function InlineFolderForm({
   onDone: () => void;
 }) {
   const createFolder = useCreateFolder();
+  const submittingRef = useRef(false);
 
   const form = useForm({
     defaultValues: { name: "" },
@@ -102,6 +103,14 @@ function InlineFolderForm({
     },
   });
 
+  const submitOnce = () => {
+    if (submittingRef.current) {
+      return;
+    }
+    submittingRef.current = true;
+    form.handleSubmit();
+  };
+
   return (
     <div className="px-1 py-0.5">
       <form.Field name="name">
@@ -110,7 +119,7 @@ function InlineFolderForm({
             className="h-6 text-xs"
             onBlur={() => {
               if (field.state.value.trim()) {
-                form.handleSubmit();
+                submitOnce();
               } else {
                 onDone();
               }
@@ -119,7 +128,7 @@ function InlineFolderForm({
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-                form.handleSubmit();
+                submitOnce();
               } else if (e.key === "Escape") {
                 onDone();
               }
@@ -141,6 +150,7 @@ function RenameFolderForm({
   onDone: () => void;
 }) {
   const updateFolder = useUpdateFolder();
+  const submittingRef = useRef(false);
 
   const form = useForm({
     defaultValues: { name: folder.name },
@@ -157,18 +167,26 @@ function RenameFolderForm({
     },
   });
 
+  const submitOnce = () => {
+    if (submittingRef.current) {
+      return;
+    }
+    submittingRef.current = true;
+    form.handleSubmit();
+  };
+
   return (
     <div className="flex-1">
       <form.Field name="name">
         {(field) => (
           <Input
             className="h-6 text-xs"
-            onBlur={() => form.handleSubmit()}
+            onBlur={() => submitOnce()}
             onChange={(e) => field.handleChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-                form.handleSubmit();
+                submitOnce();
               } else if (e.key === "Escape") {
                 onDone();
               }

@@ -76,8 +76,10 @@ export function TagActionsProvider({
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && newName.trim()) {
-                updateTag.mutate({ id: tagId, name: newName.trim() });
-                setRenameOpen(false);
+                updateTag.mutate(
+                  { id: tagId, name: newName.trim() },
+                  { onSuccess: () => setRenameOpen(false) }
+                );
               }
             }}
             placeholder="Tag name"
@@ -89,8 +91,10 @@ export function TagActionsProvider({
               disabled={!newName.trim() || newName.trim() === tagName}
               onClick={() => {
                 if (newName.trim() && newName.trim() !== tagName) {
-                  updateTag.mutate({ id: tagId, name: newName.trim() });
-                  setRenameOpen(false);
+                  updateTag.mutate(
+                    { id: tagId, name: newName.trim() },
+                    { onSuccess: () => setRenameOpen(false) }
+                  );
                 }
               }}
             >
