@@ -20,10 +20,11 @@ export const getRouter = () => {
   });
 
   const router = createTanStackRouter({
-    defaultPreload: "render",
+    defaultPreload: "intent",
     defaultPreloadStaleTime: 30_000,
     defaultPendingMs: 0,
     defaultPendingMinMs: 300,
+    defaultViewTransition: true,
     routeTree,
     scrollRestoration: true,
     context: { queryClient, orpc },
