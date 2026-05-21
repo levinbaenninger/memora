@@ -8,7 +8,7 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "@memora/ui/components/badge";
 import { Button } from "@memora/ui/components/button";
@@ -56,8 +56,13 @@ export function NoteMetadataStrip({
   const [localTagNames, setLocalTagNames] = useState(() =>
     tags.map((t) => t.name)
   );
+  // Mirror in a ref so rapid synchronous toggles can compose against the
+  // latest list without waiting for React to commit the previous setState.
+  const localTagNamesRef = useRef(localTagNames);
   useEffect(() => {
-    setLocalTagNames(tags.map((t) => t.name));
+    const next = tags.map((t) => t.name);
+    localTagNamesRef.current = next;
+    setLocalTagNames(next);
   }, [tags]);
 
   const currentTagNames = localTagNames;
@@ -72,13 +77,13 @@ export function NoteMetadataStrip({
   };
 
   const handleTagToggle = (tagName: string) => {
-    setLocalTagNames((prev) => {
-      const next = prev.includes(tagName)
-        ? prev.filter((n) => n !== tagName)
-        : [...prev, tagName];
-      updateNote.mutate({ id: noteId, tagNames: next });
-      return next;
-    });
+    const prev = localTagNamesRef.current;
+    const next = prev.includes(tagName)
+      ? prev.filter((n) => n !== tagName)
+      : [...prev, tagName];
+    localTagNamesRef.current = next;
+    setLocalTagNames(next);
+    updateNote.mutate({ id: noteId, tagNames: next });
   };
 
   const handleCreateTag = () => {
@@ -86,14 +91,16 @@ export function NoteMetadataStrip({
     if (!name) {
       return;
     }
-    setLocalTagNames((prev) => {
-      if (prev.includes(name)) {
-        return prev;
-      }
-      const next = [...prev, name];
-      updateNote.mutate({ id: noteId, tagNames: next });
-      return next;
-    });
+    const prev = localTagNamesRef.current;
+    if (prev.includes(name)) {
+      setTagInput("");
+      setTagPopoverOpen(false);
+      return;
+    }
+    const next = [...prev, name];
+    localTagNamesRef.current = next;
+    setLocalTagNames(next);
+    updateNote.mutate({ id: noteId, tagNames: next });
     setTagInput("");
     setTagPopoverOpen(false);
   };

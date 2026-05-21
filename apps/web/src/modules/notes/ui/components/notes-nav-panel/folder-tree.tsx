@@ -103,12 +103,16 @@ function InlineFolderForm({
     },
   });
 
-  const submitOnce = () => {
+  const submitOnce = async () => {
     if (submittingRef.current) {
       return;
     }
     submittingRef.current = true;
-    form.handleSubmit();
+    try {
+      await form.handleSubmit();
+    } finally {
+      submittingRef.current = false;
+    }
   };
 
   return (
@@ -167,12 +171,16 @@ function RenameFolderForm({
     },
   });
 
-  const submitOnce = () => {
+  const submitOnce = async () => {
     if (submittingRef.current) {
       return;
     }
     submittingRef.current = true;
-    form.handleSubmit();
+    try {
+      await form.handleSubmit();
+    } finally {
+      submittingRef.current = false;
+    }
   };
 
   return (
