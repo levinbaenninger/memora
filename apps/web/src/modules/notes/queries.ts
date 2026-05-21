@@ -21,6 +21,7 @@ export function notesListInput(params: Omit<NotesListParams, "q">) {
     pinned: view === "pinned" ? true : undefined,
     favorite: view === "favorites" ? true : undefined,
     includeArchived: view === "archived",
+    archivedOnly: view === "archived",
     limit,
     offset,
   };
@@ -35,6 +36,7 @@ export function notesSearchInput(params: NotesListParams & { q: string }) {
     pinned: view === "pinned" ? true : undefined,
     favorite: view === "favorites" ? true : undefined,
     includeArchived: view === "archived",
+    archivedOnly: view === "archived",
     limit,
     offset,
   };

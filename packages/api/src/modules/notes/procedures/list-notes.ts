@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq, exists, inArray, isNull } from "drizzle-orm";
+import { and, desc, eq, exists, inArray, isNotNull, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -17,6 +17,7 @@ export const listNotesRequestDtoSchema = paginationSchema.extend({
   pinned: z.boolean().optional(),
   favorite: z.boolean().optional(),
   includeArchived: z.boolean().default(false),
+  archivedOnly: z.boolean().default(false),
 });
 
 export const listNotesResponseDtoSchema = z.array(
@@ -59,7 +60,9 @@ export const listNotes = authorized
 
     const where: SQL[] = [eq(notes.userId, userId)];
 
-    if (!input.includeArchived) {
+    if (input.archivedOnly) {
+      where.push(isNotNull(notes.archivedAt));
+    } else if (!input.includeArchived) {
       where.push(isNull(notes.archivedAt));
     }
 
