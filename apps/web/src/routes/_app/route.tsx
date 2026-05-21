@@ -13,8 +13,15 @@ import { AppShell } from "@/modules/app/ui/views/app-shell";
 import { authClient } from "@/modules/auth/client";
 
 export const Route = createFileRoute("/_app")({
-  async beforeLoad() {
-    const { data: session } = await authClient.getSession();
+  async beforeLoad({ context }) {
+    const session = await context.queryClient.ensureQueryData({
+      queryKey: ["auth", "session"],
+      queryFn: async () => {
+        const { data } = await authClient.getSession();
+        return data ?? null;
+      },
+      staleTime: Number.POSITIVE_INFINITY,
+    });
     if (!session) {
       throw redirect({
         params: { path: viewPaths.auth.signIn },
