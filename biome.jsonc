@@ -12,7 +12,7 @@
   },
   "overrides": [
     {
-      "includes": ["apps/web/src/routes/api/**/*.ts"],
+      "includes": ["apps/web/src/routes/**"],
       "linter": {
         "rules": {
           "style": {

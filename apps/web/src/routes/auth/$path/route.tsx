@@ -14,9 +14,6 @@ const authPathTitles: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/auth/$path")({
-  head: ({ params }) => ({
-    meta: [{ title: authPathTitles[params.path] ?? "Authentication" }],
-  }),
   ssr: false,
   async beforeLoad({ params: { path } }) {
     if (!Object.values(viewPaths.auth).includes(path)) {
@@ -37,6 +34,11 @@ export const Route = createFileRoute("/auth/$path")({
       throw redirect({ replace: true, to: "/dashboard" });
     }
   },
+  head: ({ params }) => ({
+    meta: [
+      { title: `${authPathTitles[params.path] ?? "Authentication"} | Memora` },
+    ],
+  }),
   component: AuthPage,
 });
 

@@ -20,7 +20,6 @@ import {
   InputGroupInput,
 } from "@memora/ui/components/input-group";
 import { Label } from "@memora/ui/components/label";
-import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
@@ -214,9 +213,7 @@ function ChangePasswordForm({
                   value={currentPassword}
                 />
               ) : (
-                <Skeleton>
-                  <Input className="invisible" />
-                </Skeleton>
+                <Input disabled id="currentPassword" />
               )}
 
               <FieldError>{fieldErrors.currentPassword}</FieldError>
@@ -277,9 +274,7 @@ function ChangePasswordForm({
                   </InputGroupAddon>
                 </InputGroup>
               ) : (
-                <Skeleton>
-                  <Input className="invisible" />
-                </Skeleton>
+                <Input disabled id="newPassword" />
               )}
 
               <FieldError>{fieldErrors.newPassword}</FieldError>
@@ -342,9 +337,7 @@ function ChangePasswordForm({
                     </InputGroupAddon>
                   </InputGroup>
                 ) : (
-                  <Skeleton>
-                    <Input className="invisible" />
-                  </Skeleton>
+                  <Input disabled id="confirmPassword" />
                 )}
 
                 <FieldError>{fieldErrors.confirmPassword}</FieldError>

@@ -1,31 +1,52 @@
 import { useAuthenticate } from "@better-auth-ui/react";
+import { viewPaths } from "@better-auth-ui/react/core";
 import {
   createFileRoute,
   Link,
   Outlet,
+  redirect,
   useLocation,
+  useSearch,
 } from "@tanstack/react-router";
 
 import { AppShell } from "@/modules/app/ui/views/app-shell";
-import { RootLoading } from "@/modules/app/ui/views/root/root-loading";
+import { authClient } from "@/modules/auth/client";
 
 export const Route = createFileRoute("/_app")({
+  async beforeLoad({ context }) {
+    const session = await context.queryClient.ensureQueryData({
+      queryKey: ["auth", "session"],
+      queryFn: async () => {
+        const { data } = await authClient.getSession();
+        return data ?? null;
+      },
+      staleTime: 5 * 60 * 1000,
+    });
+    if (!session) {
+      throw redirect({
+        params: { path: viewPaths.auth.signIn },
+        replace: true,
+        to: "/auth/$path",
+      });
+    }
+  },
   component: AppShellLayout,
 });
 
 function AppShellLayout() {
   const { data: session } = useAuthenticate();
   const { pathname } = useLocation();
-
-  if (!session) {
-    return <RootLoading />;
-  }
+  const search = useSearch({ strict: false });
 
   return (
     <AppShell
+      currentSearch={search as Record<string, unknown>}
       pathname={pathname}
-      renderLink={(to, params) => <Link params={params} to={to} />}
-      user={session.user}
+      renderLink={(to, params, linkSearch) => (
+        // biome-ignore lint/suspicious/noExplicitAny: TanStack Router search types require cast
+        <Link params={params} search={linkSearch as any} to={to} />
+      )}
+      user={session?.user}
     >
       <Outlet />
     </AppShell>

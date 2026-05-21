@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/tasks")({
   head: () => ({
-    meta: [{ title: "Tasks" }],
+    meta: [{ title: "Tasks | Memora" }],
   }),
   component: TasksPage,
 });

@@ -1,0 +1,347 @@
+/* Map BlockNote color vars to shadcn vars. Applied globally on .bn-root
+ * because menus/toolbars/side-menu are portaled outside the editor wrapper. */
+.bn-root,
+.bn-root[data-color-scheme="light"],
+.bn-root[data-color-scheme="dark"] {
+  --bn-colors-editor-background: var(--background);
+  --bn-colors-editor-text: var(--foreground);
+  --bn-colors-menu-background: var(--popover);
+  --bn-colors-menu-text: var(--popover-foreground);
+  --bn-colors-tooltip-background: var(--popover);
+  --bn-colors-tooltip-text: var(--popover-foreground);
+  --bn-colors-hovered-background: var(--accent);
+  --bn-colors-hovered-text: var(--accent-foreground);
+  --bn-colors-selected-background: var(--accent);
+  --bn-colors-selected-text: var(--accent-foreground);
+  --bn-colors-disabled-background: var(--muted);
+  --bn-colors-disabled-text: var(--muted-foreground);
+  --bn-colors-shadow: var(--border);
+  --bn-colors-border: var(--border);
+  --bn-colors-side-menu: var(--muted-foreground);
+}
+
+.bn-editor,
+.bn-container {
+  color: var(--foreground);
+  background-color: transparent;
+}
+
+/* Remove inner horizontal padding so content lines up with title */
+.memora-blocknote .bn-editor {
+  padding-inline: 0;
+}
+
+.memora-blocknote .bn-container {
+  overflow: visible;
+}
+
+/* Side menu (drag/plus handles) floats outside editor flow.
+ * Raise z-index so it stays above sidebar inset chrome. */
+.bn-side-menu {
+  z-index: 50;
+}
+
+/* Heading sizes: smaller + no extra top padding so side menu aligns.
+ * Browser default h1 is 2em — override with !important on both the
+ * block-content container and the actual <hN> elements. */
+.bn-block-content[data-content-type="heading"] {
+  padding-top: 0 !important;
+  line-height: 1.3 !important;
+}
+.bn-block-content[data-content-type="heading"] h1 {
+  font-size: 1.5rem !important;
+}
+.bn-block-content[data-content-type="heading"] h2 {
+  font-size: 1.25rem !important;
+}
+.bn-block-content[data-content-type="heading"] h3 {
+  font-size: 1.125rem !important;
+}
+.bn-block-content[data-content-type="heading"][data-level="1"] {
+  --level: 1.5rem;
+}
+.bn-block-content[data-content-type="heading"][data-level="2"] {
+  --level: 1.25rem;
+}
+.bn-block-content[data-content-type="heading"][data-level="3"] {
+  --level: 1.125rem;
+}
+.bn-block-content[data-content-type="heading"]:not([data-level]) {
+  --level: 1.5rem;
+}
+[data-prev-level="1"] {
+  --prev-level: 1.5rem;
+}
+[data-prev-level="2"] {
+  --prev-level: 1.25rem;
+}
+[data-prev-level="3"] {
+  --prev-level: 1.125rem;
+}
+
+/* Side menu height matches block content height (no extra heading padding now,
+ * so default 30px is close to right for all heading levels at our sizes). */
+.bn-side-menu[data-block-type="heading"][data-level="1"] {
+  height: 36px;
+}
+.bn-side-menu[data-block-type="heading"][data-level="2"] {
+  height: 32px;
+}
+.bn-side-menu[data-block-type="heading"][data-level="3"] {
+  height: 30px;
+}
+
+/* Drop cursor: thinner + neutral color (preserve length per axis) */
+.prosemirror-dropcursor-block {
+  height: 2px !important;
+  background-color: var(--muted-foreground) !important;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+.prosemirror-dropcursor-vertical {
+  width: 2px !important;
+  background-color: var(--muted-foreground) !important;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+.bn-table-drop-cursor {
+  background-color: var(--muted-foreground) !important;
+}
+
+/* Block spacing — breathing room between top-level blocks */
+.bn-editor > .bn-block-group > .bn-block-outer + .bn-block-outer {
+  margin-top: 4px;
+}
+.bn-block-content {
+  padding-block: 2px !important;
+}
+/* Headings get extra top space when following another block.
+ * BlockNote omits data-level on the wrapper for default H1 — use the actual
+ * <hN> tag to detect level reliably. */
+.bn-block-outer + .bn-block-outer:has(h1) {
+  margin-top: 24px !important;
+}
+.bn-block-outer + .bn-block-outer:has(h2) {
+  margin-top: 18px !important;
+}
+.bn-block-outer + .bn-block-outer:has(h3) {
+  margin-top: 14px !important;
+}
+
+/* Kill block layout transitions */
+.bn-editor *,
+.bn-editor *::before,
+.bn-editor *::after {
+  transition: none !important;
+}
+
+/* Drag-handle dropdown: shift right so it anchors near bottom-right of trigger */
+.bn-shadcn .bn-menu-dropdown {
+  margin-left: -80px;
+}
+
+/* Hide broken Radix tooltip arrow + add breathing room since arrow is gone.
+ * Scoped to Radix's popper wrapper so it only affects BlockNote tooltips
+ * (Radix) and not the app's Base UI tooltips, which share the same data-slot. */
+:where([data-radix-popper-content-wrapper]) [data-slot="tooltip-content"] svg {
+  display: none !important;
+}
+:where([data-radix-popper-content-wrapper]) [data-slot="tooltip-content"] {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+/* Slash menu keyboard selection highlight */
+.bn-suggestion-menu [aria-selected="true"],
+.bn-suggestion-menu [role="option"]:hover {
+  color: var(--accent-foreground);
+  background-color: var(--accent);
+}
+
+/* Delete menu item: destructive color + icon spacing */
+.memora-delete-item {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--destructive);
+}
+.bn-menu-item:has(.memora-delete-item) {
+  color: var(--destructive) !important;
+}
+.bn-menu-item:has(.memora-delete-item):hover {
+  background-color: color-mix(in oklch, var(--destructive) 12%, transparent);
+}
+
+/* Lists: marker color from muted-foreground, vertically centered */
+.bn-block-content[data-content-type="bulletListItem"]::before,
+.bn-block-content[data-content-type="numberedListItem"]::before {
+  align-items: center !important;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.bn-block-content[data-content-type="bulletListItem"],
+.bn-block-content[data-content-type="numberedListItem"] {
+  align-items: center;
+}
+.bn-block-content[data-content-type="bulletListItem"],
+.bn-block-content[data-content-type="numberedListItem"],
+.bn-block-content[data-content-type="checkListItem"] {
+  padding-block: 2px;
+}
+.bn-block-group .bn-block-group {
+  margin-left: 20px;
+}
+
+/* Checklist: align checkbox + text on same baseline */
+.bn-block-content[data-content-type="checkListItem"] {
+  align-items: center;
+}
+.bn-block-content[data-content-type="checkListItem"] > div:has(> input) {
+  display: flex;
+  align-items: center;
+  height: auto !important;
+}
+.bn-block-content[data-content-type="checkListItem"]
+  > div
+  > input[type="checkbox"] {
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px !important;
+  margin: 0 8px 0 2px !important;
+  appearance: none;
+  cursor: pointer;
+  background-color: var(--background);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+}
+.bn-block-content[data-content-type="checkListItem"]
+  > div
+  > input[type="checkbox"]:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+.bn-block-content[data-content-type="checkListItem"]
+  > div
+  > input[type="checkbox"]:checked::after {
+  position: absolute;
+  inset: 1px;
+  content: "";
+  background-color: var(--primary-foreground);
+  -webkit-mask:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M3 8.5l3.5 3.5L13 5'/></svg>")
+    center / contain no-repeat;
+  mask:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M3 8.5l3.5 3.5L13 5'/></svg>")
+    center / contain no-repeat;
+}
+.bn-block-content[data-content-type="checkListItem"][data-checked="true"]
+  .bn-inline-content {
+  color: var(--muted-foreground);
+  text-decoration-color: var(--muted-foreground);
+}
+
+/* Toggle / collapsible blocks */
+.bn-toggle-button {
+  color: var(--muted-foreground);
+}
+.bn-toggle-button:hover {
+  color: var(--foreground);
+}
+.bn-toggle-button > svg {
+  width: 14px;
+  height: 14px;
+}
+.bn-toggle-add-block-button {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+/* Quote: muted color, accent border */
+.bn-block-content[data-content-type="quote"] blockquote {
+  padding-left: 0.875rem;
+  color: var(--muted-foreground);
+  border-left-color: var(--border);
+  border-left-width: 3px;
+}
+
+/* Divider: subtle border using shadcn token */
+.bn-block-content[data-content-type="divider"] hr {
+  border-top-color: var(--border);
+}
+
+/* Replace default thick blue selection outline with subtle ring */
+.bn-block-content.ProseMirror-selectednode > *,
+.ProseMirror-selectednode > .bn-block-content > * {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Inline code: shadcn-style chip */
+.bn-inline-content code {
+  padding: 0.125rem 0.35rem;
+  font-size: 0.875em;
+  color: var(--foreground);
+  background-color: var(--muted);
+  border-radius: 4px;
+}
+
+/* Code block: shadcn token bg + soft border */
+.bn-block-content[data-content-type="codeBlock"] {
+  color: var(--foreground) !important;
+  background-color: var(--muted) !important;
+  border: 1px solid var(--border);
+}
+.bn-block-content[data-content-type="codeBlock"] > pre {
+  padding: 40px 18px 16px !important;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.bn-block-content[data-content-type="codeBlock"] > div > select {
+  position: absolute !important;
+  top: 8px !important;
+  right: auto !important;
+  left: 12px !important;
+  max-width: 9rem;
+  padding: 2px 8px !important;
+  text-overflow: ellipsis;
+  font-size: 0.75rem !important;
+  color: var(--muted-foreground) !important;
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 6px !important;
+  opacity: 1 !important;
+}
+.bn-block-content[data-content-type="codeBlock"] > div > select:hover {
+  color: var(--foreground) !important;
+  background-color: color-mix(
+    in oklch,
+    var(--foreground) 8%,
+    transparent
+  ) !important;
+}
+.bn-block-content[data-content-type="codeBlock"] > div > select > option {
+  color: var(--popover-foreground) !important;
+  background-color: var(--popover) !important;
+}
+
+/* Side menu icons: smaller drag/add buttons, centered */
+.bn-shadcn .bn-side-menu {
+  align-items: center;
+  justify-content: center;
+}
+.bn-shadcn .bn-side-menu .bn-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}
+.bn-shadcn .bn-side-menu .bn-button svg {
+  width: 14px;
+  height: 14px;
+}

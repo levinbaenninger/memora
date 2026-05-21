@@ -4,14 +4,14 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { Settings } from "@/modules/app/ui/views/settings/settings";
 
 export const Route = createFileRoute("/_app/settings/$path")({
-  head: () => ({
-    meta: [{ title: "Settings" }],
-  }),
   beforeLoad({ params: { path } }) {
     if (!Object.values(viewPaths.settings).includes(path)) {
       throw notFound();
     }
   },
+  head: () => ({
+    meta: [{ title: "Settings | Memora" }],
+  }),
   component: SettingsPage,
 });
 

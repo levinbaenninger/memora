@@ -11,6 +11,7 @@ import { ThemeProvider } from "@memora/ui/components/theme-provider";
 
 import { Providers } from "@/components/providers";
 import appCss from "@/index.css?url";
+import { AppSplashOverlay } from "@/modules/app/ui/views/app-splash-overlay";
 import { RootError } from "@/modules/app/ui/views/root/root-error";
 import { RootLoading } from "@/modules/app/ui/views/root/root-loading";
 import { RootNotFound } from "@/modules/app/ui/views/root/root-not-found";
@@ -84,7 +85,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="min-h-screen bg-background text-foreground">
         <ThemeProvider defaultTheme="system" storageKey="theme">
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            <AppSplashOverlay />
+          </Providers>
         </ThemeProvider>
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools buttonPosition="bottom-right" position="bottom" />

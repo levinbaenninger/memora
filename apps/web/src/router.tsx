@@ -11,11 +11,20 @@ import { routeTree } from "./routeTree.gen";
 import { orpc } from "./utils/orpc";
 
 export const getRouter = () => {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 30_000,
+      },
+    },
+  });
 
   const router = createTanStackRouter({
     defaultPreload: "intent",
-    defaultPreloadStaleTime: 0,
+    defaultPreloadStaleTime: 30_000,
+    defaultPendingMs: 0,
+    defaultPendingMinMs: 300,
+    defaultViewTransition: true,
     routeTree,
     scrollRestoration: true,
     context: { queryClient, orpc },

@@ -4,7 +4,7 @@ import { useAuth, useListSessions, useSession } from "@better-auth-ui/react";
 
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Separator } from "@memora/ui/components/separator";
-import { Skeleton } from "@memora/ui/components/skeleton";
+import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
 import { ActiveSession } from "./active-session";
@@ -28,7 +28,7 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
   const { data: sessions, isPending } = useListSessions();
 
   const currentSessionId = session?.session.id;
-  const activeSessions = [...(sessions ?? [])].sort((a, b) => {
+  const activeSessions = (sessions ?? []).toSorted((a, b) => {
     if (a.id === currentSessionId && b.id !== currentSessionId) {
       return -1;
     }
@@ -49,7 +49,9 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
       <Card className={cn("p-0", className)}>
         <CardContent className="p-0">
           {isPending ? (
-            <SessionRowSkeleton />
+            <div className="flex justify-center p-6">
+              <Spinner className="size-5" />
+            </div>
           ) : (
             activeSessions.map((activeSession, index) => (
               <div key={activeSession.id}>
@@ -62,20 +64,5 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function SessionRowSkeleton() {
-  return (
-    <Card className="border-0 bg-transparent shadow-none ring-0">
-      <CardContent className="flex items-center gap-3">
-        <Skeleton className="size-10 rounded-md" />
-
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-3 w-32" />
-        </div>
-      </CardContent>
-    </Card>
   );
 }

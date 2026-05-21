@@ -21,6 +21,11 @@
     "@orpc/zod": "catalog:",
     "@orpc/contract": "catalog:",
     "@sentry/tanstackstart-react": "catalog:",
+    "@blocknote/code-block": "catalog:",
+    "@blocknote/core": "catalog:",
+    "@blocknote/react": "catalog:",
+    "@blocknote/shadcn": "catalog:",
+    "@floating-ui/react": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-hotkeys": "catalog:",
@@ -47,7 +52,8 @@
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "vite-tsconfig-paths": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "catalog:",
