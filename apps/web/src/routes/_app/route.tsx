@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_app")({
         const { data } = await authClient.getSession();
         return data ?? null;
       },
-      staleTime: Number.POSITIVE_INFINITY,
+      staleTime: 5 * 60 * 1000,
     });
     if (!session) {
       throw redirect({
