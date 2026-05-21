@@ -23,11 +23,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@memora/ui/components/empty";
+import { Spinner } from "@memora/ui/components/spinner";
 
 import { useCreateNote } from "@/modules/notes/mutations";
 import { type NoteView, useNotesList } from "@/modules/notes/queries";
 import { NoteCard } from "../components/note-card";
-import { NoteGridSkeleton } from "./note-grid-skeleton";
 
 interface NoteGridViewProps {
   contextActions?: ReactNode;
@@ -54,10 +54,6 @@ export function NoteGridView({
     tagId,
     view,
   });
-
-  if (isPending) {
-    return <NoteGridSkeleton title={title} titleIcon={titleIcon} />;
-  }
 
   const handleCreate = () => {
     createNote.mutate({
@@ -121,7 +117,13 @@ export function NoteGridView({
         )}
       </div>
 
-      {isError && (
+      {isPending && (
+        <div className="flex flex-1 items-center justify-center">
+          <Spinner className="size-6" />
+        </div>
+      )}
+
+      {!isPending && isError && (
         <Empty className="flex-1">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -135,7 +137,7 @@ export function NoteGridView({
         </Empty>
       )}
 
-      {!isError && notes.length === 0 && (
+      {!(isPending || isError) && notes.length === 0 && (
         <Empty className="flex-1">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -176,7 +178,7 @@ export function NoteGridView({
         </Empty>
       )}
 
-      {!isError && notes.length > 0 && (
+      {!(isPending || isError) && notes.length > 0 && (
         <div
           className="grid gap-3"
           style={{
