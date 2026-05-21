@@ -158,6 +158,7 @@ export function FolderActionsProvider({
             <AlertDialogTitle>New subfolder</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
+            autoFocus
             onChange={(e) =>
               dispatch({ type: "setSubfolderName", value: e.target.value })
             }
@@ -208,6 +209,7 @@ export function FolderActionsProvider({
             <AlertDialogTitle>Rename folder</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
+            autoFocus
             onChange={(e) =>
               dispatch({ type: "setRenameName", value: e.target.value })
             }
