@@ -7,7 +7,6 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { env } from "@memora/env/client";
 
-import { RouteSkeleton } from "./components/route-skeleton";
 import { routeTree } from "./routeTree.gen";
 import { orpc } from "./utils/orpc";
 
@@ -26,7 +25,6 @@ export const getRouter = () => {
     defaultPendingMs: 0,
     defaultPendingMinMs: 300,
     defaultViewTransition: true,
-    defaultPendingComponent: RouteSkeleton,
     routeTree,
     scrollRestoration: true,
     context: { queryClient, orpc },
