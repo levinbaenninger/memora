@@ -6,7 +6,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useNavigate } from "@tanstack/react-router";
-import { createContext, type ReactNode, use, useState } from "react";
+import { createContext, type ReactNode, use, useReducer } from "react";
 
 import {
   AlertDialog,
@@ -58,6 +58,65 @@ interface FolderActionsProviderProps {
   folderName: string;
 }
 
+interface FolderActionsState {
+  confirmArchive: boolean;
+  confirmDelete: boolean;
+  rename: { open: boolean; name: string };
+  subfolder: { open: boolean; name: string };
+}
+
+type FolderActionsAction =
+  | { type: "openSubfolder" }
+  | { type: "setSubfolderName"; value: string }
+  | { type: "closeSubfolder" }
+  | { type: "openRename"; name: string }
+  | { type: "setRenameName"; value: string }
+  | { type: "closeRename" }
+  | { type: "openArchive" }
+  | { type: "closeArchive" }
+  | { type: "openDelete" }
+  | { type: "closeDelete" };
+
+const initialFolderActionsState: FolderActionsState = {
+  subfolder: { open: false, name: "" },
+  rename: { open: false, name: "" },
+  confirmArchive: false,
+  confirmDelete: false,
+};
+
+function folderActionsReducer(
+  state: FolderActionsState,
+  action: FolderActionsAction
+): FolderActionsState {
+  switch (action.type) {
+    case "openSubfolder":
+      return { ...state, subfolder: { open: true, name: "" } };
+    case "setSubfolderName":
+      return {
+        ...state,
+        subfolder: { ...state.subfolder, name: action.value },
+      };
+    case "closeSubfolder":
+      return { ...state, subfolder: { ...state.subfolder, open: false } };
+    case "openRename":
+      return { ...state, rename: { open: true, name: action.name } };
+    case "setRenameName":
+      return { ...state, rename: { ...state.rename, name: action.value } };
+    case "closeRename":
+      return { ...state, rename: { ...state.rename, open: false } };
+    case "openArchive":
+      return { ...state, confirmArchive: true };
+    case "closeArchive":
+      return { ...state, confirmArchive: false };
+    case "openDelete":
+      return { ...state, confirmDelete: true };
+    case "closeDelete":
+      return { ...state, confirmDelete: false };
+    default:
+      return state;
+  }
+}
+
 export function FolderActionsProvider({
   children,
   folderId,
@@ -69,44 +128,46 @@ export function FolderActionsProvider({
   const archiveFolder = useArchiveFolder();
   const deleteFolder = useDeleteFolder();
 
-  const [subfolderOpen, setSubfolderOpen] = useState(false);
-  const [subfolderName, setSubfolderName] = useState("");
-  const [renameOpen, setRenameOpen] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [confirmArchive, setConfirmArchive] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [state, dispatch] = useReducer(
+    folderActionsReducer,
+    initialFolderActionsState
+  );
 
   const value: FolderActionsContextValue = {
-    openSubfolder: () => {
-      setSubfolderName("");
-      setSubfolderOpen(true);
-    },
-    openRename: () => {
-      setNewName(folderName);
-      setRenameOpen(true);
-    },
-    openArchive: () => setConfirmArchive(true),
-    openDelete: () => setConfirmDelete(true),
+    openSubfolder: () => dispatch({ type: "openSubfolder" }),
+    openRename: () => dispatch({ type: "openRename", name: folderName }),
+    openArchive: () => dispatch({ type: "openArchive" }),
+    openDelete: () => dispatch({ type: "openDelete" }),
   };
+
+  const subfolderName = state.subfolder.name;
+  const newName = state.rename.name;
 
   return (
     <FolderActionsContext.Provider value={value}>
       {children}
 
-      <AlertDialog onOpenChange={setSubfolderOpen} open={subfolderOpen}>
+      <AlertDialog
+        onOpenChange={(open) =>
+          dispatch({ type: open ? "openSubfolder" : "closeSubfolder" })
+        }
+        open={state.subfolder.open}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>New subfolder</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
-            onChange={(e) => setSubfolderName(e.target.value)}
+            onChange={(e) =>
+              dispatch({ type: "setSubfolderName", value: e.target.value })
+            }
             onKeyDown={(e) => {
               if (e.key === "Enter" && subfolderName.trim()) {
                 createFolder.mutate({
                   name: subfolderName.trim(),
                   parentId: folderId,
                 });
-                setSubfolderOpen(false);
+                dispatch({ type: "closeSubfolder" });
               }
             }}
             placeholder="Folder name"
@@ -122,7 +183,7 @@ export function FolderActionsProvider({
                     name: subfolderName.trim(),
                     parentId: folderId,
                   });
-                  setSubfolderOpen(false);
+                  dispatch({ type: "closeSubfolder" });
                 }
               }}
             >
@@ -132,17 +193,28 @@ export function FolderActionsProvider({
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog onOpenChange={setRenameOpen} open={renameOpen}>
+      <AlertDialog
+        onOpenChange={(open) =>
+          dispatch(
+            open
+              ? { type: "openRename", name: folderName }
+              : { type: "closeRename" }
+          )
+        }
+        open={state.rename.open}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Rename folder</AlertDialogTitle>
           </AlertDialogHeader>
           <Input
-            onChange={(e) => setNewName(e.target.value)}
+            onChange={(e) =>
+              dispatch({ type: "setRenameName", value: e.target.value })
+            }
             onKeyDown={(e) => {
               if (e.key === "Enter" && newName.trim()) {
                 updateFolder.mutate({ id: folderId, name: newName.trim() });
-                setRenameOpen(false);
+                dispatch({ type: "closeRename" });
               }
             }}
             placeholder="Folder name"
@@ -155,7 +227,7 @@ export function FolderActionsProvider({
               onClick={() => {
                 if (newName.trim() && newName.trim() !== folderName) {
                   updateFolder.mutate({ id: folderId, name: newName.trim() });
-                  setRenameOpen(false);
+                  dispatch({ type: "closeRename" });
                 }
               }}
             >
@@ -165,7 +237,12 @@ export function FolderActionsProvider({
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog onOpenChange={setConfirmArchive} open={confirmArchive}>
+      <AlertDialog
+        onOpenChange={(open) =>
+          dispatch({ type: open ? "openArchive" : "closeArchive" })
+        }
+        open={state.confirmArchive}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Archive "{folderName}"?</AlertDialogTitle>
@@ -179,7 +256,7 @@ export function FolderActionsProvider({
               onClick={() => {
                 archiveFolder.mutate(folderId, {
                   onSuccess: () => {
-                    setConfirmArchive(false);
+                    dispatch({ type: "closeArchive" });
                     navigate({ to: "/notes" });
                   },
                 });
@@ -191,7 +268,12 @@ export function FolderActionsProvider({
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog onOpenChange={setConfirmDelete} open={confirmDelete}>
+      <AlertDialog
+        onOpenChange={(open) =>
+          dispatch({ type: open ? "openDelete" : "closeDelete" })
+        }
+        open={state.confirmDelete}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete "{folderName}"?</AlertDialogTitle>
@@ -205,7 +287,7 @@ export function FolderActionsProvider({
               onClick={() => {
                 deleteFolder.mutate(folderId, {
                   onSuccess: () => {
-                    setConfirmDelete(false);
+                    dispatch({ type: "closeDelete" });
                     navigate({ to: "/notes" });
                   },
                 });

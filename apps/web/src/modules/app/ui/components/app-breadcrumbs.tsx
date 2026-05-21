@@ -32,25 +32,29 @@ export function AppBreadcrumbs({
       <BreadcrumbList className="flex-nowrap overflow-hidden">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
+          const linkElement =
+            isLast || !item.path
+              ? null
+              : renderLink(item.path, item.params, item.search);
 
           return (
             <Fragment key={`${item.title}-${item.path ?? index}`}>
               <BreadcrumbItem
                 className={isLast ? "min-w-0 flex-1" : "hidden sm:inline-flex"}
               >
-                {isLast || !item.path ? (
-                  <BreadcrumbPage className="flex min-w-0 items-center gap-2 [&>svg]:size-3.5">
-                    {item.icon}
-                    <span className="min-w-0 truncate">{item.title}</span>
-                  </BreadcrumbPage>
-                ) : (
+                {linkElement ? (
                   <BreadcrumbLink
                     className="flex min-w-0 items-center gap-2 [&>svg]:size-3.5"
-                    render={renderLink(item.path, item.params, item.search)}
+                    render={linkElement}
                   >
                     {item.icon}
                     <span className="min-w-0 truncate">{item.title}</span>
                   </BreadcrumbLink>
+                ) : (
+                  <BreadcrumbPage className="flex min-w-0 items-center gap-2 [&>svg]:size-3.5">
+                    {item.icon}
+                    <span className="min-w-0 truncate">{item.title}</span>
+                  </BreadcrumbPage>
                 )}
               </BreadcrumbItem>
               {!isLast && (

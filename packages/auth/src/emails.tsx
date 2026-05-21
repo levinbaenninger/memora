@@ -1,5 +1,3 @@
-"use server";
-
 import { render } from "@react-email/render";
 
 import { email } from "@memora/email";

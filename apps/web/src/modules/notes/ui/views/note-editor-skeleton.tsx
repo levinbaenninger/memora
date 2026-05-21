@@ -6,7 +6,7 @@ export function NoteEditorSkeleton() {
       <div className="flex w-full min-w-0 flex-1 flex-col">
         <div className="flex items-center justify-between gap-2 pt-6">
           <Skeleton className="h-10 w-3/4 max-w-xl" />
-          <Skeleton className="h-8 w-8 rounded-md" />
+          <Skeleton className="size-8 rounded-md" />
         </div>
         <div className="flex flex-wrap items-center gap-2 py-3">
           <Skeleton className="h-5 w-24 rounded-md" />

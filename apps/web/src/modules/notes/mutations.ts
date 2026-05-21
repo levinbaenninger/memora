@@ -90,14 +90,16 @@ export function useUpdateNote() {
 
 export function useArchiveNote() {
   const navigate = useNavigate();
-  const inv = useNotesInvalidation();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => client.notes.archive({ id }),
     onSuccess: (_data, id) => {
-      inv.invalidateList();
-      inv.invalidateSearch();
-      inv.invalidateNote(id);
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.get.key({ input: { id } }),
+      });
       navigate({ to: "/notes" });
       toast.success("Note archived");
     },
@@ -107,14 +109,16 @@ export function useArchiveNote() {
 
 export function useRestoreNote() {
   const navigate = useNavigate();
-  const inv = useNotesInvalidation();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => client.notes.restore({ id }),
     onSuccess: (_data, id) => {
-      inv.invalidateList();
-      inv.invalidateSearch();
-      inv.invalidateNote(id);
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.get.key({ input: { id } }),
+      });
       toast.success("Note restored");
       navigate({
         to: "/notes/$noteId",
@@ -127,7 +131,7 @@ export function useRestoreNote() {
 
 export function useDeleteNote() {
   const navigate = useNavigate();
-  const inv = useNotesInvalidation();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -144,8 +148,8 @@ export function useDeleteNote() {
       return client.notes.hardDelete({ id });
     },
     onSuccess: () => {
-      inv.invalidateList();
-      inv.invalidateSearch();
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
       navigate({ to: "/notes" });
       toast.success("Note deleted");
     },
@@ -180,14 +184,16 @@ export function useUpdateFolder() {
 }
 
 export function useArchiveFolder() {
-  const inv = useNotesInvalidation();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => client.notes.folders.archive({ id }),
     onSuccess: () => {
-      inv.invalidateFolders();
-      inv.invalidateList();
-      inv.invalidateSearch();
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.folders.list.key(),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
       toast.success("Folder archived");
     },
     onError: () => toast.error("Failed to archive folder"),
@@ -195,7 +201,7 @@ export function useArchiveFolder() {
 }
 
 export function useDeleteFolder() {
-  const inv = useNotesInvalidation();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -210,9 +216,11 @@ export function useDeleteFolder() {
       return client.notes.folders.hardDelete({ id });
     },
     onSuccess: () => {
-      inv.invalidateFolders();
-      inv.invalidateList();
-      inv.invalidateSearch();
+      queryClient.invalidateQueries({
+        queryKey: orpc.notes.folders.list.key(),
+      });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
       toast.success("Folder deleted");
     },
     onError: () => toast.error("Failed to delete folder"),
@@ -247,14 +255,14 @@ export function useUpdateTag() {
 }
 
 export function useDeleteTag() {
-  const inv = useNotesInvalidation();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => client.notes.tags.delete({ id }),
     onSuccess: () => {
-      inv.invalidateTags();
-      inv.invalidateList();
-      inv.invalidateSearch();
+      queryClient.invalidateQueries({ queryKey: orpc.notes.tags.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
       toast.success("Tag deleted");
     },
     onError: () => toast.error("Failed to delete tag"),

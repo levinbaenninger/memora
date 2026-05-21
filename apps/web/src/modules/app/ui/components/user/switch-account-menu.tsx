@@ -4,6 +4,7 @@ import {
   useSession,
 } from "@better-auth-ui/react";
 import { Check, CirclePlus } from "lucide-react";
+import type { ReactNode } from "react";
 
 import {
   DropdownMenuItem,
@@ -36,16 +37,17 @@ export function SwitchAccountMenu() {
         {!isPending && <Check className="ml-auto" />}
       </DropdownMenuItem>
 
-      {deviceSessions
-        ?.filter(
-          (deviceSession) => deviceSession.session.id !== session?.session.id
-        )
-        .map((deviceSession) => (
-          <SwitchAccountItem
-            deviceSession={deviceSession}
-            key={deviceSession.session.id}
-          />
-        ))}
+      {deviceSessions?.reduce<ReactNode[]>((items, deviceSession) => {
+        if (deviceSession.session.id !== session?.session.id) {
+          items.push(
+            <SwitchAccountItem
+              deviceSession={deviceSession}
+              key={deviceSession.session.id}
+            />
+          );
+        }
+        return items;
+      }, [])}
 
       <DropdownMenuSeparator />
 

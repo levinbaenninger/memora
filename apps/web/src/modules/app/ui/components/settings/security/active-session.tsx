@@ -8,27 +8,30 @@ import { Button } from "@memora/ui/components/button";
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Spinner } from "@memora/ui/components/spinner";
 
+const relativeTimeFormat = new Intl.RelativeTimeFormat(undefined, {
+  numeric: "auto",
+});
+
+const TIME_AGO_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ["year", 31_536_000],
+  ["month", 2_592_000],
+  ["week", 604_800],
+  ["day", 86_400],
+  ["hour", 3600],
+  ["minute", 60],
+  ["second", 1],
+];
+
 function timeAgo(date: Date) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
 
-  const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
-    ["year", 31_536_000],
-    ["month", 2_592_000],
-    ["week", 604_800],
-    ["day", 86_400],
-    ["hour", 3600],
-    ["minute", 60],
-    ["second", 1],
-  ];
-
-  for (const [unit, threshold] of UNITS) {
+  for (const [unit, threshold] of TIME_AGO_UNITS) {
     if (seconds >= threshold) {
-      return rtf.format(-Math.floor(seconds / threshold), unit);
+      return relativeTimeFormat.format(-Math.floor(seconds / threshold), unit);
     }
   }
 
-  return rtf.format(0, "second");
+  return relativeTimeFormat.format(0, "second");
 }
 
 interface ActiveSessionProps {

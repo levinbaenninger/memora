@@ -6,7 +6,7 @@ import {
   useSession,
 } from "@better-auth-ui/react";
 import { Eye, EyeOff } from "lucide-react";
-import { type SyntheticEvent, useState } from "react";
+import { type SyntheticEvent, useReducer } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@memora/ui/components/button";
@@ -111,6 +111,57 @@ function SetPassword({ className }: { className?: string }) {
   );
 }
 
+type FormField = "currentPassword" | "newPassword" | "confirmPassword";
+
+interface ChangePasswordState {
+  errors: Partial<Record<FormField, string>>;
+  values: Record<FormField, string>;
+  visible: { newPassword: boolean; confirmPassword: boolean };
+}
+
+type ChangePasswordAction =
+  | { type: "setValue"; field: FormField; value: string }
+  | { type: "setError"; field: FormField; message: string | undefined }
+  | { type: "toggleVisible"; field: "newPassword" | "confirmPassword" }
+  | { type: "resetValues" };
+
+const initialChangePasswordState: ChangePasswordState = {
+  values: { currentPassword: "", newPassword: "", confirmPassword: "" },
+  visible: { newPassword: false, confirmPassword: false },
+  errors: {},
+};
+
+function changePasswordReducer(
+  state: ChangePasswordState,
+  action: ChangePasswordAction
+): ChangePasswordState {
+  switch (action.type) {
+    case "setValue":
+      return {
+        ...state,
+        values: { ...state.values, [action.field]: action.value },
+        errors: { ...state.errors, [action.field]: undefined },
+      };
+    case "setError":
+      return {
+        ...state,
+        errors: { ...state.errors, [action.field]: action.message },
+      };
+    case "toggleVisible":
+      return {
+        ...state,
+        visible: {
+          ...state.visible,
+          [action.field]: !state.visible[action.field],
+        },
+      };
+    case "resetValues":
+      return { ...state, values: initialChangePasswordState.values };
+    default:
+      return state;
+  }
+}
+
 function ChangePasswordForm({
   className,
   emailAndPassword,
@@ -122,42 +173,31 @@ function ChangePasswordForm({
   localization: ReturnType<typeof useAuth>["localization"];
   session: ReturnType<typeof useSession>["data"];
 }) {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [state, dispatch] = useReducer(
+    changePasswordReducer,
+    initialChangePasswordState
+  );
+  const { values, visible, errors: fieldErrors } = state;
+  const { currentPassword, newPassword, confirmPassword } = values;
+  const isNewPasswordVisible = visible.newPassword;
+  const isConfirmPasswordVisible = visible.confirmPassword;
 
   const { mutate: changePassword, isPending } = useChangePassword({
     onError: (error) => {
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      dispatch({ type: "resetValues" });
       toast.error(error.message);
     },
     onSuccess: () => {
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      dispatch({ type: "resetValues" });
       toast.success(localization.settings.changePasswordSuccess);
     },
   });
-
-  const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false);
-
-  const [fieldErrors, setFieldErrors] = useState<{
-    currentPassword?: string;
-    newPassword?: string;
-    confirmPassword?: string;
-  }>({});
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (emailAndPassword.confirmPassword && newPassword !== confirmPassword) {
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      dispatch({ type: "resetValues" });
       toast.error(localization.auth.passwordsDoNotMatch);
       return;
     }
@@ -190,22 +230,20 @@ function ChangePasswordForm({
                   disabled={isPending}
                   id="currentPassword"
                   name="currentPassword"
-                  onChange={(e) => {
-                    setCurrentPassword(e.target.value);
-
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      currentPassword: undefined,
-                    }));
-                  }}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "setValue",
+                      field: "currentPassword",
+                      value: e.target.value,
+                    })
+                  }
                   onInvalid={(e) => {
                     e.preventDefault();
-
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      currentPassword: (e.target as HTMLInputElement)
-                        .validationMessage,
-                    }));
+                    dispatch({
+                      type: "setError",
+                      field: "currentPassword",
+                      message: (e.target as HTMLInputElement).validationMessage,
+                    });
                   }}
                   placeholder={localization.settings.currentPasswordPlaceholder}
                   required
@@ -234,21 +272,21 @@ function ChangePasswordForm({
                     maxLength={emailAndPassword.maxPasswordLength}
                     minLength={emailAndPassword.minPasswordLength}
                     name="newPassword"
-                    onChange={(e) => {
-                      setNewPassword(e.target.value);
-
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        newPassword: undefined,
-                      }));
-                    }}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "setValue",
+                        field: "newPassword",
+                        value: e.target.value,
+                      })
+                    }
                     onInvalid={(e) => {
                       e.preventDefault();
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        newPassword: (e.target as HTMLInputElement)
+                      dispatch({
+                        type: "setError",
+                        field: "newPassword",
+                        message: (e.target as HTMLInputElement)
                           .validationMessage,
-                      }));
+                      });
                     }}
                     placeholder={localization.auth.newPasswordPlaceholder}
                     required
@@ -265,7 +303,10 @@ function ChangePasswordForm({
                       }
                       disabled={isPending}
                       onClick={() =>
-                        setIsNewPasswordVisible(!isNewPasswordVisible)
+                        dispatch({
+                          type: "toggleVisible",
+                          field: "newPassword",
+                        })
                       }
                       size="icon-xs"
                     >
@@ -296,22 +337,21 @@ function ChangePasswordForm({
                       maxLength={emailAndPassword.maxPasswordLength}
                       minLength={emailAndPassword.minPasswordLength}
                       name="confirmPassword"
-                      onChange={(e) => {
-                        setConfirmPassword(e.target.value);
-
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          confirmPassword: undefined,
-                        }));
-                      }}
+                      onChange={(e) =>
+                        dispatch({
+                          type: "setValue",
+                          field: "confirmPassword",
+                          value: e.target.value,
+                        })
+                      }
                       onInvalid={(e) => {
                         e.preventDefault();
-
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          confirmPassword: (e.target as HTMLInputElement)
+                        dispatch({
+                          type: "setError",
+                          field: "confirmPassword",
+                          message: (e.target as HTMLInputElement)
                             .validationMessage,
-                        }));
+                        });
                       }}
                       placeholder={localization.auth.confirmPasswordPlaceholder}
                       required
@@ -328,7 +368,10 @@ function ChangePasswordForm({
                         }
                         disabled={isPending}
                         onClick={() =>
-                          setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+                          dispatch({
+                            type: "toggleVisible",
+                            field: "confirmPassword",
+                          })
                         }
                         size="icon-xs"
                       >
