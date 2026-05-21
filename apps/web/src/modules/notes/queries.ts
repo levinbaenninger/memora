@@ -13,39 +13,48 @@ export interface NotesListParams {
   view: NoteView;
 }
 
-export function useNotesList(params: NotesListParams) {
+export function notesListInput(params: Omit<NotesListParams, "q">) {
+  const { folderId, tagId, view, limit = 50, offset = 0 } = params;
+  return {
+    folderId: folderId ?? undefined,
+    tagId: tagId ?? undefined,
+    pinned: view === "pinned" ? true : undefined,
+    favorite: view === "favorites" ? true : undefined,
+    includeArchived: view === "archived",
+    limit,
+    offset,
+  };
+}
+
+export function notesSearchInput(params: NotesListParams & { q: string }) {
   const { folderId, tagId, view, q, limit = 50, offset = 0 } = params;
-  const isArchived = view === "archived";
+  return {
+    query: q,
+    folderId: folderId ?? undefined,
+    tagIds: tagId ? [tagId] : [],
+    pinned: view === "pinned" ? true : undefined,
+    favorite: view === "favorites" ? true : undefined,
+    includeArchived: view === "archived",
+    limit,
+    offset,
+  };
+}
+
+export function useNotesList(params: NotesListParams) {
+  const { q } = params;
   const normalizedQ = q?.trim() ?? "";
   const hasQuery = normalizedQ.length > 0;
 
   const searchResult = useQuery({
     ...orpc.notes.search.queryOptions({
-      input: {
-        query: normalizedQ,
-        folderId: folderId ?? undefined,
-        tagIds: tagId ? [tagId] : [],
-        pinned: view === "pinned" ? true : undefined,
-        favorite: view === "favorites" ? true : undefined,
-        includeArchived: isArchived,
-        limit,
-        offset,
-      },
+      input: notesSearchInput({ ...params, q: normalizedQ }),
     }),
     enabled: hasQuery,
   });
 
   const listResult = useQuery({
     ...orpc.notes.list.queryOptions({
-      input: {
-        folderId: folderId ?? undefined,
-        tagId: tagId ?? undefined,
-        pinned: view === "pinned" ? true : undefined,
-        favorite: view === "favorites" ? true : undefined,
-        includeArchived: isArchived,
-        limit,
-        offset,
-      },
+      input: notesListInput(params),
     }),
     enabled: !hasQuery,
   });

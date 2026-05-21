@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 
 import { AppShell } from "@/modules/app/ui/views/app-shell";
+import { AppSplash } from "@/modules/app/ui/views/app-splash";
 import { authClient } from "@/modules/auth/client";
 
 export const Route = createFileRoute("/_app")({
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/_app")({
       ),
     ]),
   component: AppShellLayout,
+  pendingComponent: AppSplash,
 });
 
 function AppShellLayout() {

@@ -3,13 +3,14 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
+import { notesListInput } from "@/modules/notes/queries";
 import { NoteCard } from "@/modules/notes/ui/components/note-card";
 import { orpc } from "@/utils/orpc";
 
 export function RecentNotes() {
   const { data: notes } = useSuspenseQuery(
     orpc.notes.list.queryOptions({
-      input: { includeArchived: false, limit: 8, offset: 0 },
+      input: notesListInput({ view: "all", limit: 8 }),
     })
   );
 

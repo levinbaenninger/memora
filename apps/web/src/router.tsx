@@ -7,15 +7,26 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { env } from "@memora/env/client";
 
+import { RouteSkeleton } from "./components/route-skeleton";
 import { routeTree } from "./routeTree.gen";
 import { orpc } from "./utils/orpc";
 
 export const getRouter = () => {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 30_000,
+      },
+    },
+  });
 
   const router = createTanStackRouter({
     defaultPreload: "intent",
-    defaultPreloadStaleTime: 0,
+    defaultPreloadStaleTime: 30_000,
+    defaultPendingMs: 0,
+    defaultPendingMinMs: 300,
+    defaultViewTransition: true,
+    defaultPendingComponent: RouteSkeleton,
     routeTree,
     scrollRestoration: true,
     context: { queryClient, orpc },

@@ -3,11 +3,12 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { recordVisit } from "@/modules/command-menu/recent-visits-client";
-import { useTagsList } from "@/modules/notes/queries";
+import { notesListInput } from "@/modules/notes/queries";
 import {
   TagActionsProvider,
   TagMenuItems,
 } from "@/modules/notes/ui/components/tag-actions";
+import { NoteGridSkeleton } from "@/modules/notes/ui/views/note-grid-skeleton";
 import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/tag/$tagId")({
@@ -19,12 +20,7 @@ export const Route = createFileRoute("/_app/notes/tag/$tagId")({
       ),
       context.queryClient.ensureQueryData(
         context.orpc.notes.list.queryOptions({
-          input: {
-            includeArchived: false,
-            limit: 50,
-            offset: 0,
-            tagId: params.tagId,
-          },
+          input: notesListInput({ view: "all", tagId: params.tagId }),
         })
       ),
     ]);
@@ -41,20 +37,23 @@ export const Route = createFileRoute("/_app/notes/tag/$tagId")({
     ],
   }),
   component: TagView,
+  pendingComponent: () => (
+    <NoteGridSkeleton
+      titleIcon={<HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />}
+    />
+  ),
 });
 
 function TagView() {
   const { tagId } = Route.useParams();
-  const { data: tags } = useTagsList();
-  const tag = tags.find((t) => t.id === tagId);
-  const name = tag?.name ?? "Tag";
+  const { tagName } = Route.useLoaderData();
 
   return (
-    <TagActionsProvider tagId={tagId} tagName={name}>
+    <TagActionsProvider tagId={tagId} tagName={tagName}>
       <NoteGridView
         contextActions={<TagMenuItems />}
         tagId={tagId}
-        title={name}
+        title={tagName}
         titleIcon={<HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />}
         view="all"
       />

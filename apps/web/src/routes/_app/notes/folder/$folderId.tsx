@@ -3,11 +3,12 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { recordVisit } from "@/modules/command-menu/recent-visits-client";
-import { useFoldersList } from "@/modules/notes/queries";
+import { notesListInput } from "@/modules/notes/queries";
 import {
   FolderActionsProvider,
   FolderMenuItems,
 } from "@/modules/notes/ui/components/folder-actions";
+import { NoteGridSkeleton } from "@/modules/notes/ui/views/note-grid-skeleton";
 import { NoteGridView } from "@/modules/notes/ui/views/note-grid-view";
 
 export const Route = createFileRoute("/_app/notes/folder/$folderId")({
@@ -19,12 +20,7 @@ export const Route = createFileRoute("/_app/notes/folder/$folderId")({
       ),
       context.queryClient.ensureQueryData(
         context.orpc.notes.list.queryOptions({
-          input: {
-            folderId: params.folderId,
-            includeArchived: false,
-            limit: 50,
-            offset: 0,
-          },
+          input: notesListInput({ view: "all", folderId: params.folderId }),
         })
       ),
     ]);
@@ -42,20 +38,23 @@ export const Route = createFileRoute("/_app/notes/folder/$folderId")({
     ],
   }),
   component: FolderView,
+  pendingComponent: () => (
+    <NoteGridSkeleton
+      titleIcon={<HugeiconsIcon icon={FolderIcon} strokeWidth={2} />}
+    />
+  ),
 });
 
 function FolderView() {
   const { folderId } = Route.useParams();
-  const { data: folders } = useFoldersList();
-  const folder = folders.find((f) => f.id === folderId);
-  const name = folder?.name ?? "Folder";
+  const { folderName } = Route.useLoaderData();
 
   return (
-    <FolderActionsProvider folderId={folderId} folderName={name}>
+    <FolderActionsProvider folderId={folderId} folderName={folderName}>
       <NoteGridView
         contextActions={<FolderMenuItems />}
         folderId={folderId}
-        title={name}
+        title={folderName}
         titleIcon={<HugeiconsIcon icon={FolderIcon} strokeWidth={2} />}
         view="all"
       />

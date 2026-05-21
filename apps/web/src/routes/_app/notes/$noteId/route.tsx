@@ -3,9 +3,9 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { recordVisit } from "@/modules/command-menu/recent-visits-client";
+import { NoteEditorSkeleton } from "@/modules/notes/ui/views/note-editor-skeleton";
 import { NoteEditorView } from "@/modules/notes/ui/views/note-editor-view";
 import { NotesErrorView } from "@/modules/notes/ui/views/notes-error-view";
-import { NotesLoadingView } from "@/modules/notes/ui/views/notes-loading-view";
 import { NotesNotFoundView } from "@/modules/notes/ui/views/notes-not-found-view";
 
 const noteDetailSearchSchema = z.object({
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_app/notes/$noteId")({
     ],
   }),
   component: NoteEditorView,
-  pendingComponent: NotesLoadingView,
+  pendingComponent: NoteEditorSkeleton,
   errorComponent: NotesErrorView,
   notFoundComponent: NotesNotFoundView,
 });
