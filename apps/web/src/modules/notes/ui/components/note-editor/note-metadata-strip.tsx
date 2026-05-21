@@ -85,9 +85,11 @@ export function NoteMetadataStrip({
       : [...prev, tagName];
     localTagNamesRef.current = next;
     setLocalTagNames(next);
-    lastTagMutationRef.current = lastTagMutationRef.current.then(() =>
-      updateNote.mutateAsync({ id: noteId, tagNames: next })
-    );
+    lastTagMutationRef.current = lastTagMutationRef.current
+      .then(() => updateNote.mutateAsync({ id: noteId, tagNames: next }))
+      .catch(() => {
+        // Swallow so a rejected mutation doesn't permanently block the chain.
+      });
   };
 
   const handleCreateTag = () => {
@@ -104,9 +106,11 @@ export function NoteMetadataStrip({
     const next = [...prev, name];
     localTagNamesRef.current = next;
     setLocalTagNames(next);
-    lastTagMutationRef.current = lastTagMutationRef.current.then(() =>
-      updateNote.mutateAsync({ id: noteId, tagNames: next })
-    );
+    lastTagMutationRef.current = lastTagMutationRef.current
+      .then(() => updateNote.mutateAsync({ id: noteId, tagNames: next }))
+      .catch(() => {
+        // Swallow so a rejected mutation doesn't permanently block the chain.
+      });
     setTagInput("");
     setTagPopoverOpen(false);
   };
