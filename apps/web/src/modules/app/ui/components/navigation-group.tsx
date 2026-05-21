@@ -1,5 +1,7 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useEffect, useState } from "react";
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -16,7 +18,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@memora/ui/components/sidebar";
-import { useState } from "react";
+
 import type {
   AppLinkRenderer,
   SidebarNavGroup,
@@ -30,9 +32,13 @@ interface NavigationMenuItemProps {
 
 function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
   const { isMobile, setOpenMobile } = useSidebar();
-  const [open, setOpen] = useState(
-    !!item.isActive || !!item.subItems?.some((i) => !!i.isActive)
-  );
+  const shouldOpen =
+    !!item.isActive || !!item.subItems?.some((i) => !!i.isActive);
+  const [open, setOpen] = useState(shouldOpen);
+
+  useEffect(() => {
+    setOpen(shouldOpen);
+  }, [shouldOpen]);
 
   const closeMobileSheet = () => {
     if (isMobile) {

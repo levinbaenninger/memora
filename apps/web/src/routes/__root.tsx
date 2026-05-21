@@ -1,4 +1,3 @@
-import { ThemeProvider } from "@memora/ui/components/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
@@ -7,6 +6,9 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+
+import { ThemeProvider } from "@memora/ui/components/theme-provider";
+
 import { Providers } from "@/components/providers";
 import appCss from "@/index.css?url";
 import { RootError } from "@/modules/app/ui/views/root/root-error";

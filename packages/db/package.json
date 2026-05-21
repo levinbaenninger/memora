@@ -19,7 +19,8 @@
   "dependencies": {
     "@memora/env": "workspace:*",
     "drizzle-orm": "catalog:",
-    "@neondatabase/serverless": "catalog:"
+    "@neondatabase/serverless": "catalog:",
+    "nanoid": "catalog:"
   },
   "devDependencies": {
     "@memora/config": "workspace:*",

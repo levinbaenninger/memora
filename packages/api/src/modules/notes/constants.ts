@@ -1,0 +1,1 @@
+export const ARCHIVE_RETENTION_DAYS = 30;

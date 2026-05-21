@@ -1,13 +1,3 @@
-import { auth } from "@memora/auth";
+import type { RequestHeadersPluginContext } from "@orpc/server/plugins";
 
-export async function createContext({ req }: { req: Request }) {
-  const session = await auth.api.getSession({
-    headers: req.headers,
-  });
-
-  return {
-    auth: session,
-  };
-}
-
-export type Context = Awaited<ReturnType<typeof createContext>>;
+export interface Context extends RequestHeadersPluginContext {}

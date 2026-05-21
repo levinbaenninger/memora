@@ -1,5 +1,6 @@
-import { auth } from "@memora/auth";
 import { createFileRoute } from "@tanstack/react-router";
+
+import { auth } from "@memora/auth";
 
 export const Route = createFileRoute("/api/auth/$")({
   server: {

@@ -3,12 +3,15 @@ import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 
 import "./index.css";
+import { QueryClient } from "@tanstack/react-query";
+
 import { env } from "@memora/env/client";
+
 import { routeTree } from "./routeTree.gen";
-import { createAppQueryClient, orpc } from "./utils/orpc";
+import { orpc } from "./utils/orpc";
 
 export const getRouter = () => {
-  const queryClient = createAppQueryClient();
+  const queryClient = new QueryClient();
 
   const router = createTanStackRouter({
     defaultPreload: "intent",

@@ -3,7 +3,8 @@
   "extends": ["ultracite/biome/core", "ultracite/biome/react"],
   "files": {
     "includes": [
-      "!.agents",
+      "!.agents/skills",
+      "!.claude/skills",
       "!packages/ui/src/components",
       "!packages/ui/src/hooks",
       "!packages/ui/src/lib/utils.ts"
@@ -26,6 +27,23 @@
       "performance": {
         "noBarrelFile": "off",
         "noNamespaceImport": "off"
+      }
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              [":PACKAGE:", ":PACKAGE_WITH_PROTOCOL:", "!@memora/**"],
+              ":BLANK_LINE:",
+              ["@memora/**"],
+              ":BLANK_LINE:"
+            ]
+          }
+        }
       }
     }
   }

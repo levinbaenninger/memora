@@ -1,6 +1,10 @@
 "use client";
 
 import { useAuth, useDeleteUser, useListAccounts } from "@better-auth-ui/react";
+import { TriangleAlert } from "lucide-react";
+import { type SyntheticEvent, useState } from "react";
+import { toast } from "sonner";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,9 +24,6 @@ import { Input } from "@memora/ui/components/input";
 import { Label } from "@memora/ui/components/label";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
-import { TriangleAlert } from "lucide-react";
-import { type SyntheticEvent, useState } from "react";
-import { toast } from "sonner";
 
 interface DeleteUserProps {
   className?: string;

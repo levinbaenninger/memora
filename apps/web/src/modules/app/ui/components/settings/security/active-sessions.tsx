@@ -1,10 +1,12 @@
 "use client";
 
 import { useAuth, useListSessions, useSession } from "@better-auth-ui/react";
+
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Separator } from "@memora/ui/components/separator";
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
+
 import { ActiveSession } from "./active-session";
 
 interface ActiveSessionsProps {
@@ -25,9 +27,18 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
 
   const { data: sessions, isPending } = useListSessions();
 
-  const activeSessions = [...(sessions ?? [])].sort((activeSession) =>
-    activeSession.id === session?.session.id ? -1 : 1
-  );
+  const currentSessionId = session?.session.id;
+  const activeSessions = [...(sessions ?? [])].sort((a, b) => {
+    if (a.id === currentSessionId && b.id !== currentSessionId) {
+      return -1;
+    }
+
+    if (b.id === currentSessionId && a.id !== currentSessionId) {
+      return 1;
+    }
+
+    return 0;
+  });
 
   return (
     <div>
@@ -40,7 +51,7 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
           {isPending ? (
             <SessionRowSkeleton />
           ) : (
-            activeSessions?.map((activeSession, index) => (
+            activeSessions.map((activeSession, index) => (
               <div key={activeSession.id}>
                 {index > 0 && <Separator />}
 

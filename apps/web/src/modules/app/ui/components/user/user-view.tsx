@@ -1,9 +1,11 @@
 "use client";
 
 import { useSession } from "@better-auth-ui/react";
+import type { User } from "better-auth";
+
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
-import type { User } from "better-auth";
+
 import { UserAvatar } from "./user-avatar";
 
 interface UserViewProps {

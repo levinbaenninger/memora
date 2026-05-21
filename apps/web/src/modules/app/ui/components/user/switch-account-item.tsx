@@ -7,6 +7,7 @@ import {
 
 import { DropdownMenuItem } from "@memora/ui/components/dropdown-menu";
 import { Spinner } from "@memora/ui/components/spinner";
+
 import { UserView } from "./user-view";
 
 type DeviceSession = NonNullable<

@@ -1,6 +1,7 @@
-import { env } from "@memora/env/server";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
 
-export const sql = neon(env.DATABASE_URL);
-export const db = drizzle({ client: sql });
+import { env } from "@memora/env/server";
+
+const pool = new Pool({ connectionString: env.DATABASE_URL });
+export const db = drizzle({ client: pool });

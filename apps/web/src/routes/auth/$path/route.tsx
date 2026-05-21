@@ -1,6 +1,8 @@
 import { viewPaths } from "@better-auth-ui/react/core";
-import { Auth } from "@memora/ui/components/auth/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
+import { Auth } from "@memora/ui/components/auth/auth";
+
 import { authClient } from "@/modules/auth/client";
 
 const authPathTitles: Record<string, string> = {

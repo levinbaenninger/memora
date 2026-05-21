@@ -1,5 +1,8 @@
 import { useAuth } from "@better-auth-ui/react";
 import type { SettingsView } from "@better-auth-ui/react/core";
+import { notFound } from "@tanstack/react-router";
+import { useMemo } from "react";
+
 import {
   Tabs,
   TabsContent,
@@ -7,8 +10,7 @@ import {
   TabsTrigger,
 } from "@memora/ui/components/tabs";
 import { cn } from "@memora/ui/lib/utils";
-import { notFound } from "@tanstack/react-router";
-import { useMemo } from "react";
+
 import { AccountSettings } from "../../components/settings/account/account-settings";
 import { SecuritySettings } from "../../components/settings/security/security-settings";
 

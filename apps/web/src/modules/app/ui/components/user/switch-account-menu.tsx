@@ -3,12 +3,14 @@ import {
   useListDeviceSessions,
   useSession,
 } from "@better-auth-ui/react";
+import { Check, CirclePlus } from "lucide-react";
+
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuSubContent,
 } from "@memora/ui/components/dropdown-menu";
-import { Check, CirclePlus } from "lucide-react";
+
 import { SwitchAccountItem } from "./switch-account-item";
 import { UserView } from "./user-view";
 

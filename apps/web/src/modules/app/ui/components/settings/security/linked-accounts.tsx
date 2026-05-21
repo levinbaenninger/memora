@@ -1,10 +1,12 @@
 "use client";
 
 import { useAuth, useListAccounts } from "@better-auth-ui/react";
+
 import { Card, CardContent } from "@memora/ui/components/card";
 import { Separator } from "@memora/ui/components/separator";
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
+
 import { LinkedAccount } from "./linked-account";
 
 interface LinkedAccountsProps {

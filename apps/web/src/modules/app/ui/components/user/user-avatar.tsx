@@ -1,6 +1,10 @@
 "use client";
 
 import { useSession } from "@better-auth-ui/react";
+import type { User } from "better-auth";
+import { User2 } from "lucide-react";
+import type { ReactNode } from "react";
+
 import {
   Avatar,
   AvatarFallback,
@@ -8,9 +12,6 @@ import {
 } from "@memora/ui/components/avatar";
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { cn } from "@memora/ui/lib/utils";
-import type { User } from "better-auth";
-import { User2 } from "lucide-react";
-import type { ReactNode } from "react";
 
 interface UserAvatarProps {
   className?: string;
