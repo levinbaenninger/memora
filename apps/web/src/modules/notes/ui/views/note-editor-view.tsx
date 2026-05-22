@@ -117,7 +117,7 @@ export function NoteEditorView() {
           tags={note.tags}
         />
 
-        <div className="flex-1 border-t pt-4">
+        <div className="flex-1 border-t pt-4 pl-12 md:pl-0">
           <BlockNoteEditorView
             content={initialContent}
             editable={!isArchived}
