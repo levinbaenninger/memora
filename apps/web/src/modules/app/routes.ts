@@ -129,15 +129,16 @@ function isNavItemActive(
   return pathMatch;
 }
 
-function comparePathLengthDesc(a: SidebarNavItem, b: SidebarNavItem) {
-  return (b.path?.length ?? 0) - (a.path?.length ?? 0);
-}
-
 function getActiveSubItem(item: SidebarNavItem, pathname: string) {
-  return item.subItems
-    ?.filter((child) => isNavItemActive(child, pathname))
-    .slice()
-    .sort(comparePathLengthDesc)[0];
+  const matches = item.subItems?.filter((child) =>
+    isNavItemActive(child, pathname)
+  );
+  if (!matches?.length) {
+    return undefined;
+  }
+  return matches.reduce((best, child) =>
+    (child.path?.length ?? 0) > (best.path?.length ?? 0) ? child : best
+  );
 }
 
 function getActiveNavBreadcrumb(pathname: string) {

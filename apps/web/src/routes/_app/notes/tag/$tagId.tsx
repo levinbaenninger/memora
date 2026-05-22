@@ -1,9 +1,10 @@
 import { Tag01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import { recordVisit } from "@/modules/command-menu/recent-visits-client";
-import { notesListInput } from "@/modules/notes/queries";
+import { notesListInput, useTagsList } from "@/modules/notes/queries";
 import {
   TagActionsProvider,
   TagMenuItems,
@@ -46,7 +47,13 @@ export const Route = createFileRoute("/_app/notes/tag/$tagId")({
 
 function TagView() {
   const { tagId } = Route.useParams();
-  const { tagName } = Route.useLoaderData();
+  const { tagName: initialName } = Route.useLoaderData();
+  const { data: tags } = useTagsList();
+  const tagName = tags.find((tag) => tag.id === tagId)?.name ?? initialName;
+
+  useEffect(() => {
+    document.title = `${tagName} | Memora`;
+  }, [tagName]);
 
   return (
     <TagActionsProvider tagId={tagId} tagName={tagName}>

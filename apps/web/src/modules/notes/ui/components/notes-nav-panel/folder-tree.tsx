@@ -120,6 +120,7 @@ function InlineFolderForm({
       <form.Field name="name">
         {(field) => (
           <Input
+            autoFocus
             className="h-6 text-xs"
             onBlur={() => {
               if (field.state.value.trim()) {
@@ -188,6 +189,7 @@ function RenameFolderForm({
       <form.Field name="name">
         {(field) => (
           <Input
+            autoFocus
             className="h-6 text-xs"
             onBlur={() => submitOnce()}
             onChange={(e) => field.handleChange(e.target.value)}

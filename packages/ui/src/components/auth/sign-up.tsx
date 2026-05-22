@@ -5,7 +5,7 @@ import {
 } from "@better-auth-ui/react"
 import { useDebouncer } from "@tanstack/react-pacer"
 import { Check, Eye, EyeOff, X } from "lucide-react"
-import { type SyntheticEvent, useState } from "react"
+import { type SyntheticEvent, useReducer } from "react"
 import { toast } from "sonner"
 import { Button } from "@memora/ui/components/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@memora/ui/components/card"
@@ -32,6 +32,75 @@ type SignUpProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
+}
+
+type FieldErrors = {
+  name?: string
+  email?: string
+  password?: string
+  confirmPassword?: string
+}
+
+type FormState = {
+  password: string
+  confirmPassword: string
+  username: string
+  isPasswordVisible: boolean
+  isConfirmPasswordVisible: boolean
+  fieldErrors: FieldErrors
+}
+
+type FormAction =
+  | { type: "setPassword"; value: string }
+  | { type: "setConfirmPassword"; value: string }
+  | { type: "setUsername"; value: string }
+  | { type: "togglePasswordVisibility" }
+  | { type: "toggleConfirmPasswordVisibility" }
+  | { type: "setFieldError"; field: keyof FieldErrors; value: string | undefined }
+  | { type: "clearPasswords" }
+
+const initialFormState: FormState = {
+  password: "",
+  confirmPassword: "",
+  username: "",
+  isPasswordVisible: false,
+  isConfirmPasswordVisible: false,
+  fieldErrors: {}
+}
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "setPassword":
+      return {
+        ...state,
+        password: action.value,
+        fieldErrors: { ...state.fieldErrors, password: undefined }
+      }
+    case "setConfirmPassword":
+      return {
+        ...state,
+        confirmPassword: action.value,
+        fieldErrors: { ...state.fieldErrors, confirmPassword: undefined }
+      }
+    case "setUsername":
+      return { ...state, username: action.value }
+    case "togglePasswordVisibility":
+      return { ...state, isPasswordVisible: !state.isPasswordVisible }
+    case "toggleConfirmPasswordVisibility":
+      return {
+        ...state,
+        isConfirmPasswordVisible: !state.isConfirmPasswordVisible
+      }
+    case "setFieldError":
+      return {
+        ...state,
+        fieldErrors: { ...state.fieldErrors, [action.field]: action.value }
+      }
+    case "clearPasswords":
+      return { ...state, password: "", confirmPassword: "" }
+    default:
+      return state
+  }
 }
 
 /**
@@ -65,9 +134,15 @@ export function SignUp({
     Link
   } = useAuth()
 
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [username, setUsername] = useState("")
+  const [state, dispatch] = useReducer(formReducer, initialFormState)
+  const {
+    password,
+    confirmPassword,
+    username,
+    isPasswordVisible,
+    isConfirmPasswordVisible,
+    fieldErrors
+  } = state
 
   const {
     mutate: isUsernameAvailable,
@@ -89,7 +164,7 @@ export function SignUp({
   )
 
   function handleUsernameChange(value: string) {
-    setUsername(value)
+    dispatch({ type: "setUsername", value })
     resetUsername()
 
     if (usernameConfig?.isUsernameAvailable) {
@@ -99,8 +174,7 @@ export function SignUp({
 
   const { mutate: signUpEmail, isPending: signUpPending } = useSignUpEmail({
     onError: (error) => {
-      setPassword("")
-      setConfirmPassword("")
+      dispatch({ type: "clearPasswords" })
       toast.error(error.error?.message || error.message)
     },
     onSuccess: () => {
@@ -115,17 +189,6 @@ export function SignUp({
 
   const isPending = signUpPending
 
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false)
-
-  const [fieldErrors, setFieldErrors] = useState<{
-    name?: string
-    email?: string
-    password?: string
-    confirmPassword?: string
-  }>({})
-
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -135,8 +198,7 @@ export function SignUp({
 
     if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
       toast.error(localization.auth.passwordsDoNotMatch)
-      setPassword("")
-      setConfirmPassword("")
+      dispatch({ type: "clearPasswords" })
       return
     }
 
@@ -169,265 +231,63 @@ export function SignUp({
       <CardContent>
         <div className="flex flex-col gap-6">
           {socialPosition === "top" && (
-            <>
-              {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons
-                  socialLayout={socialLayout}
-                  isPending={isPending}
-                />
-              )}
-
-              {showSeparator && (
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-xs flex items-center">
-                  {localization.auth.or}
-                </FieldSeparator>
-              )}
-            </>
+            <SocialSection
+              socialLayout={socialLayout}
+              isPending={isPending}
+              showSeparator={!!showSeparator}
+              orLabel={localization.auth.or}
+            />
           )}
 
           {emailAndPassword?.enabled && (
             <form onSubmit={handleSubmit}>
               <FieldGroup>
-                <Field data-invalid={!!fieldErrors.name}>
-                  <Label htmlFor="name">{localization.auth.name}</Label>
-
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    placeholder={localization.auth.namePlaceholder}
-                    required
-                    disabled={isPending}
-                    onChange={() => {
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        name: undefined
-                      }))
-                    }}
-                    onInvalid={(e) => {
-                      e.preventDefault()
-
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        name: (e.target as HTMLInputElement).validationMessage
-                      }))
-                    }}
-                    aria-invalid={!!fieldErrors.name}
-                  />
-
-                  <FieldError>{fieldErrors.name}</FieldError>
-                </Field>
+                <NameField
+                  isPending={isPending}
+                  error={fieldErrors.name}
+                  localization={localization}
+                  dispatch={dispatch}
+                />
 
                 {usernameConfig?.enabled && (
-                  <Field
-                    data-invalid={
-                      !!usernameError ||
-                      (usernameData && !usernameData.available)
-                    }
-                  >
-                    <Label htmlFor="username">
-                      {localization.auth.username}
-                    </Label>
-
-                    <InputGroup>
-                      <InputGroupInput
-                        id="username"
-                        name="username"
-                        type="text"
-                        autoComplete="username"
-                        placeholder={localization.auth.usernamePlaceholder}
-                        required
-                        minLength={usernameConfig.minUsernameLength}
-                        maxLength={usernameConfig.maxUsernameLength}
-                        disabled={isPending}
-                        value={username}
-                        onChange={(e) => handleUsernameChange(e.target.value)}
-                        aria-invalid={
-                          !!usernameError ||
-                          (usernameData && !usernameData.available)
-                        }
-                      />
-
-                      {usernameConfig.isUsernameAvailable &&
-                        username.trim() && (
-                          <InputGroupAddon align="inline-end">
-                            {usernameData?.available ? (
-                              <Check className="text-foreground" />
-                            ) : usernameError ||
-                              usernameData?.available === false ? (
-                              <X className="text-destructive" />
-                            ) : (
-                              <Spinner />
-                            )}
-                          </InputGroupAddon>
-                        )}
-                    </InputGroup>
-
-                    <FieldError>
-                      {usernameError?.error?.message ||
-                        usernameError?.message ||
-                        (usernameData?.available === false
-                          ? localization.auth.usernameTaken
-                          : null)}
-                    </FieldError>
-                  </Field>
+                  <UsernameField
+                    username={username}
+                    isPending={isPending}
+                    usernameConfig={usernameConfig}
+                    usernameData={usernameData}
+                    usernameError={usernameError}
+                    localization={localization}
+                    onChange={handleUsernameChange}
+                  />
                 )}
 
-                <Field data-invalid={!!fieldErrors.email}>
-                  <Label htmlFor="email">{localization.auth.email}</Label>
+                <EmailField
+                  isPending={isPending}
+                  error={fieldErrors.email}
+                  localization={localization}
+                  dispatch={dispatch}
+                />
 
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder={localization.auth.emailPlaceholder}
-                    required
-                    disabled={isPending}
-                    onChange={() => {
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        email: undefined
-                      }))
-                    }}
-                    onInvalid={(e) => {
-                      e.preventDefault()
-
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        email: (e.target as HTMLInputElement).validationMessage
-                      }))
-                    }}
-                    aria-invalid={!!fieldErrors.email}
-                  />
-
-                  <FieldError>{fieldErrors.email}</FieldError>
-                </Field>
-
-                <Field data-invalid={!!fieldErrors.password}>
-                  <Label htmlFor="password">{localization.auth.password}</Label>
-
-                  <InputGroup>
-                    <InputGroupInput
-                      id="password"
-                      name="password"
-                      type={isPasswordVisible ? "text" : "password"}
-                      autoComplete="new-password"
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value)
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          password: undefined
-                        }))
-                      }}
-                      placeholder={localization.auth.passwordPlaceholder}
-                      required
-                      minLength={emailAndPassword?.minPasswordLength}
-                      maxLength={emailAndPassword?.maxPasswordLength}
-                      disabled={isPending}
-                      onInvalid={(e) => {
-                        e.preventDefault()
-
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          password: (e.target as HTMLInputElement)
-                            .validationMessage
-                        }))
-                      }}
-                      aria-invalid={!!fieldErrors.password}
-                    />
-
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupButton
-                        aria-label={
-                          isPasswordVisible
-                            ? localization.auth.hidePassword
-                            : localization.auth.showPassword
-                        }
-                        title={
-                          isPasswordVisible
-                            ? localization.auth.hidePassword
-                            : localization.auth.showPassword
-                        }
-                        onClick={() => {
-                          setIsPasswordVisible(!isPasswordVisible)
-                        }}
-                      >
-                        {isPasswordVisible ? <EyeOff /> : <Eye />}
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                  </InputGroup>
-
-                  <FieldError>{fieldErrors.password}</FieldError>
-                </Field>
+                <PasswordField
+                  password={password}
+                  isPending={isPending}
+                  isVisible={isPasswordVisible}
+                  error={fieldErrors.password}
+                  emailAndPassword={emailAndPassword}
+                  localization={localization}
+                  dispatch={dispatch}
+                />
 
                 {emailAndPassword?.confirmPassword && (
-                  <Field data-invalid={!!fieldErrors.confirmPassword}>
-                    <Label htmlFor="confirmPassword">
-                      {localization.auth.confirmPassword}
-                    </Label>
-
-                    <InputGroup>
-                      <InputGroupInput
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type={isConfirmPasswordVisible ? "text" : "password"}
-                        autoComplete="new-password"
-                        value={confirmPassword}
-                        onChange={(e) => {
-                          setConfirmPassword(e.target.value)
-
-                          setFieldErrors((prev) => ({
-                            ...prev,
-                            confirmPassword: undefined
-                          }))
-                        }}
-                        placeholder={
-                          localization.auth.confirmPasswordPlaceholder
-                        }
-                        required
-                        minLength={emailAndPassword?.minPasswordLength}
-                        maxLength={emailAndPassword?.maxPasswordLength}
-                        disabled={isPending}
-                        onInvalid={(e) => {
-                          e.preventDefault()
-
-                          setFieldErrors((prev) => ({
-                            ...prev,
-                            confirmPassword: (e.target as HTMLInputElement)
-                              .validationMessage
-                          }))
-                        }}
-                        aria-invalid={!!fieldErrors.confirmPassword}
-                      />
-
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupButton
-                          aria-label={
-                            isConfirmPasswordVisible
-                              ? localization.auth.hidePassword
-                              : localization.auth.showPassword
-                          }
-                          title={
-                            isConfirmPasswordVisible
-                              ? localization.auth.hidePassword
-                              : localization.auth.showPassword
-                          }
-                          onClick={() =>
-                            setIsConfirmPasswordVisible(
-                              !isConfirmPasswordVisible
-                            )
-                          }
-                        >
-                          {isConfirmPasswordVisible ? <EyeOff /> : <Eye />}
-                        </InputGroupButton>
-                      </InputGroupAddon>
-                    </InputGroup>
-
-                    <FieldError>{fieldErrors.confirmPassword}</FieldError>
-                  </Field>
+                  <ConfirmPasswordField
+                    confirmPassword={confirmPassword}
+                    isPending={isPending}
+                    isVisible={isConfirmPasswordVisible}
+                    error={fieldErrors.confirmPassword}
+                    emailAndPassword={emailAndPassword}
+                    localization={localization}
+                    dispatch={dispatch}
+                  />
                 )}
 
                 <div className="flex flex-col gap-3">
@@ -442,20 +302,13 @@ export function SignUp({
           )}
 
           {socialPosition === "bottom" && (
-            <>
-              {showSeparator && (
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-xs flex items-center">
-                  {localization.auth.or}
-                </FieldSeparator>
-              )}
-
-              {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons
-                  socialLayout={socialLayout}
-                  isPending={isPending}
-                />
-              )}
-            </>
+            <SocialSection
+              socialLayout={socialLayout}
+              isPending={isPending}
+              showSeparator={!!showSeparator}
+              orLabel={localization.auth.or}
+              reverse
+            />
           )}
         </div>
 
@@ -474,5 +327,346 @@ export function SignUp({
         )}
       </CardContent>
     </Card>
+  )
+}
+
+type AuthContext = ReturnType<typeof useAuth>
+type Localization = AuthContext["localization"]
+type EmailAndPasswordConfig = AuthContext["emailAndPassword"]
+type UsernameConfig = NonNullable<AuthContext["username"]>
+type UsernameAvailableResult = ReturnType<typeof useIsUsernameAvailable>
+type UsernameData = UsernameAvailableResult["data"]
+type UsernameMutationError = UsernameAvailableResult["error"]
+
+type SocialSectionProps = {
+  socialLayout?: SocialLayout
+  isPending: boolean
+  showSeparator: boolean
+  orLabel: string
+  reverse?: boolean
+}
+
+function SocialSection({
+  socialLayout,
+  isPending,
+  showSeparator,
+  orLabel,
+  reverse
+}: SocialSectionProps) {
+  const { socialProviders } = useAuth()
+  const hasProviders = !!socialProviders && socialProviders.length > 0
+
+  const separator = showSeparator ? (
+    <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-xs flex items-center">
+      {orLabel}
+    </FieldSeparator>
+  ) : null
+
+  const buttons = hasProviders ? (
+    <ProviderButtons socialLayout={socialLayout} isPending={isPending} />
+  ) : null
+
+  return (
+    <>
+      {reverse ? separator : buttons}
+      {reverse ? buttons : separator}
+    </>
+  )
+}
+
+type NameFieldProps = {
+  isPending: boolean
+  error: string | undefined
+  localization: Localization
+  dispatch: React.Dispatch<FormAction>
+}
+
+function NameField({ isPending, error, localization, dispatch }: NameFieldProps) {
+  return (
+    <Field data-invalid={!!error}>
+      <Label htmlFor="name">{localization.auth.name}</Label>
+
+      <Input
+        id="name"
+        name="name"
+        type="text"
+        autoComplete="name"
+        placeholder={localization.auth.namePlaceholder}
+        required
+        disabled={isPending}
+        onChange={() => {
+          dispatch({ type: "setFieldError", field: "name", value: undefined })
+        }}
+        onInvalid={(e) => {
+          e.preventDefault()
+
+          dispatch({
+            type: "setFieldError",
+            field: "name",
+            value: (e.target as HTMLInputElement).validationMessage
+          })
+        }}
+        aria-invalid={!!error}
+      />
+
+      <FieldError>{error}</FieldError>
+    </Field>
+  )
+}
+
+type UsernameFieldProps = {
+  username: string
+  isPending: boolean
+  usernameConfig: UsernameConfig
+  usernameData: UsernameData
+  usernameError: UsernameMutationError
+  localization: Localization
+  onChange: (value: string) => void
+}
+
+function UsernameField({
+  username,
+  isPending,
+  usernameConfig,
+  usernameData,
+  usernameError,
+  localization,
+  onChange
+}: UsernameFieldProps) {
+  const invalid = !!usernameError || (usernameData && !usernameData.available)
+
+  return (
+    <Field data-invalid={invalid}>
+      <Label htmlFor="username">{localization.auth.username}</Label>
+
+      <InputGroup>
+        <InputGroupInput
+          id="username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          placeholder={localization.auth.usernamePlaceholder}
+          required
+          minLength={usernameConfig.minUsernameLength}
+          maxLength={usernameConfig.maxUsernameLength}
+          disabled={isPending}
+          value={username}
+          onChange={(e) => onChange(e.target.value)}
+          aria-invalid={invalid}
+        />
+
+        {usernameConfig.isUsernameAvailable && username.trim() && (
+          <InputGroupAddon align="inline-end">
+            {usernameData?.available ? (
+              <Check className="text-foreground" />
+            ) : usernameError || usernameData?.available === false ? (
+              <X className="text-destructive" />
+            ) : (
+              <Spinner />
+            )}
+          </InputGroupAddon>
+        )}
+      </InputGroup>
+
+      <FieldError>
+        {usernameError?.error?.message ||
+          usernameError?.message ||
+          (usernameData?.available === false
+            ? localization.auth.usernameTaken
+            : null)}
+      </FieldError>
+    </Field>
+  )
+}
+
+type EmailFieldProps = {
+  isPending: boolean
+  error: string | undefined
+  localization: Localization
+  dispatch: React.Dispatch<FormAction>
+}
+
+function EmailField({ isPending, error, localization, dispatch }: EmailFieldProps) {
+  return (
+    <Field data-invalid={!!error}>
+      <Label htmlFor="email">{localization.auth.email}</Label>
+
+      <Input
+        id="email"
+        name="email"
+        type="email"
+        autoComplete="email"
+        placeholder={localization.auth.emailPlaceholder}
+        required
+        disabled={isPending}
+        onChange={() => {
+          dispatch({ type: "setFieldError", field: "email", value: undefined })
+        }}
+        onInvalid={(e) => {
+          e.preventDefault()
+
+          dispatch({
+            type: "setFieldError",
+            field: "email",
+            value: (e.target as HTMLInputElement).validationMessage
+          })
+        }}
+        aria-invalid={!!error}
+      />
+
+      <FieldError>{error}</FieldError>
+    </Field>
+  )
+}
+
+type PasswordFieldProps = {
+  password: string
+  isPending: boolean
+  isVisible: boolean
+  error: string | undefined
+  emailAndPassword: EmailAndPasswordConfig
+  localization: Localization
+  dispatch: React.Dispatch<FormAction>
+}
+
+function PasswordField({
+  password,
+  isPending,
+  isVisible,
+  error,
+  emailAndPassword,
+  localization,
+  dispatch
+}: PasswordFieldProps) {
+  return (
+    <Field data-invalid={!!error}>
+      <Label htmlFor="password">{localization.auth.password}</Label>
+
+      <InputGroup>
+        <InputGroupInput
+          id="password"
+          name="password"
+          type={isVisible ? "text" : "password"}
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => {
+            dispatch({ type: "setPassword", value: e.target.value })
+          }}
+          placeholder={localization.auth.passwordPlaceholder}
+          required
+          minLength={emailAndPassword?.minPasswordLength}
+          maxLength={emailAndPassword?.maxPasswordLength}
+          disabled={isPending}
+          onInvalid={(e) => {
+            e.preventDefault()
+
+            dispatch({
+              type: "setFieldError",
+              field: "password",
+              value: (e.target as HTMLInputElement).validationMessage
+            })
+          }}
+          aria-invalid={!!error}
+        />
+
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton
+            aria-label={
+              isVisible
+                ? localization.auth.hidePassword
+                : localization.auth.showPassword
+            }
+            title={
+              isVisible
+                ? localization.auth.hidePassword
+                : localization.auth.showPassword
+            }
+            onClick={() => {
+              dispatch({ type: "togglePasswordVisibility" })
+            }}
+          >
+            {isVisible ? <EyeOff /> : <Eye />}
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+
+      <FieldError>{error}</FieldError>
+    </Field>
+  )
+}
+
+type ConfirmPasswordFieldProps = {
+  confirmPassword: string
+  isPending: boolean
+  isVisible: boolean
+  error: string | undefined
+  emailAndPassword: EmailAndPasswordConfig
+  localization: Localization
+  dispatch: React.Dispatch<FormAction>
+}
+
+function ConfirmPasswordField({
+  confirmPassword,
+  isPending,
+  isVisible,
+  error,
+  emailAndPassword,
+  localization,
+  dispatch
+}: ConfirmPasswordFieldProps) {
+  return (
+    <Field data-invalid={!!error}>
+      <Label htmlFor="confirmPassword">
+        {localization.auth.confirmPassword}
+      </Label>
+
+      <InputGroup>
+        <InputGroupInput
+          id="confirmPassword"
+          name="confirmPassword"
+          type={isVisible ? "text" : "password"}
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => {
+            dispatch({ type: "setConfirmPassword", value: e.target.value })
+          }}
+          placeholder={localization.auth.confirmPasswordPlaceholder}
+          required
+          minLength={emailAndPassword?.minPasswordLength}
+          maxLength={emailAndPassword?.maxPasswordLength}
+          disabled={isPending}
+          onInvalid={(e) => {
+            e.preventDefault()
+
+            dispatch({
+              type: "setFieldError",
+              field: "confirmPassword",
+              value: (e.target as HTMLInputElement).validationMessage
+            })
+          }}
+          aria-invalid={!!error}
+        />
+
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton
+            aria-label={
+              isVisible
+                ? localization.auth.hidePassword
+                : localization.auth.showPassword
+            }
+            title={
+              isVisible
+                ? localization.auth.hidePassword
+                : localization.auth.showPassword
+            }
+            onClick={() => dispatch({ type: "toggleConfirmPasswordVisibility" })}
+          >
+            {isVisible ? <EyeOff /> : <Eye />}
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+
+      <FieldError>{error}</FieldError>
+    </Field>
   )
 }
