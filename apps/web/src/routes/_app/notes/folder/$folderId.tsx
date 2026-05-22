@@ -1,9 +1,10 @@
 import { FolderIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import { recordVisit } from "@/modules/command-menu/recent-visits-client";
-import { notesListInput } from "@/modules/notes/queries";
+import { notesListInput, useFoldersList } from "@/modules/notes/queries";
 import {
   FolderActionsProvider,
   FolderMenuItems,
@@ -47,7 +48,14 @@ export const Route = createFileRoute("/_app/notes/folder/$folderId")({
 
 function FolderView() {
   const { folderId } = Route.useParams();
-  const { folderName } = Route.useLoaderData();
+  const { folderName: initialName } = Route.useLoaderData();
+  const { data: folders } = useFoldersList();
+  const folderName =
+    folders.find((folder) => folder.id === folderId)?.name ?? initialName;
+
+  useEffect(() => {
+    document.title = `${folderName} | Memora`;
+  }, [folderName]);
 
   return (
     <FolderActionsProvider folderId={folderId} folderName={folderName}>

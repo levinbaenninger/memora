@@ -41,7 +41,13 @@ export function useGlobalHotkeys() {
     mutationFn: (input: { pinned?: boolean; favorite?: boolean }) =>
       client.notes.update({ id: noteId ?? "", ...input }),
     onSuccess: (_data, variables) => {
-      invalidateNote();
+      if (noteId) {
+        queryClient.invalidateQueries({
+          queryKey: orpc.notes.get.key({ input: { id: noteId } }),
+        });
+        queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+      }
       if (variables.favorite !== undefined) {
         toast.success(variables.favorite ? "Favorited" : "Unfavorited");
       }
@@ -55,7 +61,13 @@ export function useGlobalHotkeys() {
   const archive = useMutation({
     mutationFn: () => client.notes.archive({ id: noteId ?? "" }),
     onSuccess: () => {
-      invalidateNote();
+      if (noteId) {
+        queryClient.invalidateQueries({
+          queryKey: orpc.notes.get.key({ input: { id: noteId } }),
+        });
+        queryClient.invalidateQueries({ queryKey: orpc.notes.list.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.notes.search.key() });
+      }
       toast.success("Note archived", {
         action: {
           label: "Undo",

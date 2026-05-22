@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, use, useEffect, useState } from "react"
 import { ScriptOnce } from "@tanstack/react-router"
 
 type Theme = "dark" | "light" | "system"
@@ -25,7 +25,7 @@ const UNSAFE_SCRIPT_CHARS: Record<string, string> = {
 
 function safeScriptJson(value: string) {
   return JSON.stringify(value).replace(
-    /[&<>/\u2028\u2029]/g,
+    new RegExp("[&<>/\\u2028\\u2029]", "g"),
     (char) => UNSAFE_SCRIPT_CHARS[char] ?? char
   )
 }
@@ -57,41 +57,43 @@ function applyTheme(theme: Theme) {
   root.style.colorScheme = resolved
 }
 
+function readStoredTheme(storageKey: string, defaultTheme: Theme): Theme {
+  if (typeof window === "undefined") {
+    return defaultTheme
+  }
+  try {
+    const stored = localStorage.getItem(storageKey)
+    if (stored === "light" || stored === "dark" || stored === "system") {
+      return stored
+    }
+  } catch {
+    // ignore — storage unavailable
+  }
+  return defaultTheme
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "theme",
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(defaultTheme)
-  const [mounted, setMounted] = useState(false)
+  const [theme, setThemeState] = useState<Theme>(() =>
+    readStoredTheme(storageKey, defaultTheme)
+  )
 
   useEffect(() => {
-    const stored = localStorage.getItem(storageKey)
-    setThemeState(
-      stored === "light" || stored === "dark" || stored === "system"
-        ? stored
-        : defaultTheme
-    )
-    setMounted(true)
-  }, [defaultTheme, storageKey])
-
-  useEffect(() => {
-    if (!mounted) return
-    applyTheme(theme)
-  }, [theme, mounted])
-
-  useEffect(() => {
-    if (!mounted || theme !== "system") return
+    if (theme !== "system") return
 
     const media = window.matchMedia("(prefers-color-scheme: dark)")
     const onChange = () => applyTheme("system")
     media.addEventListener("change", onChange)
     return () => media.removeEventListener("change", onChange)
-  }, [theme, mounted])
+  }, [theme])
 
   const setTheme = (next: Theme) => {
     localStorage.setItem(storageKey, next)
     setThemeState(next)
+    applyTheme(next)
   }
 
   return (
@@ -103,8 +105,5 @@ export function ThemeProvider({
 }
 
 export function useTheme() {
-  const context = useContext(ThemeProviderContext)
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider")
-  return context
+  return use(ThemeProviderContext)
 }
