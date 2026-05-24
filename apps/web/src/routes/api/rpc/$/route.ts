@@ -24,6 +24,37 @@ function redact(value: unknown, seen = new WeakSet<object>()): unknown {
     if (Array.isArray(value)) {
       return value.map((v) => redact(v, seen));
     }
+    // Error instances expose name/message/stack as non-enumerable properties,
+    // which Object.entries skips — produce a plain object that preserves them
+    // (plus any custom enumerable own props like `code`, `data`, `cause`).
+    if (value instanceof Error) {
+      const err = value as Error & { cause?: unknown };
+      const out: Record<string, unknown> = {
+        name: err.name,
+        message: redact(err.message, seen),
+      };
+      if (err.stack) {
+        out.stack = redact(err.stack, seen);
+      }
+      if (err.cause !== undefined) {
+        out.cause = redact(err.cause, seen);
+      }
+      for (const key of Object.getOwnPropertyNames(err)) {
+        if (
+          key === "name" ||
+          key === "message" ||
+          key === "stack" ||
+          key === "cause"
+        ) {
+          continue;
+        }
+        out[key] = redact(
+          (err as unknown as Record<string, unknown>)[key],
+          seen
+        );
+      }
+      return out;
+    }
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
       out[k] = redact(v, seen);

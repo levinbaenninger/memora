@@ -52,9 +52,6 @@ function AppShellLayout() {
     let token: string | null = null;
     try {
       token = window.localStorage.getItem(PENDING_DUPLICATE_TOKEN_KEY);
-      if (token) {
-        window.localStorage.removeItem(PENDING_DUPLICATE_TOKEN_KEY);
-      }
     } catch {
       return;
     }
@@ -62,13 +59,28 @@ function AppShellLayout() {
       return;
     }
     drainedRef.current = true;
+    const clearToken = () => {
+      try {
+        window.localStorage.removeItem(PENDING_DUPLICATE_TOKEN_KEY);
+      } catch {
+        // localStorage may be blocked; nothing to clean up.
+      }
+    };
     client.notes.shares
       .duplicate({ token })
       .then(({ id }) => {
+        clearToken();
         toast.success("Note duplicated");
         navigate({ to: "/notes/$noteId", params: { noteId: id } });
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        // Transient errors (rate limit, network) leave the token so a later
+        // visit can retry. Permanent ones (link revoked, expired, deleted)
+        // clear it so we don't toast the same error forever.
+        const code = (error as { code?: string } | null)?.code;
+        if (code !== "TOO_MANY_REQUESTS") {
+          clearToken();
+        }
         toast.error("Could not duplicate the shared note.");
       });
   }, [navigate, session]);

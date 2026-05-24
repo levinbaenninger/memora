@@ -42,45 +42,54 @@ export const createShare = authorized
       throw errors.TOO_MANY_REQUESTS({});
     }
 
-    const [note] = await db
-      .select({ id: notes.id })
-      .from(notes)
-      .where(
-        and(
-          eq(notes.id, input.noteId),
-          eq(notes.userId, userId),
-          isNull(notes.archivedAt)
-        )
-      )
-      .limit(1);
-
-    if (!note) {
-      throw errors.NOT_FOUND({ message: "Note not found." });
-    }
-
-    const now = new Date();
-    const [activeCount] = await db
-      .select({ value: count() })
-      .from(noteShares)
-      .where(
-        and(
-          eq(noteShares.noteId, input.noteId),
-          or(isNull(noteShares.expiresAt), gt(noteShares.expiresAt, now))
-        )
-      );
-
-    if ((activeCount?.value ?? 0) >= MAX_ACTIVE_SHARES_PER_NOTE) {
-      throw errors.BAD_REQUEST({
-        message: `A note can have at most ${MAX_ACTIVE_SHARES_PER_NOTE} active share links. Revoke an existing link before creating a new one.`,
-      });
-    }
-
     const expiresAt = expiryPresetToDate(input.expiry);
 
-    const [created] = await db
-      .insert(noteShares)
-      .values({ noteId: input.noteId, expiresAt })
-      .returning();
+    // Lock the note row for the duration of the transaction so concurrent
+    // create-share calls for the same note serialize through this section —
+    // otherwise two racing requests could both pass the cap check and exceed
+    // MAX_ACTIVE_SHARES_PER_NOTE.
+    const created = await db.transaction(async (tx) => {
+      const [note] = await tx
+        .select({ id: notes.id })
+        .from(notes)
+        .where(
+          and(
+            eq(notes.id, input.noteId),
+            eq(notes.userId, userId),
+            isNull(notes.archivedAt)
+          )
+        )
+        .for("update")
+        .limit(1);
+
+      if (!note) {
+        throw errors.NOT_FOUND({ message: "Note not found." });
+      }
+
+      const now = new Date();
+      const [activeCount] = await tx
+        .select({ value: count() })
+        .from(noteShares)
+        .where(
+          and(
+            eq(noteShares.noteId, input.noteId),
+            or(isNull(noteShares.expiresAt), gt(noteShares.expiresAt, now))
+          )
+        );
+
+      if ((activeCount?.value ?? 0) >= MAX_ACTIVE_SHARES_PER_NOTE) {
+        throw errors.BAD_REQUEST({
+          message: `A note can have at most ${MAX_ACTIVE_SHARES_PER_NOTE} active share links. Revoke an existing link before creating a new one.`,
+        });
+      }
+
+      const [row] = await tx
+        .insert(noteShares)
+        .values({ noteId: input.noteId, expiresAt })
+        .returning();
+
+      return row;
+    });
 
     if (!created) {
       throw errors.INTERNAL_SERVER_ERROR({});

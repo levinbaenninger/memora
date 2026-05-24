@@ -25,7 +25,9 @@ Security is a first-class concern for this project; the threat model below is pa
 - **Token entropy**: 32-char nanoid (~190 bits) — bruteforce infeasible. Lookup is an indexed unique-column query, not an app-level compare, so timing attacks on lookup are not a concern.
 - **Rate limits**:
   - Public read endpoint `/api/public/shares/$token`: 60 req/min per IP.
-  - Owner mutations (create / revoke): 30 link creates per hour per user.
+  - Create a Share Link: 30 per hour per user.
+  - Duplicate a shared Note: 30 per hour per user.
+  - Revoke a Share Link: not rate-limited — the action shrinks attack surface, and the per-user create limit already bounds churn.
   - Per-Note cap: at most 50 active Share Links.
 - **Ownership**: every mint and revoke asserts `share.note.userId === session.userId` server-side. Never trust client-supplied `noteId` alone.
 - **Headers on Public Detail and the public RPC**:
