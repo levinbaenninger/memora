@@ -31,6 +31,13 @@ import { useSharePopoverStore } from "../../store";
 
 type Expiry = "none" | "1d" | "7d" | "30d";
 
+const EXPIRY_LABELS: Record<Expiry, string> = {
+  none: "No expiry",
+  "1d": "Expires in 1 day",
+  "7d": "Expires in 7 days",
+  "30d": "Expires in 30 days",
+};
+
 function buildShareUrl(token: string): string {
   if (typeof window === "undefined") {
     return `/share/${token}`;
@@ -48,8 +55,8 @@ function formatExpiry(date: Date | null): string {
 }
 
 interface Props {
-  noteId: string;
   disabled?: boolean;
+  noteId: string;
 }
 
 export function SharePopover({ noteId, disabled }: Props) {
@@ -124,14 +131,15 @@ export function SharePopover({ noteId, disabled }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Select
-            onValueChange={(v) => setExpiry(v as Expiry)}
-            value={expiry}
-          >
-            <SelectTrigger className="h-8 flex-1 text-xs">
-              <SelectValue />
+          <Select onValueChange={(v) => setExpiry(v as Expiry)} value={expiry}>
+            <SelectTrigger className="flex-1">
+              <SelectValue>
+                {(value: unknown) =>
+                  EXPIRY_LABELS[value as Expiry] ?? EXPIRY_LABELS.none
+                }
+              </SelectValue>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent align="start" alignItemWithTrigger={false}>
               <SelectItem value="none">No expiry</SelectItem>
               <SelectItem value="1d">Expires in 1 day</SelectItem>
               <SelectItem value="7d">Expires in 7 days</SelectItem>
@@ -167,7 +175,7 @@ export function SharePopover({ noteId, disabled }: Props) {
                     <p className="truncate font-mono text-xs">
                       …/{share.token.slice(-8)}
                     </p>
-                    <p className="text-muted-foreground text-[10px]">
+                    <p className="text-[10px] text-muted-foreground">
                       {formatExpiry(share.expiresAt)}
                     </p>
                   </div>
