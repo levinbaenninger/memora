@@ -17,6 +17,7 @@ import {
   NoteIcon,
   PinIcon,
   PinOffIcon,
+  Share01Icon,
   Tag01Icon,
   UndoIcon,
 } from "@hugeicons/core-free-icons";
@@ -48,6 +49,7 @@ import {
   useUpdateFolder,
   useUpdateTag,
 } from "@/modules/notes/mutations";
+import { useSharePopoverStore } from "@/modules/sharing/store";
 import { client, orpc } from "@/utils/orpc";
 import { useCommandMenu } from "./context";
 import {
@@ -389,6 +391,7 @@ function NoteContextActions({
   setPage: (page: ReturnType<typeof useCommandMenu>["page"]) => void;
 }) {
   const queryClient = useQueryClient();
+  const openSharePopover = useSharePopoverStore((s) => s.open);
   const noteQuery = useQuery({
     ...orpc.notes.get.queryOptions({
       input: { id: noteId, includeArchived: true },
@@ -509,6 +512,16 @@ function NoteContextActions({
         <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
         <span>Add tag…</span>
       </CommandItem>
+      {isArchived ? null : (
+        <CommandItem
+          keywords={["share", "link", "public"]}
+          onSelect={() => closeAndRun(() => openSharePopover(noteId))}
+          value="note-share"
+        >
+          <HugeiconsIcon icon={Share01Icon} strokeWidth={2} />
+          <span>Share note…</span>
+        </CommandItem>
+      )}
       <CommandItem
         keywords={["archive", "restore", "delete", "trash"]}
         onSelect={() =>

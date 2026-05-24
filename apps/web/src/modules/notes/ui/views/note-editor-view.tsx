@@ -19,6 +19,7 @@ import {
 } from "@/modules/notes/mutations";
 import { useNote } from "@/modules/notes/queries";
 import { useNotesStore } from "@/modules/notes/store";
+import { SharePopover } from "@/modules/sharing/ui/components/share-popover";
 import { BlockNoteEditorView } from "../components/note-editor/blocknote-editor";
 import { NoteActionsMenu } from "../components/note-editor/note-actions-menu";
 import { NoteMetadataStrip } from "../components/note-editor/note-metadata-strip";
@@ -103,11 +104,14 @@ export function NoteEditorView() {
             placeholder="Untitled"
             ref={titleRef}
           />
-          <NoteActionsMenu
-            favorite={note.favorite}
-            noteId={noteId}
-            pinned={note.pinned}
-          />
+          <div className="flex shrink-0 items-center gap-1">
+            <SharePopover disabled={isArchived} noteId={noteId} />
+            <NoteActionsMenu
+              favorite={note.favorite}
+              noteId={noteId}
+              pinned={note.pinned}
+            />
+          </div>
         </div>
 
         <NoteMetadataStrip

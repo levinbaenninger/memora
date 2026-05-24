@@ -54,6 +54,20 @@ _Avoid_: History, recently viewed.
 An action in the Command Menu scoped to the currently-open entity — e.g., Pin/Unpin a Note on `/notes/$noteId`, Rename Folder on `/notes/folder/$id`. Hidden when no entity is in context.
 _Avoid_: Quick action, contextual command.
 
+### Sharing
+
+**Share Link**:
+An owner-minted capability URL granting read-only access to one Note. A Note may have many Share Links. Revocable by hard delete. Optionally expires.
+_Avoid_: Invite, share token (token is an implementation detail).
+
+**Visitor**:
+An unauthenticated person opening a Share Link. Not a User; has no Workspace, Folder, or Tag access.
+_Avoid_: Guest, recipient, viewer.
+
+**Public Detail**:
+The stripped read-only Detail surface at `/share/$token`. Renders title, body, owner name, and `updatedAt` only — no sidebar, no Command Menu, no Folder/Tag metadata.
+_Avoid_: Shared view, preview.
+
 ## Relationships
 
 - A **Note** belongs to at most one **Folder** and carries many **Tags**.
@@ -61,6 +75,8 @@ _Avoid_: Quick action, contextual command.
 - A **View** filters the **Grid**; clicking a card opens the **Detail**.
 - A **Recent Visit** points to exactly one **Note**, **Folder**, or **Tag** and is removed when that entity is hard-deleted.
 - The **Command Menu** reads **Folders**, **Tags**, and **Recent Visits** eagerly; it queries **Notes** lazily via FTS.
+- A **Share Link** points to exactly one **Note**; deleted when the Note is hard-deleted. While the Note is archived, the Share Link resolves to 404.
+- A **Visitor** opens a **Share Link** and sees a **Public Detail**; they have no access to any other entity.
 
 ## Example dialogue
 
