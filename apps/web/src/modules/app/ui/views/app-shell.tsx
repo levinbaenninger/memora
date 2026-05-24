@@ -56,7 +56,7 @@ export function AppShell({
           navGroups={navGroups}
           renderLink={renderLink}
         />
-        <SidebarInset className="fade-in slide-in-from-bottom-2 min-w-0 animate-in px-16 py-4 duration-500 ease-out md:py-6">
+        <SidebarInset className="fade-in slide-in-from-bottom-2 min-w-0 animate-in px-6 py-4 duration-500 ease-out md:px-16 md:py-6">
           <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col">
             <AppHeader
               breadcrumbItems={breadcrumbItems}
