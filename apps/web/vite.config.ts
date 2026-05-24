@@ -12,6 +12,15 @@ const blocknoteCommentsStub = fileURLToPath(
   new URL("./src/utils/blocknote-comments-stub.ts", import.meta.url)
 );
 
+// Matches @blocknote/react comment-chunk filenames such as
+// `FloatingThreadController.js`, `FloatingThreadController-DXD0P6RJ.js`, or
+// the same names without the `.js` extension. Pattern parts:
+//   (?:^|[\\/])                  — start of string or a (posix/windows) path
+//                                  separator, so we match the basename only
+//   Floating(?:Thread|Composer)Controller
+//                                — the two controller chunks we want to stub
+//   (?:-[A-Za-z0-9_]+)?          — Rolldown's optional content-hash suffix
+//   (?:\.js)?$                   — optional `.js` extension at end of string
 const BLOCKNOTE_COMMENTS_CHUNK =
   /(?:^|[\\/])Floating(?:Thread|Composer)Controller(?:-[A-Za-z0-9_]+)?(?:\.js)?$/;
 const BLOCKNOTE_REACT_PATH = /@blocknote[\\/]react[\\/]/;
@@ -24,9 +33,19 @@ function stubBlocknoteComments(): Plugin {
       if (!BLOCKNOTE_COMMENTS_CHUNK.test(source)) {
         return null;
       }
-      const resolved = await this.resolve(source, importer, {
-        skipSelf: true,
-      });
+      let resolved: Awaited<ReturnType<typeof this.resolve>> | null = null;
+      try {
+        resolved = await this.resolve(source, importer, {
+          skipSelf: true,
+        });
+      } catch (error) {
+        this.warn(
+          `stub-blocknote-comments: failed to resolve ${source}: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
+        return null;
+      }
       if (!resolved) {
         return null;
       }
