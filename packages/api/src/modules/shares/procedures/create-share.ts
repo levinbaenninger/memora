@@ -2,12 +2,16 @@ import { and, count, eq, gt, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
-import { notes, noteShares } from "@memora/db/schema";
+import { noteShares, notes } from "@memora/db/schema";
 
 import { consumeRateLimit } from "../../../middlewares/rate-limit";
 import { authorized } from "../../../procedures/authorized";
 import { MAX_ACTIVE_SHARES_PER_NOTE } from "../constants";
-import { expiryPresetSchema, expiryPresetToDate, shareSchema } from "../schemas";
+import {
+  expiryPresetSchema,
+  expiryPresetToDate,
+  shareSchema,
+} from "../schemas";
 
 export const createShareRequestDtoSchema = z.object({
   noteId: z.nanoid(),

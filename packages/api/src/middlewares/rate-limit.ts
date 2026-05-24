@@ -17,10 +17,10 @@ function sweep(now: number) {
 }
 
 export interface RateLimitOptions {
-  /** Stable identifier for this limiter, namespaced into the key. */
-  name: string;
   /** Max requests allowed within the window. */
   limit: number;
+  /** Stable identifier for this limiter, namespaced into the key. */
+  name: string;
   /** Window length in milliseconds. */
   windowMs: number;
 }

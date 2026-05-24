@@ -2,8 +2,8 @@ import { and, eq, gt, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
+import { noteShares, notes } from "@memora/db/schema";
 import { user } from "@memora/db/schema/auth";
-import { notes, noteShares } from "@memora/db/schema";
 
 import {
   consumeRateLimit,

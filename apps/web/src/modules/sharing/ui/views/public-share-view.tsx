@@ -13,10 +13,14 @@ import { BlockNoteReadOnlyView } from "@/modules/notes/ui/components/note-editor
 import { PENDING_DUPLICATE_TOKEN_KEY } from "@/modules/sharing/pending-duplicate";
 import { client } from "@/utils/orpc";
 
+const UPDATED_AT_FORMAT = new Intl.DateTimeFormat(undefined, {
+  dateStyle: "medium",
+});
+
 interface Props {
-  title: string;
   content: PartialBlock[];
   ownerName: string;
+  title: string;
   updatedAt: Date;
 }
 
@@ -46,7 +50,7 @@ function DuplicateButton() {
   const { data: session } = authClient.useSession();
   const [pending, setPending] = useState(false);
 
-  const handleClick = async () => {
+  const handleDuplicate = async () => {
     if (!session) {
       try {
         window.localStorage.setItem(PENDING_DUPLICATE_TOKEN_KEY, token);
@@ -74,14 +78,24 @@ function DuplicateButton() {
   };
 
   return (
-    <Button disabled={pending} onClick={handleClick} size="sm" variant="outline">
+    <Button
+      disabled={pending}
+      onClick={handleDuplicate}
+      size="sm"
+      variant="outline"
+    >
       <HugeiconsIcon icon={NoteAddIcon} strokeWidth={2} />
       {session ? "Duplicate to my notes" : "Sign in to duplicate"}
     </Button>
   );
 }
 
-export function PublicShareView({ title, content, ownerName, updatedAt }: Props) {
+export function PublicShareView({
+  title,
+  content,
+  ownerName,
+  updatedAt,
+}: Props) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PublicShareHeader />
@@ -89,12 +103,10 @@ export function PublicShareView({ title, content, ownerName, updatedAt }: Props)
       <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h1 className="font-bold text-3xl">{title || "Untitled"}</h1>
+            <h1 className="font-semibold text-3xl">{title || "Untitled"}</h1>
             <p className="mt-2 text-muted-foreground text-sm">
               Shared by {ownerName} · Updated{" "}
-              {new Intl.DateTimeFormat(undefined, {
-                dateStyle: "medium",
-              }).format(updatedAt)}
+              {UPDATED_AT_FORMAT.format(updatedAt)}
             </p>
           </div>
           <DuplicateButton />
@@ -129,7 +141,7 @@ export function PublicShareNotFound() {
   return (
     <div className="grid min-h-screen place-items-center bg-background p-6 text-foreground">
       <div className="max-w-md text-center">
-        <h1 className="font-bold text-2xl">Link invalid or expired</h1>
+        <h1 className="font-semibold text-2xl">Link invalid or expired</h1>
         <p className="mt-2 text-muted-foreground text-sm">
           This share link is no longer available. Ask the owner to send a new
           one.
@@ -158,7 +170,7 @@ export function PublicShareError({ error }: { error: Error }) {
     return (
       <div className="grid min-h-screen place-items-center bg-background p-6 text-foreground">
         <div className="max-w-md text-center">
-          <h1 className="font-bold text-2xl">Too many requests</h1>
+          <h1 className="font-semibold text-2xl">Too many requests</h1>
           <p className="mt-2 text-muted-foreground text-sm">
             You've opened too many share links in a short window. Wait a minute
             and try again.

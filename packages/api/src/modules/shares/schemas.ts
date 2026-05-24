@@ -15,7 +15,12 @@ export function expiryPresetToDate(preset: ExpiryPreset): Date | null {
   if (preset === "none") {
     return null;
   }
-  const days = preset === "1d" ? 1 : preset === "7d" ? 7 : 30;
+  const daysByPreset: Record<Exclude<ExpiryPreset, "none">, number> = {
+    "1d": 1,
+    "7d": 7,
+    "30d": 30,
+  };
+  const days = daysByPreset[preset];
   const date = new Date();
   date.setUTCDate(date.getUTCDate() + days);
   return date;

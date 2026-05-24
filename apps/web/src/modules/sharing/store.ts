@@ -1,9 +1,9 @@
 import { create } from "zustand";
 
 interface SharePopoverStore {
-  openForNoteId: string | null;
-  open: (noteId: string) => void;
   close: () => void;
+  open: (noteId: string) => void;
+  openForNoteId: string | null;
 }
 
 export const useSharePopoverStore = create<SharePopoverStore>((set) => ({

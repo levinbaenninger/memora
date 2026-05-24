@@ -45,18 +45,87 @@ function buildShareUrl(token: string): string {
   return `${window.location.origin}/share/${token}`;
 }
 
+const EXPIRY_DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
+  dateStyle: "medium",
+});
+
 function formatExpiry(date: Date | null): string {
   if (!date) {
     return "Never expires";
   }
-  return `Expires ${new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-  }).format(date)}`;
+  return `Expires ${EXPIRY_DATE_FORMAT.format(date)}`;
 }
 
 interface Props {
   disabled?: boolean;
   noteId: string;
+}
+
+interface ShareRow {
+  expiresAt: Date | null;
+  id: string;
+  token: string;
+}
+
+function SharesList({
+  isLoading,
+  shares,
+  onCopy,
+  onRevoke,
+  revokePending,
+}: {
+  isLoading: boolean;
+  shares: ShareRow[];
+  onCopy: (token: string) => void;
+  onRevoke: (id: string) => void;
+  revokePending: boolean;
+}) {
+  if (isLoading) {
+    return <p className="py-2 text-muted-foreground text-xs">Loading…</p>;
+  }
+  if (shares.length === 0) {
+    return (
+      <p className="py-2 text-muted-foreground text-xs">
+        No active share links.
+      </p>
+    );
+  }
+  return (
+    <ul className="flex flex-col gap-1">
+      {shares.map((share) => (
+        <li
+          className="flex items-center gap-2 rounded-md border border-border px-2 py-1.5"
+          key={share.id}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-mono text-xs">
+              …/{share.token.slice(-8)}
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              {formatExpiry(share.expiresAt)}
+            </p>
+          </div>
+          <Button
+            aria-label="Copy share link"
+            onClick={() => onCopy(share.token)}
+            size="icon-xs"
+            variant="ghost"
+          >
+            <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />
+          </Button>
+          <Button
+            aria-label="Revoke share link"
+            disabled={revokePending}
+            onClick={() => onRevoke(share.id)}
+            size="icon-xs"
+            variant="ghost"
+          >
+            <HugeiconsIcon icon={Delete01Icon} strokeWidth={2} />
+          </Button>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export function SharePopover({ noteId, disabled }: Props) {
@@ -158,48 +227,13 @@ export function SharePopover({ noteId, disabled }: Props) {
         </div>
 
         <div className="-mx-1 max-h-64 overflow-y-auto px-1">
-          {sharesQuery.isLoading ? (
-            <p className="py-2 text-muted-foreground text-xs">Loading…</p>
-          ) : shares.length === 0 ? (
-            <p className="py-2 text-muted-foreground text-xs">
-              No active share links.
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-1">
-              {shares.map((share) => (
-                <li
-                  className="flex items-center gap-2 rounded-md border border-border px-2 py-1.5"
-                  key={share.id}
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-mono text-xs">
-                      …/{share.token.slice(-8)}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {formatExpiry(share.expiresAt)}
-                    </p>
-                  </div>
-                  <Button
-                    aria-label="Copy share link"
-                    onClick={() => handleCopy(share.token)}
-                    size="icon-xs"
-                    variant="ghost"
-                  >
-                    <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />
-                  </Button>
-                  <Button
-                    aria-label="Revoke share link"
-                    disabled={revokeShare.isPending}
-                    onClick={() => revokeShare.mutate({ id: share.id })}
-                    size="icon-xs"
-                    variant="ghost"
-                  >
-                    <HugeiconsIcon icon={Delete01Icon} strokeWidth={2} />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
+          <SharesList
+            isLoading={sharesQuery.isLoading}
+            onCopy={handleCopy}
+            onRevoke={(id) => revokeShare.mutate({ id })}
+            revokePending={revokeShare.isPending}
+            shares={shares}
+          />
         </div>
       </PopoverContent>
     </Popover>
