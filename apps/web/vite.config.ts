@@ -14,6 +14,7 @@ const blocknoteCommentsStub = fileURLToPath(
 
 const BLOCKNOTE_COMMENTS_CHUNK =
   /(?:^|[\\/])Floating(?:Thread|Composer)Controller(?:-[A-Za-z0-9_]+)?(?:\.js)?$/;
+const BLOCKNOTE_REACT_PATH = /@blocknote[\\/]react[\\/]/;
 
 function stubBlocknoteComments(): Plugin {
   return {
@@ -30,7 +31,7 @@ function stubBlocknoteComments(): Plugin {
         return null;
       }
       if (
-        /@blocknote[\\/]react[\\/]/.test(resolved.id) &&
+        BLOCKNOTE_REACT_PATH.test(resolved.id) &&
         BLOCKNOTE_COMMENTS_CHUNK.test(resolved.id)
       ) {
         return blocknoteCommentsStub;
