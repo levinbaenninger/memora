@@ -4,6 +4,7 @@ import { foldersRouter } from "./modules/folders/router";
 import { linksRouter } from "./modules/links/router";
 import { notesRouter } from "./modules/notes/router";
 import { recentVisitsRouter } from "./modules/recent-visits/router";
+import { sharesRouter } from "./modules/shares/router";
 import { tagsRouter } from "./modules/tags/router";
 
 export const appRouter = {
@@ -11,6 +12,7 @@ export const appRouter = {
     ...notesRouter,
     folders: foldersRouter,
     links: linksRouter,
+    shares: sharesRouter,
     tags: tagsRouter,
   },
   recentVisits: recentVisitsRouter,

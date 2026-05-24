@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareTokenRouteImport } from './routes/share/$token'
 import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
 import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
 import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
@@ -33,6 +34,11 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPathRouteRoute = AuthPathRouteRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AppNotesRouteRouteWithChildren
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/share/$token': typeof ShareTokenRoute
   '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRouteRoute
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/share/$token': typeof ShareTokenRoute
   '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/_app/notes': typeof AppNotesRouteRouteWithChildren
   '/_app/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/share/$token': typeof ShareTokenRoute
   '/_app/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/_app/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/tasks'
     | '/auth/$path'
+    | '/share/$token'
     | '/notes/$noteId'
     | '/settings/$path'
     | '/api/auth/$'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/tasks'
     | '/auth/$path'
+    | '/share/$token'
     | '/notes/$noteId'
     | '/settings/$path'
     | '/api/auth/$'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_app/notes'
     | '/_app/tasks'
     | '/auth/$path'
+    | '/share/$token'
     | '/_app/notes/$noteId'
     | '/_app/settings/$path'
     | '/api/auth/$'
@@ -216,6 +228,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthPathRouteRoute: typeof AuthPathRouteRoute
+  ShareTokenRoute: typeof ShareTokenRoute
   ApiAuthSplatRouteRoute: typeof ApiAuthSplatRouteRoute
   ApiRpcSplatRouteRoute: typeof ApiRpcSplatRouteRoute
 }
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/$path': {
@@ -383,6 +403,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
   AuthPathRouteRoute: AuthPathRouteRoute,
+  ShareTokenRoute: ShareTokenRoute,
   ApiAuthSplatRouteRoute: ApiAuthSplatRouteRoute,
   ApiRpcSplatRouteRoute: ApiRpcSplatRouteRoute,
 }
