@@ -74,11 +74,13 @@ function AppShellLayout() {
         navigate({ to: "/notes/$noteId", params: { noteId: id } });
       })
       .catch((error: unknown) => {
-        // Transient errors (rate limit, network) leave the token so a later
-        // visit can retry. Permanent ones (link revoked, expired, deleted)
-        // clear it so we don't toast the same error forever.
+        // Only clear the token for definite server-side failures (a
+        // structured error code that isn't a rate limit). Plain JS errors
+        // — network blips, parse errors, anything without a `code` — are
+        // treated as transient and leave the token in place so a later
+        // visit can retry.
         const code = (error as { code?: string } | null)?.code;
-        if (code !== "TOO_MANY_REQUESTS") {
+        if (code !== undefined && code !== "TOO_MANY_REQUESTS") {
           clearToken();
         }
         toast.error("Could not duplicate the shared note.");
