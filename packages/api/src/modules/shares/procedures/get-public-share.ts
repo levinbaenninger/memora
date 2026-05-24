@@ -5,6 +5,10 @@ import { db } from "@memora/db";
 import { user } from "@memora/db/schema/auth";
 import { notes, noteShares } from "@memora/db/schema";
 
+import {
+  consumeRateLimit,
+  extractClientIp,
+} from "../../../middlewares/rate-limit";
 import { base } from "../../../procedures/base";
 import { noteContentSchema } from "../../notes/content/schema";
 
@@ -19,13 +23,24 @@ export const getPublicShareResponseDtoSchema = z.object({
   updatedAt: z.date(),
 });
 
+const PUBLIC_SHARE_RATE_LIMIT = {
+  name: "shares.getPublic",
+  limit: 60,
+  windowMs: 60_000,
+};
+
 export const getPublicShare = base
   .input(getPublicShareRequestDtoSchema)
   .output(getPublicShareResponseDtoSchema)
   .errors({
     NOT_FOUND: { message: "Share link not found." },
+    TOO_MANY_REQUESTS: { message: "Too many requests. Try again later." },
   })
-  .handler(async ({ input, errors }) => {
+  .handler(async ({ context, input, errors }) => {
+    const ip = extractClientIp(context.reqHeaders);
+    if (!consumeRateLimit(ip, PUBLIC_SHARE_RATE_LIMIT)) {
+      throw errors.TOO_MANY_REQUESTS({});
+    }
     const now = new Date();
     const [row] = await db
       .select({

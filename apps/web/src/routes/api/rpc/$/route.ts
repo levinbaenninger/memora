@@ -6,11 +6,38 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 
 import { appRouter } from "@memora/api/router";
 
+// Redact long opaque-looking tokens (e.g. share tokens) from any string we log.
+// We err on the side of redacting too much: any 24+ char run of url-safe
+// alphanumerics is replaced. Share tokens are 32-char nanoids; nanoids used
+// for entity ids are 21 chars and stay intact.
+const TOKEN_RE = /[A-Za-z0-9_-]{24,}/g;
+
+function redact(value: unknown, seen = new WeakSet<object>()): unknown {
+  if (typeof value === "string") {
+    return value.replace(TOKEN_RE, "[redacted]");
+  }
+  if (value && typeof value === "object") {
+    if (seen.has(value as object)) {
+      return "[circular]";
+    }
+    seen.add(value as object);
+    if (Array.isArray(value)) {
+      return value.map((v) => redact(v, seen));
+    }
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = redact(v, seen);
+    }
+    return out;
+  }
+  return value;
+}
+
 const rpcHandler = new RPCHandler(appRouter, {
   plugins: [new RequestHeadersPlugin()],
   interceptors: [
     onError((error) => {
-      console.error(error);
+      console.error(redact(error));
     }),
   ],
 });

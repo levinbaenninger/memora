@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { notes, noteShares } from "@memora/db/schema";
 
+import { consumeRateLimit } from "../../../middlewares/rate-limit";
 import { authorized } from "../../../procedures/authorized";
 import { MAX_ACTIVE_SHARES_PER_NOTE } from "../constants";
 import { expiryPresetSchema, expiryPresetToDate, shareSchema } from "../schemas";
@@ -15,6 +16,12 @@ export const createShareRequestDtoSchema = z.object({
 
 export const createShareResponseDtoSchema = shareSchema;
 
+const CREATE_SHARE_RATE_LIMIT = {
+  name: "shares.create",
+  limit: 30,
+  windowMs: 60 * 60 * 1000,
+};
+
 export const createShare = authorized
   .input(createShareRequestDtoSchema)
   .output(createShareResponseDtoSchema)
@@ -22,9 +29,14 @@ export const createShare = authorized
     NOT_FOUND: {},
     BAD_REQUEST: {},
     INTERNAL_SERVER_ERROR: {},
+    TOO_MANY_REQUESTS: { message: "Too many requests. Try again later." },
   })
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
+
+    if (!consumeRateLimit(userId, CREATE_SHARE_RATE_LIMIT)) {
+      throw errors.TOO_MANY_REQUESTS({});
+    }
 
     const [note] = await db
       .select({ id: notes.id })
