@@ -3,7 +3,9 @@ import { isDefinedError, ORPCError } from "@orpc/client";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import {
+  PublicShareError,
   PublicShareNotFound,
+  PublicShareSkeleton,
   PublicShareView,
 } from "@/modules/sharing/ui/views/public-share-view";
 
@@ -38,7 +40,9 @@ export const Route = createFileRoute("/share/$token")({
     };
   },
   component: PublicShareRoute,
+  pendingComponent: PublicShareSkeleton,
   notFoundComponent: PublicShareNotFound,
+  errorComponent: PublicShareError,
 });
 
 function PublicShareRoute() {

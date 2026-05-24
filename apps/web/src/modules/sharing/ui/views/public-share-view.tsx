@@ -41,6 +41,30 @@ export function PublicShareView({ title, content, ownerName, updatedAt }: Props)
   );
 }
 
+export function PublicShareSkeleton() {
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-border border-b">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
+          <span className="font-semibold text-lg">Memora</span>
+          <span className="rounded-full border border-border px-3 py-1 text-muted-foreground text-xs">
+            Shared note
+          </span>
+        </div>
+      </header>
+      <main className="mx-auto max-w-3xl px-6 py-10">
+        <div className="h-8 w-2/3 animate-pulse rounded-md bg-muted" />
+        <div className="mt-3 h-4 w-1/3 animate-pulse rounded-md bg-muted" />
+        <div className="mt-8 flex flex-col gap-3">
+          <div className="h-4 w-full animate-pulse rounded-md bg-muted" />
+          <div className="h-4 w-11/12 animate-pulse rounded-md bg-muted" />
+          <div className="h-4 w-10/12 animate-pulse rounded-md bg-muted" />
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export function PublicShareNotFound() {
   return (
     <div className="grid min-h-screen place-items-center bg-background p-6 text-foreground">
@@ -59,4 +83,22 @@ export function PublicShareNotFound() {
       </div>
     </div>
   );
+}
+
+export function PublicShareError({ error }: { error: Error }) {
+  const code = (error as { code?: string } | null)?.code;
+  if (code === "TOO_MANY_REQUESTS") {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background p-6 text-foreground">
+        <div className="max-w-md text-center">
+          <h1 className="font-bold text-2xl">Too many requests</h1>
+          <p className="mt-2 text-muted-foreground text-sm">
+            You've opened too many share links in a short window. Wait a minute
+            and try again.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return <PublicShareNotFound />;
 }
