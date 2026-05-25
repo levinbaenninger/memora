@@ -67,6 +67,7 @@ export const auth = betterAuth({
     },
   },
   hooks: {
+    // biome-ignore lint/suspicious/useAwait: createAuthMiddleware requires an async handler
     before: createAuthMiddleware(async (ctx) => {
       const passwordField = ctx.path ? POLICY_PATHS[ctx.path] : undefined;
       if (!passwordField) {
