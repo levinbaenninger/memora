@@ -404,9 +404,10 @@ function PasswordPrompt({
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
       <FieldGroup>
-        <Field>
+        <Field data-invalid={!!error}>
           <Label htmlFor="two-factor-password">Current password</Label>
           <Input
+            aria-invalid={!!error}
             autoComplete="current-password"
             autoFocus
             id="two-factor-password"
@@ -460,9 +461,10 @@ function QrAndVerify({
       <Separator />
 
       <FieldGroup>
-        <Field>
+        <Field data-invalid={!!error}>
           <Label htmlFor="enrollment-code">Verification code</Label>
           <Input
+            aria-invalid={!!error}
             autoComplete="one-time-code"
             autoFocus
             id="enrollment-code"
