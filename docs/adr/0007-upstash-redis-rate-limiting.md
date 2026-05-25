@@ -25,7 +25,7 @@ A single `Ratelimit` instance per `name` is constructed lazily with `slidingWind
 ## Consequences
 
 - **New dependency**: `@upstash/ratelimit` and `@upstash/redis` added to `packages/api`.
-- **New required env vars** in `@memora/env/server`: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. Boot fails fast in any environment without them — including local dev. Contributors provision a free Upstash dev database; the README is updated with the setup step.
+- **New required env vars** in `@memora/env/server`: `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Boot fails fast in any environment without them — including local dev. Contributors provision a free Upstash dev database; the README is updated with the setup step.
 - **API shape change**: `consumeRateLimit` becomes async and returns `{ success, limit, remaining, reset }`. All three callsites in `packages/api/src/modules/shares/procedures/` (`create-share`, `duplicate-from-share`, `get-public-share`) await the call and, on denial, throw `ORPCError("TOO_MANY_REQUESTS", { data: { retryAfter } })` so clients see structured 429s with a retry hint.
 - **Key namespacing**: keys are `memora:${NODE_ENV}:${name}:${identifier}`. Prevents dev and prod cross-talk on a shared dev database and reserves headroom for future limiters outside the shares module.
 - **Identifier policy unchanged**: IP for the public share read (via `extractClientIp` reading `x-forwarded-for` then `x-real-ip`), `userId` for the authenticated write paths.
