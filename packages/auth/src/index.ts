@@ -68,22 +68,6 @@ export const auth = betterAuth({
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      if (ctx.path === "/two-factor/disable") {
-        const userId = ctx.context.session?.user?.id;
-        if (userId) {
-          const accounts =
-            await ctx.context.internalAdapter.findAccounts(userId);
-          if (accounts.some((account) => account.providerId === "credential")) {
-            throw new APIError("FORBIDDEN", {
-              code: "TWO_FACTOR_REQUIRED",
-              message:
-                "Two-factor authentication is required on accounts with a password and cannot be disabled.",
-            });
-          }
-        }
-        return;
-      }
-
       const passwordField = ctx.path ? POLICY_PATHS[ctx.path] : undefined;
       if (!passwordField) {
         return;

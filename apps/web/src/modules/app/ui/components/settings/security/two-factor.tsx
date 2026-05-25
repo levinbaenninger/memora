@@ -4,6 +4,7 @@ import { useListAccounts, useSession } from "@better-auth-ui/react";
 import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
 import { type SyntheticEvent, useState } from "react";
 import { toast } from "sonner";
@@ -34,15 +35,22 @@ type Step =
   | { kind: "password" }
   | { kind: "qr"; totpURI: string; backupCodes: string[] }
   | { kind: "backup-codes"; backupCodes: string[] }
-  | { kind: "regenerate-password" };
+  | { kind: "regenerate-password" }
+  | { kind: "disable-password" }
+  | { kind: "disable-confirm" };
 
 interface TwoFactorProps {
   className?: string;
 }
 
-function passwordPromptLabel(kind: "password" | "regenerate-password"): string {
+function passwordPromptLabel(
+  kind: "password" | "regenerate-password" | "disable-password"
+): string {
   if (kind === "password") {
     return "Continue";
+  }
+  if (kind === "disable-password") {
+    return "Disable";
   }
   return "Regenerate";
 }
@@ -51,6 +59,7 @@ export function TwoFactor({ className }: TwoFactorProps) {
   const { data: session, refetch: refetchSession } = useSession();
   const { data: accounts, isPending: accountsPending } = useListAccounts();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const refreshGuards = async () => {
     await Promise.all([
@@ -133,6 +142,35 @@ export function TwoFactor({ className }: TwoFactorProps) {
     toast.success("Two-factor authentication enabled.");
   };
 
+  const callDisable = async () => {
+    setPending(true);
+    setError(null);
+    const { error: disableError } = await authClient.twoFactor.disable({
+      password: hasCredentialAccount ? password : undefined,
+    });
+    setPending(false);
+
+    if (disableError) {
+      const message = disableError.message || "Could not disable 2FA.";
+      setError(message);
+      toast.error(message);
+      return;
+    }
+
+    setPassword("");
+    refetchSession?.();
+    await refreshGuards();
+
+    if (hasCredentialAccount) {
+      toast.success("Two-factor authentication reset. Set it up again.");
+      navigate({ to: "/auth/setup-2fa" });
+      return;
+    }
+
+    toast.success("Two-factor authentication disabled.");
+    reset();
+  };
+
   const callRegenerate = async () => {
     setPending(true);
     setError(null);
@@ -166,6 +204,16 @@ export function TwoFactor({ className }: TwoFactorProps) {
               disabled={!accountsLoaded}
               enabled={twoFactorEnabled}
               hasCredentialAccount={hasCredentialAccount}
+              onDisable={() => {
+                if (!accountsLoaded) {
+                  return;
+                }
+                if (hasCredentialAccount) {
+                  setStep({ kind: "disable-password" });
+                } else {
+                  setStep({ kind: "disable-confirm" });
+                }
+              }}
               onEnable={() => {
                 if (!accountsLoaded) {
                   return;
@@ -190,7 +238,8 @@ export function TwoFactor({ className }: TwoFactorProps) {
           )}
 
           {(step.kind === "password" ||
-            step.kind === "regenerate-password") && (
+            step.kind === "regenerate-password" ||
+            step.kind === "disable-password") && (
             <PasswordPrompt
               error={error}
               onCancel={reset}
@@ -198,14 +247,25 @@ export function TwoFactor({ className }: TwoFactorProps) {
                 event.preventDefault();
                 if (step.kind === "password") {
                   callEnable();
-                } else {
+                } else if (step.kind === "regenerate-password") {
                   callRegenerate();
+                } else {
+                  callDisable();
                 }
               }}
               password={password}
               pending={pending}
               setPassword={setPassword}
               submitLabel={passwordPromptLabel(step.kind)}
+            />
+          )}
+
+          {step.kind === "disable-confirm" && (
+            <DisableConfirm
+              error={error}
+              onCancel={reset}
+              onConfirm={callDisable}
+              pending={pending}
             />
           )}
 
@@ -232,13 +292,15 @@ export function TwoFactor({ className }: TwoFactorProps) {
 function IdleView({
   disabled,
   enabled,
-  hasCredentialAccount: _hasCredentialAccount,
+  hasCredentialAccount,
+  onDisable,
   onEnable,
   onRegenerate,
 }: {
   disabled: boolean;
   enabled: boolean;
   hasCredentialAccount: boolean;
+  onDisable: () => void;
   onEnable: () => void;
   onRegenerate: () => void;
 }) {
@@ -258,12 +320,13 @@ function IdleView({
     );
   }
 
+  const description = hasCredentialAccount
+    ? "Two-factor authentication is active. Resetting starts the setup again with a fresh authenticator secret and backup codes."
+    : "Two-factor authentication is active on this account.";
+
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-muted-foreground text-sm">
-        Two-factor authentication is active on this account and cannot be
-        disabled.
-      </p>
+      <p className="text-muted-foreground text-sm">{description}</p>
       <div className="flex flex-wrap gap-2">
         <Button
           disabled={disabled}
@@ -272,6 +335,49 @@ function IdleView({
           variant="outline"
         >
           Regenerate backup codes
+        </Button>
+        <Button
+          disabled={disabled}
+          onClick={onDisable}
+          type="button"
+          variant="destructive"
+        >
+          Disable
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function DisableConfirm({
+  error,
+  onCancel,
+  onConfirm,
+  pending,
+}: {
+  error: string | null;
+  onCancel: () => void;
+  onConfirm: () => void;
+  pending: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-muted-foreground text-sm">
+        Disable two-factor authentication? Your authenticator and backup codes
+        will stop working. You can re-enable it at any time.
+      </p>
+      {error && <p className="text-destructive text-sm">{error}</p>}
+      <div className="flex gap-2">
+        <Button
+          disabled={pending}
+          onClick={onConfirm}
+          type="button"
+          variant="destructive"
+        >
+          {pending ? <Spinner /> : "Disable"}
+        </Button>
+        <Button onClick={onCancel} type="button" variant="ghost">
+          Cancel
         </Button>
       </div>
     </div>
