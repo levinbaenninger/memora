@@ -15,19 +15,16 @@ export const user = pgTable("user", {
     .notNull(),
 });
 
-export const twoFactor = pgTable(
-  "two_factor",
-  {
-    id: text("id").primaryKey(),
-    userId: text("user_id")
-      .notNull()
-      .unique()
-      .references(() => user.id, { onDelete: "cascade" }),
-    secret: text("secret").notNull(),
-    backupCodes: text("backup_codes").notNull(),
-    verified: boolean("verified").default(false).notNull(),
-  }
-);
+export const twoFactor = pgTable("two_factor", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  secret: text("secret").notNull(),
+  backupCodes: text("backup_codes").notNull(),
+  verified: boolean("verified").default(false).notNull(),
+});
 
 export const session = pgTable(
   "session",
