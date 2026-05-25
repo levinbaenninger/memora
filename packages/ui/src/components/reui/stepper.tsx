@@ -4,8 +4,8 @@ import {
   type HTMLAttributes,
   isValidElement,
   type ReactElement,
+  use,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -24,12 +24,15 @@ type StepIndicators = {
   loading?: React.ReactNode
 }
 
+const EMPTY_INDICATORS: StepIndicators = {}
+
 interface StepperContextValue {
   activeStep: number
   setActiveStep: (step: number) => void
   stepsCount: number
   orientation: StepperOrientation
-  registerTrigger: (node: HTMLButtonElement | null) => void
+  registerTrigger: (node: HTMLButtonElement) => void
+  unregisterTrigger: (node: HTMLButtonElement) => void
   triggerNodes: HTMLButtonElement[]
   focusNext: (currentIdx: number) => void
   focusPrev: (currentIdx: number) => void
@@ -51,13 +54,13 @@ const StepItemContext = createContext<StepItemContextValue | undefined>(
 )
 
 function useStepper() {
-  const ctx = useContext(StepperContext)
+  const ctx = use(StepperContext)
   if (!ctx) throw new Error("useStepper must be used within a Stepper")
   return ctx
 }
 
 function useStepItem() {
-  const ctx = useContext(StepItemContext)
+  const ctx = use(StepItemContext)
   if (!ctx) throw new Error("useStepItem must be used within a StepperItem")
   return ctx
 }
@@ -77,23 +80,18 @@ function Stepper({
   orientation = "horizontal",
   className,
   children,
-  indicators = {},
+  indicators = EMPTY_INDICATORS,
   ...props
 }: StepperProps) {
   const [activeStep, setActiveStep] = useState(defaultValue)
   const [triggerNodes, setTriggerNodes] = useState<HTMLButtonElement[]>([])
 
-  // Register/unregister triggers
-  const registerTrigger = useCallback((node: HTMLButtonElement | null) => {
-    setTriggerNodes((prev) => {
-      if (node && !prev.includes(node)) {
-        return [...prev, node]
-      } else if (!node && prev.includes(node!)) {
-        return prev.filter((n) => n !== node)
-      } else {
-        return prev
-      }
-    })
+  const registerTrigger = useCallback((node: HTMLButtonElement) => {
+    setTriggerNodes((prev) => (prev.includes(node) ? prev : [...prev, node]))
+  }, [])
+
+  const unregisterTrigger = useCallback((node: HTMLButtonElement) => {
+    setTriggerNodes((prev) => prev.filter((n) => n !== node))
   }, [])
 
   const handleSetActiveStep = useCallback(
@@ -108,29 +106,46 @@ function Stepper({
 
   const currentStep = value ?? activeStep
 
-  // Keyboard navigation logic
-  const focusTrigger = (idx: number) => {
-    if (triggerNodes[idx]) triggerNodes[idx].focus()
-  }
-  const focusNext = (currentIdx: number) =>
-    focusTrigger((currentIdx + 1) % triggerNodes.length)
-  const focusPrev = (currentIdx: number) =>
-    focusTrigger((currentIdx - 1 + triggerNodes.length) % triggerNodes.length)
-  const focusFirst = () => focusTrigger(0)
-  const focusLast = () => focusTrigger(triggerNodes.length - 1)
+  const focusNext = useCallback(
+    (currentIdx: number) => {
+      const next = (currentIdx + 1) % triggerNodes.length
+      triggerNodes[next]?.focus()
+    },
+    [triggerNodes]
+  )
+  const focusPrev = useCallback(
+    (currentIdx: number) => {
+      const prev =
+        (currentIdx - 1 + triggerNodes.length) % triggerNodes.length
+      triggerNodes[prev]?.focus()
+    },
+    [triggerNodes]
+  )
+  const focusFirst = useCallback(() => {
+    triggerNodes[0]?.focus()
+  }, [triggerNodes])
+  const focusLast = useCallback(() => {
+    triggerNodes[triggerNodes.length - 1]?.focus()
+  }, [triggerNodes])
 
-  // Context value
-  const contextValue = useMemo<StepperContextValue>(
-    () => ({
-      activeStep: currentStep,
-      setActiveStep: handleSetActiveStep,
-      stepsCount: Children.toArray(children).filter(
+  const stepsCount = useMemo(
+    () =>
+      Children.toArray(children).filter(
         (child): child is ReactElement =>
           isValidElement(child) &&
           (child.type as { displayName?: string }).displayName === "StepperItem"
       ).length,
+    [children]
+  )
+
+  const contextValue = useMemo<StepperContextValue>(
+    () => ({
+      activeStep: currentStep,
+      setActiveStep: handleSetActiveStep,
+      stepsCount,
       orientation,
       registerTrigger,
+      unregisterTrigger,
       focusNext,
       focusPrev,
       focusFirst,
@@ -141,10 +156,16 @@ function Stepper({
     [
       currentStep,
       handleSetActiveStep,
-      children,
+      stepsCount,
       orientation,
       registerTrigger,
+      unregisterTrigger,
+      focusNext,
+      focusPrev,
+      focusFirst,
+      focusLast,
       triggerNodes,
+      indicators,
     ]
   )
 
@@ -191,10 +212,13 @@ function StepperItem({
 
   const isLoading = loading && step === activeStep
 
+  const itemContextValue = useMemo<StepItemContextValue>(
+    () => ({ step, state, isDisabled: disabled, isLoading }),
+    [step, state, disabled, isLoading]
+  )
+
   return (
-    <StepItemContext.Provider
-      value={{ step, state, isDisabled: disabled, isLoading }}
-    >
+    <StepItemContext.Provider value={itemContextValue}>
       <div
         data-slot="stepper-item"
         className={cn(
@@ -228,6 +252,7 @@ function StepperTrigger({
     setActiveStep,
     activeStep,
     registerTrigger,
+    unregisterTrigger,
     triggerNodes,
     focusNext,
     focusPrev,
@@ -239,19 +264,17 @@ function StepperTrigger({
   const id = `stepper-tab-${step}`
   const panelId = `stepper-panel-${step}`
 
-  // Register this trigger for keyboard navigation
   const btnRef = useRef<HTMLButtonElement>(null)
   useEffect(() => {
-    if (btnRef.current) {
-      registerTrigger(btnRef.current)
-    }
-  }, [btnRef.current])
+    const node = btnRef.current
+    if (!node) return
+    registerTrigger(node)
+    return () => unregisterTrigger(node)
+  }, [registerTrigger, unregisterTrigger])
 
-  // Find our index among triggers for navigation
   const myIdx = useMemo(
-    () =>
-      triggerNodes.findIndex((n: HTMLButtonElement) => n === btnRef.current),
-    [triggerNodes, btnRef.current]
+    () => triggerNodes.findIndex((n) => n === btnRef.current),
+    [triggerNodes]
   )
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -297,6 +320,7 @@ function StepperTrigger({
   return (
     <button
       ref={btnRef}
+      type="button"
       role="tab"
       id={id}
       aria-selected={isSelected}

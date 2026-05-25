@@ -93,6 +93,3 @@ export function usePasswordRequirementsVisibility(password: string) {
   }
 }
 
-export function isPasswordPolicyValid(password: string): boolean {
-  return PASSWORD_RULES.every((rule) => rule.test(password))
-}

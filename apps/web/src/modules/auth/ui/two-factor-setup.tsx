@@ -409,10 +409,12 @@ function BackupCodesStep({
           Copy all
         </Button>
       </div>
-      <label className="flex items-start gap-2 text-sm">
+      <label className="flex items-start gap-2 text-sm" htmlFor="codes-saved">
         <input
+          aria-label="I have saved these codes in a safe place"
           checked={saved}
           className="mt-1"
+          id="codes-saved"
           onChange={(event) => setSaved(event.target.checked)}
           type="checkbox"
         />

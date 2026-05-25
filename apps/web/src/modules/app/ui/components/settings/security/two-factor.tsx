@@ -486,7 +486,7 @@ function BackupCodes({
           Copy all
         </Button>
         <Button onClick={onDone} type="button">
-          Done
+          Close backup codes
         </Button>
       </div>
     </div>

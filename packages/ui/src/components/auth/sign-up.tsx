@@ -28,9 +28,9 @@ import { cn } from "@memora/ui/lib/utils"
 import { Label } from "@memora/ui/components/label"
 import {
   PasswordRequirements,
-  isPasswordPolicyValid,
   usePasswordRequirementsVisibility
 } from "./password-requirements"
+import { isPasswordPolicyValid } from "@memora/ui/lib/password-policy"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 type SignUpProps = {

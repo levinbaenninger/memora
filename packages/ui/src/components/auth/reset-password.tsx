@@ -24,9 +24,9 @@ import { cn } from "@memora/ui/lib/utils"
 import { Label } from "@memora/ui/components/label"
 import {
   PasswordRequirements,
-  isPasswordPolicyValid,
   usePasswordRequirementsVisibility
 } from "./password-requirements"
+import { isPasswordPolicyValid } from "@memora/ui/lib/password-policy"
 
 type ResetPasswordProps = {
   className?: string

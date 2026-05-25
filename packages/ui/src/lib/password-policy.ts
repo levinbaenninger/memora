@@ -66,6 +66,10 @@ export function evaluatePassword(password: string): PasswordPolicyResult {
   return { valid: failed.length === 0, failed };
 }
 
+export function isPasswordPolicyValid(password: string): boolean {
+  return PASSWORD_RULES.every((rule) => rule.test(password));
+}
+
 export function describePolicyFailure(failed: PasswordRuleId[]): string {
   if (failed.length === 0) {
     return "Password does not meet the policy.";

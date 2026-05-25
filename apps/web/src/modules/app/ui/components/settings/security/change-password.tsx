@@ -10,7 +10,6 @@ import { type SyntheticEvent, useReducer } from "react";
 import { toast } from "sonner";
 
 import {
-  isPasswordPolicyValid,
   PasswordRequirements,
   usePasswordRequirementsVisibility,
 } from "@memora/ui/components/auth/password-requirements";
@@ -26,6 +25,7 @@ import {
 } from "@memora/ui/components/input-group";
 import { Label } from "@memora/ui/components/label";
 import { Spinner } from "@memora/ui/components/spinner";
+import { isPasswordPolicyValid } from "@memora/ui/lib/password-policy";
 import { cn } from "@memora/ui/lib/utils";
 
 interface ChangePasswordProps {
