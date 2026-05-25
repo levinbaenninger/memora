@@ -6,6 +6,7 @@ import { ActiveSessions } from "./active-sessions";
 import { ChangePassword } from "./change-password";
 import { DangerZone } from "./danger-zone";
 import { LinkedAccounts } from "./linked-accounts";
+import { TwoFactor } from "./two-factor";
 
 interface SecuritySettingsProps {
   className?: string;
@@ -27,6 +28,7 @@ export function SecuritySettings({ className }: SecuritySettingsProps) {
     <div className={cn("flex w-full flex-col gap-4 md:gap-6", className)}>
       {emailAndPassword?.enabled && <ChangePassword />}
       {!!socialProviders?.length && <LinkedAccounts />}
+      <TwoFactor />
       <ActiveSessions />
       {deleteUser?.enabled && <DangerZone />}
     </div>

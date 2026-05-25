@@ -9,6 +9,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { type SyntheticEvent, useReducer } from "react";
 import { toast } from "sonner";
 
+import {
+  PasswordRequirements,
+  usePasswordRequirementsVisibility,
+} from "@memora/ui/components/auth/password-requirements";
 import { Button } from "@memora/ui/components/button";
 import { Card, CardContent, CardFooter } from "@memora/ui/components/card";
 import { Field, FieldError } from "@memora/ui/components/field";
@@ -21,6 +25,7 @@ import {
 } from "@memora/ui/components/input-group";
 import { Label } from "@memora/ui/components/label";
 import { Spinner } from "@memora/ui/components/spinner";
+import { isPasswordPolicyValid } from "@memora/ui/lib/password-policy";
 import { cn } from "@memora/ui/lib/utils";
 
 interface ChangePasswordProps {
@@ -181,6 +186,7 @@ function ChangePasswordForm({
   const { currentPassword, newPassword, confirmPassword } = values;
   const isNewPasswordVisible = visible.newPassword;
   const isConfirmPasswordVisible = visible.confirmPassword;
+  const passwordVisibility = usePasswordRequirementsVisibility(newPassword);
 
   const { mutate: changePassword, isPending } = useChangePassword({
     onError: (error) => {
@@ -265,6 +271,7 @@ function ChangePasswordForm({
               {session ? (
                 <InputGroup>
                   <InputGroupInput
+                    aria-describedby="password-requirements"
                     aria-invalid={!!fieldErrors.newPassword}
                     autoComplete="new-password"
                     disabled={isPending}
@@ -272,6 +279,7 @@ function ChangePasswordForm({
                     maxLength={emailAndPassword.maxPasswordLength}
                     minLength={emailAndPassword.minPasswordLength}
                     name="newPassword"
+                    onBlur={passwordVisibility.onBlur}
                     onChange={(e) =>
                       dispatch({
                         type: "setValue",
@@ -279,6 +287,7 @@ function ChangePasswordForm({
                         value: e.target.value,
                       })
                     }
+                    onFocus={passwordVisibility.onFocus}
                     onInvalid={(e) => {
                       e.preventDefault();
                       dispatch({
@@ -316,6 +325,15 @@ function ChangePasswordForm({
                 </InputGroup>
               ) : (
                 <Input disabled id="newPassword" />
+              )}
+
+              {passwordVisibility.shown && (
+                <PasswordRequirements
+                  alwaysVisible
+                  className="mt-1"
+                  id="password-requirements"
+                  password={newPassword}
+                />
               )}
 
               <FieldError>{fieldErrors.newPassword}</FieldError>
@@ -389,7 +407,13 @@ function ChangePasswordForm({
           </CardContent>
 
           <CardFooter>
-            <Button disabled={isPending || !session} size="sm" type="submit">
+            <Button
+              disabled={
+                isPending || !session || !isPasswordPolicyValid(newPassword)
+              }
+              size="sm"
+              type="submit"
+            >
               {isPending && <Spinner />}
 
               {localization.settings.updatePassword}

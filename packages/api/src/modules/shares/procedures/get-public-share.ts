@@ -34,12 +34,18 @@ export const getPublicShare = base
   .output(getPublicShareResponseDtoSchema)
   .errors({
     NOT_FOUND: { message: "Share link not found." },
-    TOO_MANY_REQUESTS: { message: "Too many requests. Try again later." },
+    TOO_MANY_REQUESTS: {
+      message: "Too many requests. Try again later.",
+      data: z.object({ retryAfter: z.number() }),
+    },
   })
   .handler(async ({ context, input, errors }) => {
     const ip = extractClientIp(context.reqHeaders);
-    if (!consumeRateLimit(ip, PUBLIC_SHARE_RATE_LIMIT)) {
-      throw errors.TOO_MANY_REQUESTS({});
+    const rl = await consumeRateLimit(ip, PUBLIC_SHARE_RATE_LIMIT);
+    if (!rl.success) {
+      throw errors.TOO_MANY_REQUESTS({
+        data: { retryAfter: Math.max(0, rl.reset - Date.now()) },
+      });
     }
     const now = new Date();
     const [row] = await db

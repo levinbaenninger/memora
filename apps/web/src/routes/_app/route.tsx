@@ -34,6 +34,29 @@ export const Route = createFileRoute("/_app")({
         to: "/auth/$path",
       });
     }
+
+    const twoFactorEnabled = Boolean(
+      (session.user as { twoFactorEnabled?: boolean | null }).twoFactorEnabled
+    );
+    if (!twoFactorEnabled) {
+      const accounts = await context.queryClient.ensureQueryData({
+        queryKey: ["auth", "accounts", session.user.id],
+        queryFn: async () => {
+          const { data } = await authClient.listAccounts();
+          return data ?? [];
+        },
+        staleTime: 5 * 60 * 1000,
+      });
+      const hasCredential = accounts.some(
+        (account) => account.providerId === "credential"
+      );
+      if (hasCredential) {
+        throw redirect({
+          replace: true,
+          to: "/auth/setup-2fa",
+        });
+      }
+    }
   },
   component: AppShellLayout,
 });

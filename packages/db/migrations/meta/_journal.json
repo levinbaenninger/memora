@@ -43,6 +43,41 @@
       "when": 1779622561806,
       "tag": "0005_absurd_marvel_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779699397163,
+      "tag": "0006_demonic_paladin",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1779699525379,
+      "tag": "0007_clumsy_dakota_north",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1779705229141,
+      "tag": "0008_young_warhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1779721608629,
+      "tag": "0009_serious_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1779727828829,
+      "tag": "0010_magical_captain_flint",
+      "breakpoints": true
     }
   ]
 }

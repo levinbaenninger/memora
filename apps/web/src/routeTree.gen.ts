@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShareTokenRouteImport } from './routes/share/$token'
+import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
+import { Route as AuthSetup2faRouteImport } from './routes/auth/setup-2fa'
 import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
 import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
 import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
@@ -39,6 +41,16 @@ const IndexRoute = IndexRouteImport.update({
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthTwoFactorRoute = AuthTwoFactorRouteImport.update({
+  id: '/auth/two-factor',
+  path: '/auth/two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSetup2faRoute = AuthSetup2faRouteImport.update({
+  id: '/auth/setup-2fa',
+  path: '/auth/setup-2fa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPathRouteRoute = AuthPathRouteRouteImport.update({
@@ -118,6 +130,8 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AppNotesRouteRouteWithChildren
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/setup-2fa': typeof AuthSetup2faRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
   '/share/$token': typeof ShareTokenRoute
   '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
@@ -135,6 +149,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRouteRoute
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/setup-2fa': typeof AuthSetup2faRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
   '/share/$token': typeof ShareTokenRoute
   '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
@@ -155,6 +171,8 @@ export interface FileRoutesById {
   '/_app/notes': typeof AppNotesRouteRouteWithChildren
   '/_app/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/setup-2fa': typeof AuthSetup2faRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
   '/share/$token': typeof ShareTokenRoute
   '/_app/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/_app/settings/$path': typeof AppSettingsPathRouteRoute
@@ -175,6 +193,8 @@ export interface FileRouteTypes {
     | '/notes'
     | '/tasks'
     | '/auth/$path'
+    | '/auth/setup-2fa'
+    | '/auth/two-factor'
     | '/share/$token'
     | '/notes/$noteId'
     | '/settings/$path'
@@ -192,6 +212,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/tasks'
     | '/auth/$path'
+    | '/auth/setup-2fa'
+    | '/auth/two-factor'
     | '/share/$token'
     | '/notes/$noteId'
     | '/settings/$path'
@@ -211,6 +233,8 @@ export interface FileRouteTypes {
     | '/_app/notes'
     | '/_app/tasks'
     | '/auth/$path'
+    | '/auth/setup-2fa'
+    | '/auth/two-factor'
     | '/share/$token'
     | '/_app/notes/$noteId'
     | '/_app/settings/$path'
@@ -228,6 +252,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthPathRouteRoute: typeof AuthPathRouteRoute
+  AuthSetup2faRoute: typeof AuthSetup2faRoute
+  AuthTwoFactorRoute: typeof AuthTwoFactorRoute
   ShareTokenRoute: typeof ShareTokenRoute
   ApiAuthSplatRouteRoute: typeof ApiAuthSplatRouteRoute
   ApiRpcSplatRouteRoute: typeof ApiRpcSplatRouteRoute
@@ -254,6 +280,20 @@ declare module '@tanstack/react-router' {
       path: '/share/$token'
       fullPath: '/share/$token'
       preLoaderRoute: typeof ShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/two-factor': {
+      id: '/auth/two-factor'
+      path: '/auth/two-factor'
+      fullPath: '/auth/two-factor'
+      preLoaderRoute: typeof AuthTwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/setup-2fa': {
+      id: '/auth/setup-2fa'
+      path: '/auth/setup-2fa'
+      fullPath: '/auth/setup-2fa'
+      preLoaderRoute: typeof AuthSetup2faRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/$path': {
@@ -403,6 +443,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
   AuthPathRouteRoute: AuthPathRouteRoute,
+  AuthSetup2faRoute: AuthSetup2faRoute,
+  AuthTwoFactorRoute: AuthTwoFactorRoute,
   ShareTokenRoute: ShareTokenRoute,
   ApiAuthSplatRouteRoute: ApiAuthSplatRouteRoute,
   ApiRpcSplatRouteRoute: ApiRpcSplatRouteRoute,

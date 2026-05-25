@@ -72,12 +72,8 @@ export function useUpdateNote() {
       },
       onError: (error) => {
         // Note hard-deleted between debounce and mutation — silently drop.
-        if (
-          error &&
-          typeof error === "object" &&
-          "code" in error &&
-          (error as { code?: string }).code === "NOT_FOUND"
-        ) {
+        const code = (error as { code?: string } | null)?.code;
+        if (code === "NOT_FOUND") {
           setSaveStatus("idle");
           return;
         }

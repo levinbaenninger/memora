@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 
 import { AuthProvider } from "@memora/ui/components/auth/auth-provider";
 import { Toaster } from "@memora/ui/components/sonner";
@@ -11,6 +11,15 @@ import { authClient } from "@/modules/auth/client";
 export function Providers({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    const handler = () => {
+      navigate({ to: "/auth/two-factor" });
+    };
+    window.addEventListener("memora:two-factor-redirect", handler);
+    return () =>
+      window.removeEventListener("memora:two-factor-redirect", handler);
+  }, [navigate]);
 
   return (
     <AuthProvider

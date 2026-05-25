@@ -15,9 +15,12 @@
   "dependencies": {
     "@memora/auth": "workspace:*",
     "@memora/db": "workspace:*",
+    "@memora/redis": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
+    "@sentry/core": "catalog:",
+    "@upstash/ratelimit": "catalog:",
     "drizzle-orm": "catalog:",
     "zod": "catalog:"
   },
