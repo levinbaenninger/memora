@@ -3,13 +3,20 @@
 import { dash } from "@better-auth/infra";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
+import { haveIBeenPwned } from "better-auth/plugins/haveibeenpwned";
 import { oAuthProxy } from "better-auth/plugins/oauth-proxy";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
 import { db } from "@memora/db";
 import * as schema from "@memora/db/schema/auth";
 import { env } from "@memora/env/server";
+import {
+  describePolicyFailure,
+  evaluatePassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+} from "@memora/ui/lib/password-policy";
 
 import {
   sendChangeEmailConfirmation,
@@ -19,6 +26,12 @@ import {
 } from "./emails";
 import { redisSecondaryStorage } from "./redis-secondary-storage";
 
+const POLICY_PATHS: Record<string, "password" | "newPassword"> = {
+  "/sign-up/email": "password",
+  "/change-password": "newPassword",
+  "/reset-password": "newPassword",
+};
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -27,6 +40,8 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    minPasswordLength: MIN_PASSWORD_LENGTH,
+    maxPasswordLength: MAX_PASSWORD_LENGTH,
     sendResetPassword: async ({ user, url }) => {
       await sendResetPasswordEmail(user.email, url);
     },
@@ -49,6 +64,27 @@ export const auth = betterAuth({
     },
   },
   hooks: {
+    // biome-ignore lint/suspicious/useAwait: createAuthMiddleware requires an async function.
+    before: createAuthMiddleware(async (ctx) => {
+      const passwordField = ctx.path ? POLICY_PATHS[ctx.path] : undefined;
+      if (!passwordField) {
+        return;
+      }
+
+      const body = ctx.body as Record<string, unknown> | undefined;
+      const password = body?.[passwordField];
+      if (typeof password !== "string") {
+        return;
+      }
+
+      const result = evaluatePassword(password);
+      if (!result.valid) {
+        throw new APIError("BAD_REQUEST", {
+          code: "PASSWORD_POLICY_VIOLATION",
+          message: describePolicyFailure(result.failed),
+        });
+      }
+    }),
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/change-password") {
         const session = ctx.context.session;
@@ -106,6 +142,10 @@ export const auth = betterAuth({
     oAuthProxy({
       productionURL: "https://memora.baenninger.me",
       secret: env.OAUTH_PROXY_SECRET ?? env.BETTER_AUTH_SECRET,
+    }),
+    haveIBeenPwned({
+      customPasswordCompromisedMessage:
+        "This password appeared in a known data breach. Pick another.",
     }),
     dash(),
   ],

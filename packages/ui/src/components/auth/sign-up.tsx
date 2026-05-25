@@ -26,6 +26,11 @@ import {
 import { Spinner } from "@memora/ui/components/spinner"
 import { cn } from "@memora/ui/lib/utils"
 import { Label } from "@memora/ui/components/label"
+import {
+  PasswordRequirements,
+  isPasswordPolicyValid,
+  usePasswordRequirementsVisibility
+} from "./password-requirements"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 type SignUpProps = {
@@ -291,7 +296,10 @@ export function SignUp({
                 )}
 
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" disabled={isPending}>
+                  <Button
+                    type="submit"
+                    disabled={isPending || !isPasswordPolicyValid(password)}
+                  >
                     {isPending && <Spinner />}
 
                     {localization.auth.signUp}
@@ -538,6 +546,8 @@ function PasswordField({
   localization,
   dispatch
 }: PasswordFieldProps) {
+  const visibility = usePasswordRequirementsVisibility(password)
+
   return (
     <Field data-invalid={!!error}>
       <Label htmlFor="password">{localization.auth.password}</Label>
@@ -552,6 +562,9 @@ function PasswordField({
           onChange={(e) => {
             dispatch({ type: "setPassword", value: e.target.value })
           }}
+          onFocus={visibility.onFocus}
+          onBlur={visibility.onBlur}
+          aria-describedby="password-requirements"
           placeholder={localization.auth.passwordPlaceholder}
           required
           minLength={emailAndPassword?.minPasswordLength}
@@ -589,6 +602,15 @@ function PasswordField({
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>
+
+      {visibility.shown && (
+        <PasswordRequirements
+          id="password-requirements"
+          password={password}
+          alwaysVisible
+          className="mt-1"
+        />
+      )}
 
       <FieldError>{error}</FieldError>
     </Field>

@@ -22,6 +22,11 @@ import {
 import { Spinner } from "@memora/ui/components/spinner"
 import { cn } from "@memora/ui/lib/utils"
 import { Label } from "@memora/ui/components/label"
+import {
+  PasswordRequirements,
+  isPasswordPolicyValid,
+  usePasswordRequirementsVisibility
+} from "./password-requirements"
 
 type ResetPasswordProps = {
   className?: string
@@ -54,6 +59,9 @@ export function ResetPassword({ className }: ResetPasswordProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
+  const [password, setPassword] = useState("")
+
+  const passwordVisibility = usePasswordRequirementsVisibility(password)
 
   const [fieldErrors, setFieldErrors] = useState<{
     password?: string
@@ -88,7 +96,6 @@ export function ResetPassword({ className }: ResetPasswordProps) {
     }
 
     const formData = new FormData(e.currentTarget)
-    const password = formData.get("password") as string
     const confirmPassword = formData.get("confirmPassword") as string
 
     if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
@@ -124,7 +131,12 @@ export function ResetPassword({ className }: ResetPasswordProps) {
                   minLength={emailAndPassword?.minPasswordLength}
                   maxLength={emailAndPassword?.maxPasswordLength}
                   disabled={isPending}
-                  onChange={() => {
+                  value={password}
+                  onFocus={passwordVisibility.onFocus}
+                  onBlur={passwordVisibility.onBlur}
+                  aria-describedby="password-requirements"
+                  onChange={(e) => {
+                    setPassword(e.target.value)
                     setFieldErrors((prev) => ({
                       ...prev,
                       password: undefined
@@ -161,6 +173,15 @@ export function ResetPassword({ className }: ResetPasswordProps) {
                   </InputGroupButton>
                 </InputGroupAddon>
               </InputGroup>
+
+              {passwordVisibility.shown && (
+                <PasswordRequirements
+                  id="password-requirements"
+                  password={password}
+                  alwaysVisible
+                  className="mt-1"
+                />
+              )}
 
               <FieldError>{fieldErrors.password}</FieldError>
             </Field>
@@ -226,7 +247,10 @@ export function ResetPassword({ className }: ResetPasswordProps) {
             )}
 
             <div className="flex flex-col gap-3">
-              <Button type="submit" disabled={isPending}>
+              <Button
+                type="submit"
+                disabled={isPending || !isPasswordPolicyValid(password)}
+              >
                 {isPending && <Spinner />}
 
                 {localization.auth.resetPassword}
