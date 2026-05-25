@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_app")({
     );
     if (!twoFactorEnabled) {
       const accounts = await context.queryClient.ensureQueryData({
-        queryKey: ["auth", "accounts"],
+        queryKey: ["auth", "accounts", session.user.id],
         queryFn: async () => {
           const { data } = await authClient.listAccounts();
           return data ?? [];

@@ -56,19 +56,27 @@ export function TwoFactorChallenge({ className }: { className?: string }) {
         ? client.twoFactor.verifyTotp
         : client.twoFactor.verifyBackupCode;
 
-    const { error: verifyError } = await verify({ code, trustDevice });
-    setPending(false);
+    try {
+      const { error: verifyError } = await verify({ code, trustDevice });
 
-    if (verifyError) {
-      const message = verifyError.message || "Invalid code. Try again.";
+      if (verifyError) {
+        const message = verifyError.message || "Invalid code. Try again.";
+        setError(message);
+        toast.error(message);
+        setCode("");
+        return;
+      }
+
+      toast.success("Verified.");
+      navigate({ to: redirectTo || "/dashboard" });
+    } catch {
+      const message = "Could not verify code. Check your connection and try again.";
       setError(message);
       toast.error(message);
       setCode("");
-      return;
+    } finally {
+      setPending(false);
     }
-
-    toast.success("Verified.");
-    navigate({ to: redirectTo || "/dashboard" });
   };
 
   const inputLabel = mode === "totp" ? "Authenticator code" : "Backup code";

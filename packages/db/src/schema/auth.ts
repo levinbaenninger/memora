@@ -21,6 +21,7 @@ export const twoFactor = pgTable(
     id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
+      .unique()
       .references(() => user.id, { onDelete: "cascade" }),
     secret: text("secret").notNull(),
     backupCodes: text("backup_codes").notNull(),

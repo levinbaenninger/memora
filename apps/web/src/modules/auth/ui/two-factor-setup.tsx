@@ -53,11 +53,12 @@ export function TwoFactorSetup() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { refetch: refetchSession } = useSession();
-  const { data: accounts } = useListAccounts();
+  const { data: accounts, isPending: accountsPending } = useListAccounts();
 
-  const hasCredentialAccount = accounts?.some(
-    (account) => account.providerId === "credential"
-  );
+  const accountsLoaded = !accountsPending && accounts != null;
+  const hasCredentialAccount =
+    accountsLoaded &&
+    accounts.some((account) => account.providerId === "credential");
 
   const [step, setStep] = useState<Step>({ kind: "password" });
   const [password, setPassword] = useState("");
@@ -68,6 +69,9 @@ export function TwoFactorSetup() {
 
   const callEnable = async (event: SyntheticEvent) => {
     event.preventDefault();
+    if (!accountsLoaded) {
+      return;
+    }
     setPending(true);
     setError(null);
     const { data, error: enableError } = await authClient.twoFactor.enable({
@@ -146,8 +150,9 @@ export function TwoFactorSetup() {
 
         {step.kind === "password" && (
           <PasswordStep
+            accountsLoaded={accountsLoaded}
             error={error}
-            hasCredentialAccount={Boolean(hasCredentialAccount)}
+            hasCredentialAccount={hasCredentialAccount}
             onSubmit={callEnable}
             password={password}
             pending={pending}
@@ -221,6 +226,7 @@ function StepIndicator({ current }: { current: Step["kind"] }) {
 }
 
 function PasswordStep({
+  accountsLoaded,
   password,
   setPassword,
   onSubmit,
@@ -228,6 +234,7 @@ function PasswordStep({
   hasCredentialAccount,
   error,
 }: {
+  accountsLoaded: boolean;
   password: string;
   setPassword: (value: string) => void;
   onSubmit: (event: SyntheticEvent) => void;
@@ -235,6 +242,14 @@ function PasswordStep({
   hasCredentialAccount: boolean;
   error: string | null;
 }) {
+  if (!accountsLoaded) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <Spinner />
+      </div>
+    );
+  }
+
   if (!hasCredentialAccount) {
     return (
       <form className="flex flex-col gap-4" onSubmit={onSubmit}>

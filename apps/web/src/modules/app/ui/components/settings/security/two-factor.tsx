@@ -49,7 +49,7 @@ function passwordPromptLabel(kind: "password" | "regenerate-password"): string {
 
 export function TwoFactor({ className }: TwoFactorProps) {
   const { data: session, refetch: refetchSession } = useSession();
-  const { data: accounts } = useListAccounts();
+  const { data: accounts, isPending: accountsPending } = useListAccounts();
   const queryClient = useQueryClient();
 
   const refreshGuards = async () => {
@@ -63,9 +63,10 @@ export function TwoFactor({ className }: TwoFactorProps) {
     (session?.user as { twoFactorEnabled?: boolean } | undefined)
       ?.twoFactorEnabled
   );
-  const hasCredentialAccount = accounts?.some(
-    (account) => account.providerId === "credential"
-  );
+  const accountsLoaded = !accountsPending && accounts != null;
+  const hasCredentialAccount =
+    accountsLoaded &&
+    accounts.some((account) => account.providerId === "credential");
 
   const [step, setStep] = useState<Step>({ kind: "idle" });
   const [password, setPassword] = useState("");
@@ -162,9 +163,13 @@ export function TwoFactor({ className }: TwoFactorProps) {
         <CardContent className="flex flex-col gap-4">
           {step.kind === "idle" && (
             <IdleView
+              disabled={!accountsLoaded}
               enabled={twoFactorEnabled}
-              hasCredentialAccount={Boolean(hasCredentialAccount)}
+              hasCredentialAccount={hasCredentialAccount}
               onEnable={() => {
+                if (!accountsLoaded) {
+                  return;
+                }
                 if (hasCredentialAccount) {
                   setStep({ kind: "password" });
                 } else {
@@ -172,6 +177,9 @@ export function TwoFactor({ className }: TwoFactorProps) {
                 }
               }}
               onRegenerate={() => {
+                if (!accountsLoaded) {
+                  return;
+                }
                 if (hasCredentialAccount) {
                   setStep({ kind: "regenerate-password" });
                 } else {
@@ -222,11 +230,13 @@ export function TwoFactor({ className }: TwoFactorProps) {
 }
 
 function IdleView({
+  disabled,
   enabled,
   hasCredentialAccount: _hasCredentialAccount,
   onEnable,
   onRegenerate,
 }: {
+  disabled: boolean;
   enabled: boolean;
   hasCredentialAccount: boolean;
   onEnable: () => void;
@@ -240,7 +250,7 @@ function IdleView({
           1Password, Authy, or Google Authenticator.
         </p>
         <div>
-          <Button onClick={onEnable} type="button">
+          <Button disabled={disabled} onClick={onEnable} type="button">
             Enable two-factor authentication
           </Button>
         </div>
@@ -255,7 +265,12 @@ function IdleView({
         disabled.
       </p>
       <div className="flex flex-wrap gap-2">
-        <Button onClick={onRegenerate} type="button" variant="outline">
+        <Button
+          disabled={disabled}
+          onClick={onRegenerate}
+          type="button"
+          variant="outline"
+        >
           Regenerate backup codes
         </Button>
       </div>
