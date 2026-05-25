@@ -1,9 +1,11 @@
 import {
   Children,
+  cloneElement,
   createContext,
   type HTMLAttributes,
   isValidElement,
   type ReactElement,
+  type Ref,
   use,
   useCallback,
   useEffect,
@@ -305,43 +307,55 @@ function StepperTrigger({
     }
   }
 
-  if (asChild) {
-    return (
-      <span
-        data-slot="stepper-trigger"
-        data-state={state}
-        className={className}
-      >
-        {children}
-      </span>
-    )
+  const mergedClassName = cn(
+    "focus-visible:border-ring focus-visible:ring-ring/50 inline-flex cursor-pointer items-center outline-none focus-visible:z-10 focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-60",
+    "gap-2.5 rounded-full",
+    className
+  )
+
+  const triggerProps = {
+    ref: btnRef as Ref<HTMLButtonElement>,
+    type: "button" as const,
+    role: "tab",
+    id,
+    "aria-selected": isSelected,
+    "aria-controls": panelId,
+    tabIndex: typeof tabIndex === "number" ? tabIndex : isSelected ? 0 : -1,
+    "data-slot": "stepper-trigger",
+    "data-state": state,
+    "data-loading": isLoading,
+    className: mergedClassName,
+    onClick: () => setActiveStep(step),
+    onKeyDown: handleKeyDown,
+    disabled: isDisabled,
+    ...props,
   }
 
-  return (
-    <button
-      ref={btnRef}
-      type="button"
-      role="tab"
-      id={id}
-      aria-selected={isSelected}
-      aria-controls={panelId}
-      tabIndex={typeof tabIndex === "number" ? tabIndex : isSelected ? 0 : -1}
-      data-slot="stepper-trigger"
-      data-state={state}
-      data-loading={isLoading}
-      className={cn(
-        "focus-visible:border-ring focus-visible:ring-ring/50 inline-flex cursor-pointer items-center outline-none focus-visible:z-10 focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-60",
-        "gap-2.5 rounded-full",
-        className
-      )}
-      onClick={() => setActiveStep(step)}
-      onKeyDown={handleKeyDown}
-      disabled={isDisabled}
-      {...props}
+  if (asChild) {
+    const child = Children.only(children) as ReactElement<
+      Record<string, unknown> & { ref?: Ref<HTMLButtonElement> }
     >
-      {children}
-    </button>
-  )
+    return cloneElement(child, {
+      ...child.props,
+      ...triggerProps,
+      ref: btnRef,
+      onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+        ;(child.props.onClick as
+          | ((e: React.MouseEvent<HTMLButtonElement>) => void)
+          | undefined)?.(e)
+        if (!e.defaultPrevented) setActiveStep(step)
+      },
+      onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
+        ;(child.props.onKeyDown as
+          | ((e: React.KeyboardEvent<HTMLButtonElement>) => void)
+          | undefined)?.(e)
+        if (!e.defaultPrevented) handleKeyDown(e)
+      },
+      className: cn(mergedClassName, child.props.className as string | undefined),
+    })
+  }
+
+  return <button {...triggerProps}>{children}</button>
 }
 
 function StepperIndicator({
