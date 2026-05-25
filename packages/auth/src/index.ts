@@ -4,8 +4,10 @@ import { dash } from "@better-auth/infra";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
+import { deleteSessionCookie } from "better-auth/cookies";
 import { haveIBeenPwned } from "better-auth/plugins/haveibeenpwned";
 import { oAuthProxy } from "better-auth/plugins/oauth-proxy";
+import { twoFactor } from "better-auth/plugins/two-factor";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
 import { db } from "@memora/db";
@@ -33,6 +35,7 @@ const POLICY_PATHS: Record<string, "password" | "newPassword"> = {
 };
 
 export const auth = betterAuth({
+  appName: "Memora",
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,
@@ -64,8 +67,23 @@ export const auth = betterAuth({
     },
   },
   hooks: {
-    // biome-ignore lint/suspicious/useAwait: createAuthMiddleware requires an async function.
     before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/two-factor/disable") {
+        const userId = ctx.context.session?.user?.id;
+        if (userId) {
+          const accounts =
+            await ctx.context.internalAdapter.findAccounts(userId);
+          if (accounts.some((account) => account.providerId === "credential")) {
+            throw new APIError("FORBIDDEN", {
+              code: "TWO_FACTOR_REQUIRED",
+              message:
+                "Two-factor authentication is required on accounts with a password and cannot be disabled.",
+            });
+          }
+        }
+        return;
+      }
+
       const passwordField = ctx.path ? POLICY_PATHS[ctx.path] : undefined;
       if (!passwordField) {
         return;
@@ -91,6 +109,45 @@ export const auth = betterAuth({
         if (session?.user?.email) {
           await sendPasswordChangedEmail(session.user.email);
         }
+        return;
+      }
+
+      // OAuth/social sign-in does not natively trigger Better Auth's 2FA
+      // challenge. Mirror the plugin's `/sign-in/email` after-hook for the
+      // OAuth callback paths so users with 2FA enabled get the same
+      // challenge regardless of how they signed in.
+      if (
+        ctx.path === "/callback/:id" ||
+        ctx.path === "/oauth-proxy-callback"
+      ) {
+        const newSession = ctx.context.newSession;
+        if (!newSession?.user.twoFactorEnabled) {
+          return;
+        }
+
+        deleteSessionCookie(ctx, true);
+        await ctx.context.internalAdapter.deleteSession(
+          newSession.session.token
+        );
+
+        const maxAge = 600;
+        const twoFactorCookie = ctx.context.createAuthCookie("two_factor", {
+          maxAge,
+        });
+        const identifier = `2fa-${crypto.randomUUID().replace(/-/g, "")}`;
+        await ctx.context.internalAdapter.createVerificationValue({
+          value: newSession.user.id,
+          identifier,
+          expiresAt: new Date(Date.now() + maxAge * 1000),
+        });
+        await ctx.setSignedCookie(
+          twoFactorCookie.name,
+          identifier,
+          ctx.context.secret,
+          twoFactorCookie.attributes
+        );
+
+        throw ctx.redirect("/auth/two-factor");
       }
     }),
   },
@@ -146,6 +203,13 @@ export const auth = betterAuth({
     haveIBeenPwned({
       customPasswordCompromisedMessage:
         "This password appeared in a known data breach. Pick another.",
+    }),
+    twoFactor({
+      issuer: "Memora",
+      allowPasswordless: true,
+      backupCodeOptions: {
+        storeBackupCodes: "encrypted",
+      },
     }),
     dash(),
   ],

@@ -1,9 +1,17 @@
 import { sentinelClient } from "@better-auth/infra/client";
+import { twoFactorClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { toast } from "sonner";
 
 export const authClient = createAuthClient({
-  plugins: [sentinelClient()],
+  plugins: [
+    sentinelClient(),
+    twoFactorClient({
+      onTwoFactorRedirect() {
+        window.dispatchEvent(new CustomEvent("memora:two-factor-redirect"));
+      },
+    }),
+  ],
   fetchOptions: {
     onError: ({ response }) => {
       if (response.status !== 429) {
