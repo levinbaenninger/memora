@@ -14,11 +14,12 @@ import { toast } from "sonner";
 
 import { AppShell } from "@/modules/app/ui/views/app-shell";
 import { authClient } from "@/modules/auth/client";
+import { safeRedirect } from "@/modules/auth/safe-redirect";
 import { PENDING_DUPLICATE_TOKEN_KEY } from "@/modules/sharing/pending-duplicate";
 import { client } from "@/utils/orpc";
 
 export const Route = createFileRoute("/_app")({
-  async beforeLoad({ context }) {
+  async beforeLoad({ context, location }) {
     const session = await context.queryClient.ensureQueryData({
       queryKey: ["auth", "session"],
       queryFn: async () => {
@@ -27,10 +28,12 @@ export const Route = createFileRoute("/_app")({
       },
       staleTime: 5 * 60 * 1000,
     });
+    const redirectTarget = safeRedirect(location.href);
     if (!session) {
       throw redirect({
         params: { path: viewPaths.auth.signIn },
         replace: true,
+        search: { redirect: redirectTarget },
         to: "/auth/$path",
       });
     }
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/_app")({
       if (hasCredential) {
         throw redirect({
           replace: true,
+          search: { redirect: redirectTarget },
           to: "/auth/setup-2fa",
         });
       }
