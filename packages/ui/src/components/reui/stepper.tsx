@@ -335,21 +335,29 @@ function StepperTrigger({
     const child = Children.only(children) as ReactElement<
       Record<string, unknown> & { ref?: Ref<HTMLButtonElement> }
     >
+    const childOnClick = child.props.onClick as
+      | ((e: React.MouseEvent<HTMLButtonElement>) => void)
+      | undefined
+    const childOnKeyDown = child.props.onKeyDown as
+      | ((e: React.KeyboardEvent<HTMLButtonElement>) => void)
+      | undefined
+    const propsOnClick = props.onClick
+    const propsOnKeyDown = props.onKeyDown
+    const resolvedDisabled = props.disabled ?? isDisabled
     return cloneElement(child, {
       ...child.props,
       ...triggerProps,
       ref: btnRef,
+      disabled: resolvedDisabled,
       onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-        ;(child.props.onClick as
-          | ((e: React.MouseEvent<HTMLButtonElement>) => void)
-          | undefined)?.(e)
-        if (!e.defaultPrevented) setActiveStep(step)
+        childOnClick?.(e)
+        propsOnClick?.(e)
+        if (!e.defaultPrevented && !resolvedDisabled) setActiveStep(step)
       },
       onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
-        ;(child.props.onKeyDown as
-          | ((e: React.KeyboardEvent<HTMLButtonElement>) => void)
-          | undefined)?.(e)
-        if (!e.defaultPrevented) handleKeyDown(e)
+        childOnKeyDown?.(e)
+        propsOnKeyDown?.(e)
+        if (!e.defaultPrevented && !resolvedDisabled) handleKeyDown(e)
       },
       className: cn(mergedClassName, child.props.className as string | undefined),
     })
