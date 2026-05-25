@@ -17,6 +17,7 @@ import {
   sendResetPasswordEmail,
   sendVerificationEmail,
 } from "./emails";
+import { redisSecondaryStorage } from "./redis-secondary-storage";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -56,6 +57,32 @@ export const auth = betterAuth({
         }
       }
     }),
+  },
+  secondaryStorage: redisSecondaryStorage,
+  // Keep sessions + verification tokens in Postgres alongside Redis. Without
+  // these flags Better Auth strips both tables from its internal schema when
+  // `secondaryStorage` is set (see @better-auth/core/db/get-tables), which
+  // breaks any path that does `getDefaultModelName("session")`. Redis still
+  // acts as a session cache; the DB remains the source of truth.
+  session: { storeSessionInDatabase: true },
+  verification: { storeInDatabase: true },
+  rateLimit: {
+    enabled: true,
+    storage: "secondary-storage",
+    window: 60,
+    max: 100,
+    customRules: {
+      "/sign-in/email": { window: 60, max: 5 },
+      "/sign-up/email": { window: 60 * 60, max: 10 },
+      "/forget-password": { window: 60 * 60, max: 5 },
+      "/reset-password": { window: 60 * 60, max: 5 },
+      "/two-factor/*": { window: 60, max: 5 },
+    },
+  },
+  advanced: {
+    ipAddress: {
+      ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
+    },
   },
   secret: env.BETTER_AUTH_SECRET,
   baseURL: {

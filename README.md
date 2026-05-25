@@ -38,6 +38,7 @@ CONTEXT.md           Domain language and relationships
 - Bun `1.3.13` (pinned via `packageManager`)
 - Node.js `>= 24.3.0`
 - A PostgreSQL database (Neon recommended)
+- An Upstash Redis database (free tier) for rate limiting — required in all environments. Create one at <https://console.upstash.com> and grab the REST URL + token from the database's REST API panel.
 
 ## Getting Started
 

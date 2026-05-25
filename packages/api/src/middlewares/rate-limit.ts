@@ -1,20 +1,7 @@
-interface Bucket {
-  count: number;
-  resetAt: number;
-}
+import { captureException } from "@sentry/core";
+import { Ratelimit } from "@upstash/ratelimit";
 
-const buckets = new Map<string, Bucket>();
-
-function sweep(now: number) {
-  if (buckets.size < 1024) {
-    return;
-  }
-  for (const [key, bucket] of buckets) {
-    if (bucket.resetAt <= now) {
-      buckets.delete(key);
-    }
-  }
-}
+import { redis } from "@memora/redis";
 
 export interface RateLimitOptions {
   /** Max requests allowed within the window. */
@@ -25,27 +12,53 @@ export interface RateLimitOptions {
   windowMs: number;
 }
 
-/** Returns true if the request is within budget, false if it exceeded the limit. */
-export function consumeRateLimit(
+export type RateLimitResult = Awaited<ReturnType<Ratelimit["limit"]>>;
+
+const limiters = new Map<string, Ratelimit>();
+const ephemeralCache = new Map<string, number>();
+const isProd = process.env.NODE_ENV === "production";
+const keyPrefix = `memora:${process.env.NODE_ENV ?? "development"}`;
+
+function getLimiter(opts: RateLimitOptions): Ratelimit {
+  const cacheKey = `${opts.name}:${opts.limit}:${opts.windowMs}`;
+  const existing = limiters.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+  const limiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(opts.limit, `${opts.windowMs} ms`),
+    prefix: `${keyPrefix}:${opts.name}`,
+    ephemeralCache,
+    analytics: isProd,
+    timeout: 1000,
+  });
+  limiters.set(cacheKey, limiter);
+  return limiter;
+}
+
+/**
+ * Fail-closed rate limit check backed by Upstash Redis.
+ *
+ * On Redis error or timeout, returns `success: false` so callers reject the
+ * request. The error is reported to Sentry so outages surface immediately.
+ */
+export async function consumeRateLimit(
   identifier: string,
   opts: RateLimitOptions
-): boolean {
-  const now = Date.now();
-  sweep(now);
-  const key = `${opts.name}:${identifier}`;
-  const bucket = buckets.get(key);
-
-  if (!bucket || bucket.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + opts.windowMs });
-    return true;
+): Promise<RateLimitResult> {
+  try {
+    return await getLimiter(opts).limit(identifier);
+  } catch (err) {
+    captureException(err, { tags: { rateLimiter: opts.name } });
+    return {
+      success: false,
+      limit: opts.limit,
+      remaining: 0,
+      reset: Date.now() + opts.windowMs,
+      pending: Promise.resolve(),
+    };
   }
-
-  if (bucket.count >= opts.limit) {
-    return false;
-  }
-
-  bucket.count += 1;
-  return true;
 }
 
 export function extractClientIp(headers: Headers | undefined): string {
