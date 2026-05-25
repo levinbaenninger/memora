@@ -50,7 +50,7 @@ function passwordPromptLabel(
     return "Continue";
   }
   if (kind === "disable-password") {
-    return "Disable";
+    return "Reset";
   }
   return "Regenerate";
 }
@@ -342,7 +342,7 @@ function IdleView({
           type="button"
           variant="destructive"
         >
-          Disable
+          {hasCredentialAccount ? "Reset" : "Disable"}
         </Button>
       </div>
     </div>
