@@ -241,6 +241,7 @@ export function TwoFactor({ className }: TwoFactorProps) {
             step.kind === "regenerate-password" ||
             step.kind === "disable-password") && (
             <PasswordPrompt
+              clearError={() => setError(null)}
               error={error}
               onCancel={reset}
               onSubmit={(event) => {
@@ -271,6 +272,7 @@ export function TwoFactor({ className }: TwoFactorProps) {
 
           {step.kind === "qr" && (
             <QrAndVerify
+              clearError={() => setError(null)}
               code={verifyCode}
               error={error}
               onSubmit={callVerifyEnrollment}
@@ -376,7 +378,12 @@ function DisableConfirm({
         >
           {pending ? <Spinner /> : "Disable"}
         </Button>
-        <Button onClick={onCancel} type="button" variant="ghost">
+        <Button
+          disabled={pending}
+          onClick={onCancel}
+          type="button"
+          variant="ghost"
+        >
           Cancel
         </Button>
       </div>
@@ -392,6 +399,7 @@ function PasswordPrompt({
   pending,
   submitLabel,
   error,
+  clearError,
 }: {
   password: string;
   setPassword: (value: string) => void;
@@ -400,6 +408,7 @@ function PasswordPrompt({
   pending: boolean;
   submitLabel: string;
   error: string | null;
+  clearError: () => void;
 }) {
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
@@ -411,7 +420,12 @@ function PasswordPrompt({
             autoComplete="current-password"
             autoFocus
             id="two-factor-password"
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => {
+              if (error) {
+                clearError();
+              }
+              setPassword(event.target.value);
+            }}
             required
             type="password"
             value={password}
@@ -423,7 +437,12 @@ function PasswordPrompt({
         <Button disabled={pending || !password} type="submit">
           {pending ? <Spinner /> : submitLabel}
         </Button>
-        <Button onClick={onCancel} type="button" variant="ghost">
+        <Button
+          disabled={pending}
+          onClick={onCancel}
+          type="button"
+          variant="ghost"
+        >
           Cancel
         </Button>
       </div>
@@ -438,6 +457,7 @@ function QrAndVerify({
   onSubmit,
   pending,
   error,
+  clearError,
 }: {
   totpURI: string;
   code: string;
@@ -445,6 +465,7 @@ function QrAndVerify({
   onSubmit: (event: SyntheticEvent) => void;
   pending: boolean;
   error: string | null;
+  clearError: () => void;
 }) {
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
@@ -469,7 +490,12 @@ function QrAndVerify({
             autoFocus
             id="enrollment-code"
             inputMode="numeric"
-            onChange={(event) => setCode(event.target.value.trim())}
+            onChange={(event) => {
+              if (error) {
+                clearError();
+              }
+              setCode(event.target.value.trim());
+            }}
             placeholder="123456"
             required
             value={code}
