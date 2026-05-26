@@ -1,4 +1,5 @@
 const DEFAULT_REDIRECT = "/dashboard";
+const AUTH_PATH_PATTERN = /^\/auth(\/|$|[?#])/;
 
 export function safeRedirect(input: unknown): string {
   if (typeof input !== "string" || input.length === 0) {
@@ -12,7 +13,7 @@ export function safeRedirect(input: unknown): string {
     return DEFAULT_REDIRECT;
   }
   // Don't loop back into the auth flow.
-  if (/^\/auth(\/|$|[?#])/.test(input)) {
+  if (AUTH_PATH_PATTERN.test(input)) {
     return DEFAULT_REDIRECT;
   }
   return input;
