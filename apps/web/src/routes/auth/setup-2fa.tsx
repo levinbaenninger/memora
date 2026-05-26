@@ -1,12 +1,20 @@
 import { viewPaths } from "@better-auth-ui/react/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { z } from "zod";
 
 import { authClient } from "@/modules/auth/client";
+import { safeRedirect } from "@/modules/auth/safe-redirect";
 import { TwoFactorSetup } from "@/modules/auth/ui/two-factor-setup";
+
+const setupSearchSchema = z.object({
+  redirect: z.string().optional(),
+});
 
 export const Route = createFileRoute("/auth/setup-2fa")({
   ssr: false,
-  async beforeLoad({ context }) {
+  validateSearch: (search: Record<string, unknown>) =>
+    setupSearchSchema.parse(search),
+  async beforeLoad({ context, search }) {
     const session = await context.queryClient.ensureQueryData({
       queryKey: ["auth", "session"],
       queryFn: async () => {
@@ -19,6 +27,7 @@ export const Route = createFileRoute("/auth/setup-2fa")({
       throw redirect({
         params: { path: viewPaths.auth.signIn },
         replace: true,
+        search: { redirect: safeRedirect(search.redirect) },
         to: "/auth/$path",
       });
     }
@@ -26,7 +35,7 @@ export const Route = createFileRoute("/auth/setup-2fa")({
       (session.user as { twoFactorEnabled?: boolean | null }).twoFactorEnabled
     );
     if (twoFactorEnabled) {
-      throw redirect({ replace: true, to: "/dashboard" });
+      throw redirect({ replace: true, to: safeRedirect(search.redirect) });
     }
   },
   head: () => ({

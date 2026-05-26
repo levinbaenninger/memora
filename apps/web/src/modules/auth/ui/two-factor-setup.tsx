@@ -4,7 +4,7 @@ import { useListAccounts, useSession } from "@better-auth-ui/react";
 import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
 import { type SyntheticEvent, useState } from "react";
 import { toast } from "sonner";
@@ -38,6 +38,7 @@ import { Separator } from "@memora/ui/components/separator";
 import { Spinner } from "@memora/ui/components/spinner";
 
 import { authClient } from "@/modules/auth/client";
+import { safeRedirect } from "@/modules/auth/safe-redirect";
 
 type Step =
   | { kind: "password" }
@@ -51,6 +52,8 @@ interface EnableResponse {
 
 export function TwoFactorSetup() {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { redirect?: unknown };
+  const redirectTarget = safeRedirect(search?.redirect);
   const queryClient = useQueryClient();
   const { refetch: refetchSession } = useSession();
   const { data: accounts, isPending: accountsPending } = useListAccounts();
@@ -127,7 +130,7 @@ export function TwoFactorSetup() {
 
   const handleFinish = async () => {
     await queryClient.refetchQueries({ queryKey: ["auth", "session"] });
-    navigate({ to: "/dashboard" });
+    navigate({ to: redirectTarget });
   };
 
   const handleSignOut = async () => {
