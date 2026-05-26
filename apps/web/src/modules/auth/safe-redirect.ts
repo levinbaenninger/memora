@@ -12,7 +12,7 @@ export function safeRedirect(input: unknown): string {
     return DEFAULT_REDIRECT;
   }
   // Don't loop back into the auth flow.
-  if (input.startsWith("/auth/") || input === "/auth") {
+  if (/^\/auth(\/|$|[?#])/.test(input)) {
     return DEFAULT_REDIRECT;
   }
   return input;
