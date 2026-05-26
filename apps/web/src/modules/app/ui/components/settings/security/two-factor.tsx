@@ -145,30 +145,33 @@ export function TwoFactor({ className }: TwoFactorProps) {
   const callDisable = async () => {
     setPending(true);
     setError(null);
-    const { error: disableError } = await authClient.twoFactor.disable({
-      password: hasCredentialAccount ? password : undefined,
-    });
-    setPending(false);
+    try {
+      const { error: disableError } = await authClient.twoFactor.disable({
+        password: hasCredentialAccount ? password : undefined,
+      });
 
-    if (disableError) {
-      const message = disableError.message || "Could not disable 2FA.";
-      setError(message);
-      toast.error(message);
-      return;
+      if (disableError) {
+        const message = disableError.message || "Could not disable 2FA.";
+        setError(message);
+        toast.error(message);
+        return;
+      }
+
+      setPassword("");
+      refetchSession?.();
+      await refreshGuards();
+
+      if (hasCredentialAccount) {
+        toast.success("Two-factor authentication reset. Set it up again.");
+        await navigate({ to: "/auth/setup-2fa" });
+        return;
+      }
+
+      toast.success("Two-factor authentication disabled.");
+      reset();
+    } finally {
+      setPending(false);
     }
-
-    setPassword("");
-    refetchSession?.();
-    await refreshGuards();
-
-    if (hasCredentialAccount) {
-      toast.success("Two-factor authentication reset. Set it up again.");
-      navigate({ to: "/auth/setup-2fa" });
-      return;
-    }
-
-    toast.success("Two-factor authentication disabled.");
-    reset();
   };
 
   const callRegenerate = async () => {
