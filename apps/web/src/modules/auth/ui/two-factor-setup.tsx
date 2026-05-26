@@ -270,9 +270,10 @@ function PasswordStep({
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
       <FieldGroup>
-        <Field>
+        <Field data-invalid={!!error}>
           <Label htmlFor="setup-password">Current password</Label>
           <Input
+            aria-invalid={!!error}
             autoComplete="current-password"
             autoFocus
             id="setup-password"
@@ -331,9 +332,10 @@ function QrStep({
       <Separator />
 
       <FieldGroup>
-        <Field>
+        <Field data-invalid={!!error}>
           <Label htmlFor="enrollment-code">Verification code</Label>
           <Input
+            aria-invalid={!!error}
             autoComplete="one-time-code"
             autoFocus
             id="enrollment-code"

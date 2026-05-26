@@ -90,14 +90,20 @@ export function TwoFactorChallenge({ className }: { className?: string }) {
       <CardContent>
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <FieldGroup>
-            <Field>
+            <Field data-invalid={!!error}>
               <Label htmlFor="two-factor-code">{inputLabel}</Label>
               <Input
+                aria-invalid={!!error}
                 autoComplete="one-time-code"
                 autoFocus
                 id="two-factor-code"
                 inputMode={mode === "totp" ? "numeric" : "text"}
-                onChange={(event) => setCode(event.target.value.trim())}
+                onChange={(event) => {
+                  setCode(event.target.value.trim());
+                  if (error) {
+                    setError(null);
+                  }
+                }}
                 placeholder={inputPlaceholder}
                 required
                 value={code}
