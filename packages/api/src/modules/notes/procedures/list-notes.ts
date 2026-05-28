@@ -7,8 +7,8 @@ import { noteFolders, notes, notesToTags, noteTags } from "@memora/db/schema";
 
 import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../../folders/schemas";
+import { tagSchema } from "../../note-tags/schemas";
 import { paginationSchema } from "../../shared/pagination";
-import { tagSchema } from "../../tags/schemas";
 import { noteSchema } from "../schemas";
 
 export const listNotesRequestDtoSchema = paginationSchema.extend({
