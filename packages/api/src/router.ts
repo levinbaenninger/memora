@@ -6,6 +6,7 @@ import { tagsRouter } from "./modules/note-tags/router";
 import { notesRouter } from "./modules/notes/router";
 import { recentVisitsRouter } from "./modules/recent-visits/router";
 import { sharesRouter } from "./modules/shares/router";
+import { tagsRouter as taskTagsRouter } from "./modules/task-tags/router";
 
 export const appRouter = {
   notes: {
@@ -16,6 +17,9 @@ export const appRouter = {
     tags: tagsRouter,
   },
   recentVisits: recentVisitsRouter,
+  tasks: {
+    tags: taskTagsRouter,
+  },
 };
 
 export type AppRouter = typeof appRouter;
