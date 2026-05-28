@@ -12,7 +12,6 @@ import { toast } from "sonner";
 
 import { Button } from "@memora/ui/components/button";
 import { Card, CardContent } from "@memora/ui/components/card";
-import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
@@ -73,7 +72,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
           </span>
 
           {account && isLoadingInfo ? (
-            <Skeleton className="my-0.5 h-3 w-24" />
+            <Spinner className="my-0.5 size-3 text-muted-foreground" />
           ) : (
             <span className="truncate text-muted-foreground text-xs">
               {account

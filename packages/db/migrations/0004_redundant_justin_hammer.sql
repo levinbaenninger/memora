@@ -1,0 +1,2 @@
+CREATE TYPE "public"."recent_visit_entity_type" AS ENUM('note', 'folder', 'tag');--> statement-breakpoint
+ALTER TABLE "recent_visits" ALTER COLUMN "entity_type" SET DATA TYPE "public"."recent_visit_entity_type" USING "entity_type"::"public"."recent_visit_entity_type";

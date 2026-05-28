@@ -1,0 +1,1 @@
+export const MAX_ACTIVE_SHARES_PER_NOTE = 50;

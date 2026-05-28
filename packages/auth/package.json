@@ -18,7 +18,9 @@
     "@memora/db": "workspace:*",
     "@memora/email": "workspace:*",
     "@memora/env": "workspace:*",
+    "@memora/redis": "workspace:*",
     "@memora/ui": "workspace:*",
+    "@sentry/core": "catalog:",
     "better-auth": "catalog:",
     "react": "catalog:",
     "zod": "catalog:"

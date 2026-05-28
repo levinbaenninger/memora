@@ -1,5 +1,15 @@
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  isNull,
+  or,
+  sql,
+} from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@memora/db";
@@ -14,6 +24,9 @@ import { noteSchema } from "../schemas";
 export const searchNotesRequestDtoSchema = paginationSchema.extend({
   folderId: z.nanoid().nullish(),
   includeArchived: z.boolean().default(false),
+  archivedOnly: z.boolean().default(false),
+  pinned: z.boolean().optional(),
+  favorite: z.boolean().optional(),
   query: z.string().trim().min(1).max(200),
   tagIds: z.array(z.nanoid()).max(25).default([]),
 });
@@ -93,7 +106,9 @@ export const searchNotes = authorized
 
     const where: SQL[] = [eq(notes.userId, userId), searchWhere];
 
-    if (!input.includeArchived) {
+    if (input.archivedOnly) {
+      where.push(isNotNull(notes.archivedAt));
+    } else if (!input.includeArchived) {
       where.push(isNull(notes.archivedAt));
     }
 
@@ -107,6 +122,14 @@ export const searchNotes = authorized
 
     if (candidateNoteIds) {
       where.push(inArray(notes.id, candidateNoteIds));
+    }
+
+    if (input.pinned !== undefined) {
+      where.push(eq(notes.pinned, input.pinned));
+    }
+
+    if (input.favorite !== undefined) {
+      where.push(eq(notes.favorite, input.favorite));
     }
 
     const foundNotes = await db

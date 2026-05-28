@@ -1,12 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+
+import { NotesErrorView } from "@/modules/notes/ui/views/notes-error-view";
 
 export const Route = createFileRoute("/_app/notes")({
   head: () => ({
-    meta: [{ title: "Notes" }],
+    meta: [{ title: "Notes | Memora" }],
   }),
-  component: NotesPage,
+  component: Outlet,
+  errorComponent: NotesErrorView,
 });
-
-function NotesPage() {
-  return <p className="text-muted-foreground text-sm">Notes</p>;
-}

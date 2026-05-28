@@ -1,6 +1,6 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   Collapsible,
@@ -33,12 +33,15 @@ interface NavigationMenuItemProps {
 function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
   const { isMobile, setOpenMobile } = useSidebar();
   const shouldOpen =
-    !!item.isActive || !!item.subItems?.some((i) => !!i.isActive);
+    !!item.isActive ||
+    !!item.subItems?.some((i) => !!i.isActive) ||
+    !!item.contextualContent;
   const [open, setOpen] = useState(shouldOpen);
-
-  useEffect(() => {
+  const prevShouldOpenRef = useRef(shouldOpen);
+  if (prevShouldOpenRef.current !== shouldOpen) {
+    prevShouldOpenRef.current = shouldOpen;
     setOpen(shouldOpen);
-  }, [shouldOpen]);
+  }
 
   const closeMobileSheet = () => {
     if (isMobile) {
@@ -54,45 +57,65 @@ function NavigationMenuItem({ item, renderLink }: NavigationMenuItemProps) {
       open={open}
       render={<SidebarMenuItem />}
     >
-      {item.subItems?.length ? (
+      {item.subItems?.length || item.contextualContent ? (
         <>
           <CollapsibleTrigger
-            render={<SidebarMenuButton isActive={item.isActive} />}
+            render={
+              <SidebarMenuButton
+                isActive={item.isActive}
+                render={
+                  item.path
+                    ? renderLink(item.path, item.params, item.search)
+                    : undefined
+                }
+              />
+            }
           >
             {item.icon}
             <span>{item.title}</span>
             <HugeiconsIcon
-              className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90"
+              className="ml-auto transition-transform duration-200 group-data-[collapsible=icon]:hidden group-data-open/collapsible:rotate-90"
               icon={ArrowRight01Icon}
               strokeWidth={2}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent>
-            <SidebarMenuSub>
-              {item.subItems?.map((subItem) => (
-                <SidebarMenuSubItem key={subItem.title}>
-                  <SidebarMenuSubButton
-                    isActive={subItem.isActive}
-                    onClick={closeMobileSheet}
-                    render={
-                      subItem.path
-                        ? renderLink(subItem.path, subItem.params)
-                        : undefined
-                    }
-                  >
-                    {subItem.icon}
-                    <span>{subItem.title}</span>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
-            </SidebarMenuSub>
+          <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
+            {item.subItems?.length ? (
+              <SidebarMenuSub>
+                {item.subItems.map((subItem) => (
+                  <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubButton
+                      isActive={subItem.isActive}
+                      onClick={closeMobileSheet}
+                      render={
+                        subItem.path
+                          ? renderLink(
+                              subItem.path,
+                              subItem.params,
+                              subItem.search
+                            )
+                          : undefined
+                      }
+                    >
+                      {subItem.icon}
+                      <span>{subItem.title}</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            ) : null}
+            {item.contextualContent}
           </CollapsibleContent>
         </>
       ) : (
         <SidebarMenuButton
           isActive={item.isActive}
           onClick={closeMobileSheet}
-          render={item.path ? renderLink(item.path, item.params) : undefined}
+          render={
+            item.path
+              ? renderLink(item.path, item.params, item.search)
+              : undefined
+          }
         >
           {item.icon}
           <span>{item.title}</span>

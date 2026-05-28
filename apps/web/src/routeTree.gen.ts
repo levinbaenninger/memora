@@ -11,13 +11,24 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareTokenRouteImport } from './routes/share/$token'
+import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
+import { Route as AuthSetup2faRouteImport } from './routes/auth/setup-2fa'
+import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
 import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
 import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
 import { Route as AppDashboardRouteRouteImport } from './routes/_app/dashboard/route'
+import { Route as AppNotesIndexRouteImport } from './routes/_app/notes/index'
+import { Route as AppNotesPinnedRouteImport } from './routes/_app/notes/pinned'
+import { Route as AppNotesFavoritesRouteImport } from './routes/_app/notes/favorites'
+import { Route as AppNotesArchivedRouteImport } from './routes/_app/notes/archived'
 import { Route as ApiRpcSplatRouteRouteImport } from './routes/api/rpc/$/route'
 import { Route as ApiAuthSplatRouteRouteImport } from './routes/api/auth/$/route'
 import { Route as AppSettingsPathRouteRouteImport } from './routes/_app/settings/$path/route'
+import { Route as AppNotesNoteIdRouteRouteImport } from './routes/_app/notes/$noteId/route'
+import { Route as AppNotesTagTagIdRouteImport } from './routes/_app/notes/tag/$tagId'
+import { Route as AppNotesFolderFolderIdRouteImport } from './routes/_app/notes/folder/$folderId'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
@@ -26,6 +37,26 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthTwoFactorRoute = AuthTwoFactorRouteImport.update({
+  id: '/auth/two-factor',
+  path: '/auth/two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSetup2faRoute = AuthSetup2faRouteImport.update({
+  id: '/auth/setup-2fa',
+  path: '/auth/setup-2fa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
+  id: '/auth/check-email',
+  path: '/auth/check-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPathRouteRoute = AuthPathRouteRouteImport.update({
@@ -48,6 +79,26 @@ const AppDashboardRouteRoute = AppDashboardRouteRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppNotesIndexRoute = AppNotesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
+const AppNotesPinnedRoute = AppNotesPinnedRouteImport.update({
+  id: '/pinned',
+  path: '/pinned',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
+const AppNotesFavoritesRoute = AppNotesFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
+const AppNotesArchivedRoute = AppNotesArchivedRouteImport.update({
+  id: '/archived',
+  path: '/archived',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
 const ApiRpcSplatRouteRoute = ApiRpcSplatRouteRouteImport.update({
   id: '/api/rpc/$',
   path: '/api/rpc/$',
@@ -63,38 +114,85 @@ const AppSettingsPathRouteRoute = AppSettingsPathRouteRouteImport.update({
   path: '/settings/$path',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppNotesNoteIdRouteRoute = AppNotesNoteIdRouteRouteImport.update({
+  id: '/$noteId',
+  path: '/$noteId',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
+const AppNotesTagTagIdRoute = AppNotesTagTagIdRouteImport.update({
+  id: '/tag/$tagId',
+  path: '/tag/$tagId',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
+const AppNotesFolderFolderIdRoute = AppNotesFolderFolderIdRouteImport.update({
+  id: '/folder/$folderId',
+  path: '/folder/$folderId',
+  getParentRoute: () => AppNotesRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRouteRoute
-  '/notes': typeof AppNotesRouteRoute
+  '/notes': typeof AppNotesRouteRouteWithChildren
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/auth/setup-2fa': typeof AuthSetup2faRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
   '/api/rpc/$': typeof ApiRpcSplatRouteRoute
+  '/notes/archived': typeof AppNotesArchivedRoute
+  '/notes/favorites': typeof AppNotesFavoritesRoute
+  '/notes/pinned': typeof AppNotesPinnedRoute
+  '/notes/': typeof AppNotesIndexRoute
+  '/notes/folder/$folderId': typeof AppNotesFolderFolderIdRoute
+  '/notes/tag/$tagId': typeof AppNotesTagTagIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRouteRoute
-  '/notes': typeof AppNotesRouteRoute
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/auth/setup-2fa': typeof AuthSetup2faRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
   '/api/rpc/$': typeof ApiRpcSplatRouteRoute
+  '/notes/archived': typeof AppNotesArchivedRoute
+  '/notes/favorites': typeof AppNotesFavoritesRoute
+  '/notes/pinned': typeof AppNotesPinnedRoute
+  '/notes': typeof AppNotesIndexRoute
+  '/notes/folder/$folderId': typeof AppNotesFolderFolderIdRoute
+  '/notes/tag/$tagId': typeof AppNotesTagTagIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRouteRoute
-  '/_app/notes': typeof AppNotesRouteRoute
+  '/_app/notes': typeof AppNotesRouteRouteWithChildren
   '/_app/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/auth/setup-2fa': typeof AuthSetup2faRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/_app/notes/$noteId': typeof AppNotesNoteIdRouteRoute
   '/_app/settings/$path': typeof AppSettingsPathRouteRoute
   '/api/auth/$': typeof ApiAuthSplatRouteRoute
   '/api/rpc/$': typeof ApiRpcSplatRouteRoute
+  '/_app/notes/archived': typeof AppNotesArchivedRoute
+  '/_app/notes/favorites': typeof AppNotesFavoritesRoute
+  '/_app/notes/pinned': typeof AppNotesPinnedRoute
+  '/_app/notes/': typeof AppNotesIndexRoute
+  '/_app/notes/folder/$folderId': typeof AppNotesFolderFolderIdRoute
+  '/_app/notes/tag/$tagId': typeof AppNotesTagTagIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -104,19 +202,40 @@ export interface FileRouteTypes {
     | '/notes'
     | '/tasks'
     | '/auth/$path'
+    | '/auth/check-email'
+    | '/auth/setup-2fa'
+    | '/auth/two-factor'
+    | '/share/$token'
+    | '/notes/$noteId'
     | '/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/notes/archived'
+    | '/notes/favorites'
+    | '/notes/pinned'
+    | '/notes/'
+    | '/notes/folder/$folderId'
+    | '/notes/tag/$tagId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
-    | '/notes'
     | '/tasks'
     | '/auth/$path'
+    | '/auth/check-email'
+    | '/auth/setup-2fa'
+    | '/auth/two-factor'
+    | '/share/$token'
+    | '/notes/$noteId'
     | '/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/notes/archived'
+    | '/notes/favorites'
+    | '/notes/pinned'
+    | '/notes'
+    | '/notes/folder/$folderId'
+    | '/notes/tag/$tagId'
   id:
     | '__root__'
     | '/'
@@ -125,15 +244,30 @@ export interface FileRouteTypes {
     | '/_app/notes'
     | '/_app/tasks'
     | '/auth/$path'
+    | '/auth/check-email'
+    | '/auth/setup-2fa'
+    | '/auth/two-factor'
+    | '/share/$token'
+    | '/_app/notes/$noteId'
     | '/_app/settings/$path'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/_app/notes/archived'
+    | '/_app/notes/favorites'
+    | '/_app/notes/pinned'
+    | '/_app/notes/'
+    | '/_app/notes/folder/$folderId'
+    | '/_app/notes/tag/$tagId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthPathRouteRoute: typeof AuthPathRouteRoute
+  AuthCheckEmailRoute: typeof AuthCheckEmailRoute
+  AuthSetup2faRoute: typeof AuthSetup2faRoute
+  AuthTwoFactorRoute: typeof AuthTwoFactorRoute
+  ShareTokenRoute: typeof ShareTokenRoute
   ApiAuthSplatRouteRoute: typeof ApiAuthSplatRouteRoute
   ApiRpcSplatRouteRoute: typeof ApiRpcSplatRouteRoute
 }
@@ -152,6 +286,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/two-factor': {
+      id: '/auth/two-factor'
+      path: '/auth/two-factor'
+      fullPath: '/auth/two-factor'
+      preLoaderRoute: typeof AuthTwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/setup-2fa': {
+      id: '/auth/setup-2fa'
+      path: '/auth/setup-2fa'
+      fullPath: '/auth/setup-2fa'
+      preLoaderRoute: typeof AuthSetup2faRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/check-email': {
+      id: '/auth/check-email'
+      path: '/auth/check-email'
+      fullPath: '/auth/check-email'
+      preLoaderRoute: typeof AuthCheckEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/$path': {
@@ -182,6 +344,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/notes/': {
+      id: '/_app/notes/'
+      path: '/'
+      fullPath: '/notes/'
+      preLoaderRoute: typeof AppNotesIndexRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
+    '/_app/notes/pinned': {
+      id: '/_app/notes/pinned'
+      path: '/pinned'
+      fullPath: '/notes/pinned'
+      preLoaderRoute: typeof AppNotesPinnedRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
+    '/_app/notes/favorites': {
+      id: '/_app/notes/favorites'
+      path: '/favorites'
+      fullPath: '/notes/favorites'
+      preLoaderRoute: typeof AppNotesFavoritesRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
+    '/_app/notes/archived': {
+      id: '/_app/notes/archived'
+      path: '/archived'
+      fullPath: '/notes/archived'
+      preLoaderRoute: typeof AppNotesArchivedRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
     '/api/rpc/$': {
       id: '/api/rpc/$'
       path: '/api/rpc/$'
@@ -203,19 +393,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsPathRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/notes/$noteId': {
+      id: '/_app/notes/$noteId'
+      path: '/$noteId'
+      fullPath: '/notes/$noteId'
+      preLoaderRoute: typeof AppNotesNoteIdRouteRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
+    '/_app/notes/tag/$tagId': {
+      id: '/_app/notes/tag/$tagId'
+      path: '/tag/$tagId'
+      fullPath: '/notes/tag/$tagId'
+      preLoaderRoute: typeof AppNotesTagTagIdRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
+    '/_app/notes/folder/$folderId': {
+      id: '/_app/notes/folder/$folderId'
+      path: '/folder/$folderId'
+      fullPath: '/notes/folder/$folderId'
+      preLoaderRoute: typeof AppNotesFolderFolderIdRouteImport
+      parentRoute: typeof AppNotesRouteRoute
+    }
   }
 }
 
+interface AppNotesRouteRouteChildren {
+  AppNotesNoteIdRouteRoute: typeof AppNotesNoteIdRouteRoute
+  AppNotesArchivedRoute: typeof AppNotesArchivedRoute
+  AppNotesFavoritesRoute: typeof AppNotesFavoritesRoute
+  AppNotesPinnedRoute: typeof AppNotesPinnedRoute
+  AppNotesIndexRoute: typeof AppNotesIndexRoute
+  AppNotesFolderFolderIdRoute: typeof AppNotesFolderFolderIdRoute
+  AppNotesTagTagIdRoute: typeof AppNotesTagTagIdRoute
+}
+
+const AppNotesRouteRouteChildren: AppNotesRouteRouteChildren = {
+  AppNotesNoteIdRouteRoute: AppNotesNoteIdRouteRoute,
+  AppNotesArchivedRoute: AppNotesArchivedRoute,
+  AppNotesFavoritesRoute: AppNotesFavoritesRoute,
+  AppNotesPinnedRoute: AppNotesPinnedRoute,
+  AppNotesIndexRoute: AppNotesIndexRoute,
+  AppNotesFolderFolderIdRoute: AppNotesFolderFolderIdRoute,
+  AppNotesTagTagIdRoute: AppNotesTagTagIdRoute,
+}
+
+const AppNotesRouteRouteWithChildren = AppNotesRouteRoute._addFileChildren(
+  AppNotesRouteRouteChildren,
+)
+
 interface AppRouteRouteChildren {
   AppDashboardRouteRoute: typeof AppDashboardRouteRoute
-  AppNotesRouteRoute: typeof AppNotesRouteRoute
+  AppNotesRouteRoute: typeof AppNotesRouteRouteWithChildren
   AppTasksRouteRoute: typeof AppTasksRouteRoute
   AppSettingsPathRouteRoute: typeof AppSettingsPathRouteRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDashboardRouteRoute: AppDashboardRouteRoute,
-  AppNotesRouteRoute: AppNotesRouteRoute,
+  AppNotesRouteRoute: AppNotesRouteRouteWithChildren,
   AppTasksRouteRoute: AppTasksRouteRoute,
   AppSettingsPathRouteRoute: AppSettingsPathRouteRoute,
 }
@@ -228,6 +463,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
   AuthPathRouteRoute: AuthPathRouteRoute,
+  AuthCheckEmailRoute: AuthCheckEmailRoute,
+  AuthSetup2faRoute: AuthSetup2faRoute,
+  AuthTwoFactorRoute: AuthTwoFactorRoute,
+  ShareTokenRoute: ShareTokenRoute,
   ApiAuthSplatRouteRoute: ApiAuthSplatRouteRoute,
   ApiRpcSplatRouteRoute: ApiRpcSplatRouteRoute,
 }

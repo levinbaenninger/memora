@@ -24,7 +24,11 @@ export const archiveNote = authorized
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
     const [note] = await db
-      .select({ id: notes.id, archivedAt: notes.archivedAt })
+      .select({
+        id: notes.id,
+        archivedAt: notes.archivedAt,
+        archiveExpiresAt: notes.archiveExpiresAt,
+      })
       .from(notes)
       .where(and(eq(notes.id, input.id), eq(notes.userId, userId)))
       .limit(1);
@@ -36,10 +40,11 @@ export const archiveNote = authorized
       });
     }
 
-    if (note.archivedAt) {
-      throw errors.BAD_REQUEST({
-        message: "Note is already archived.",
-        data: { id: input.id },
+    if (note.archivedAt && note.archiveExpiresAt) {
+      return archiveNoteResponseDtoSchema.parse({
+        id: input.id,
+        archivedAt: note.archivedAt,
+        archiveExpiresAt: note.archiveExpiresAt,
       });
     }
 
@@ -47,6 +52,20 @@ export const archiveNote = authorized
     const archiveExpiresAt = new Date(
       now.getTime() + ARCHIVE_RETENTION_DAYS * 24 * 60 * 60 * 1000
     );
+
+    // Data-integrity recovery: archivedAt set but archiveExpiresAt missing.
+    // Backfill expiry from now so the row becomes idempotently archive-able.
+    if (note.archivedAt && !note.archiveExpiresAt) {
+      await db
+        .update(notes)
+        .set({ archiveExpiresAt, updatedAt: now })
+        .where(and(eq(notes.id, input.id), eq(notes.userId, userId)));
+      return archiveNoteResponseDtoSchema.parse({
+        id: input.id,
+        archivedAt: note.archivedAt,
+        archiveExpiresAt,
+      });
+    }
 
     const [archived] = await db
       .update(notes)

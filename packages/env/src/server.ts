@@ -17,6 +17,8 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().min(1),
     SENTRY_AUTH_TOKEN: z.string().min(1),
     SENTRY_DSN: z.string().min(1),
+    KV_REST_API_URL: z.url(),
+    KV_REST_API_TOKEN: z.string().min(1),
   },
   runtimeEnv,
   emptyStringAsUndefined: true,

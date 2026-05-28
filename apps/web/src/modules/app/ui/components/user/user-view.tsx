@@ -3,7 +3,7 @@
 import { useSession } from "@better-auth-ui/react";
 import type { User } from "better-auth";
 
-import { Skeleton } from "@memora/ui/components/skeleton";
+import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
 import { UserAvatar } from "./user-avatar";
@@ -34,11 +34,7 @@ export function UserView({ className, isPending, user }: UserViewProps) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
         <UserAvatar isPending />
-
-        <div className="grid flex-1 gap-1 text-left text-sm">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-3 w-32" />
-        </div>
+        <Spinner className="size-4 text-muted-foreground" />
       </div>
     );
   }

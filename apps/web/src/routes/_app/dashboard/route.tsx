@@ -1,12 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_app/dashboard")({
-  head: () => ({
-    meta: [{ title: "Dashboard" }],
-  }),
-  component: DashboardPage,
-});
+import { DashboardSkeleton } from "@/modules/dashboard/ui/views/dashboard-skeleton";
+import { DashboardView } from "@/modules/dashboard/ui/views/dashboard-view";
+import { notesListInput } from "@/modules/notes/queries";
 
-function DashboardPage() {
-  return <p className="text-muted-foreground text-sm">Dashboard</p>;
-}
+export const Route = createFileRoute("/_app/dashboard")({
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(
+      context.orpc.notes.list.queryOptions({
+        input: notesListInput({ view: "all", limit: 8 }),
+      })
+    ),
+  head: () => ({
+    meta: [{ title: "Dashboard | Memora" }],
+  }),
+  component: DashboardView,
+  pendingComponent: DashboardSkeleton,
+});

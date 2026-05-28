@@ -4,11 +4,14 @@ import { user } from "../auth";
 import { noteFolders } from "./folders";
 import { noteLinks } from "./links";
 import { notes } from "./notes";
+import { noteShares } from "./shares";
 import { notesToTags, noteTags } from "./tags";
 
 export * from "./folders";
 export * from "./links";
 export * from "./notes";
+export * from "./recent-visits";
+export * from "./shares";
 export * from "./tags";
 
 export const noteFolderRelations = relations(noteFolders, ({ one, many }) => ({
@@ -37,6 +40,14 @@ export const noteRelations = relations(notes, ({ one, many }) => ({
   tags: many(notesToTags),
   outboundLinks: many(noteLinks, { relationName: "source_note" }),
   backlinks: many(noteLinks, { relationName: "target_note" }),
+  shares: many(noteShares),
+}));
+
+export const noteShareRelations = relations(noteShares, ({ one }) => ({
+  note: one(notes, {
+    fields: [noteShares.noteId],
+    references: [notes.id],
+  }),
 }));
 
 export const noteTagRelations = relations(noteTags, ({ one, many }) => ({

@@ -1,9 +1,11 @@
 import { viewPaths } from "@better-auth-ui/react/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { z } from "zod";
 
 import { Auth } from "@memora/ui/components/auth/auth";
 
 import { authClient } from "@/modules/auth/client";
+import { safeRedirect } from "@/modules/auth/safe-redirect";
 
 const authPathTitles: Record<string, string> = {
   "forgot-password": "Forgot Password",
@@ -13,12 +15,15 @@ const authPathTitles: Record<string, string> = {
   "sign-up": "Sign Up",
 };
 
+const authSearchSchema = z.object({
+  redirect: z.string().optional(),
+});
+
 export const Route = createFileRoute("/auth/$path")({
-  head: ({ params }) => ({
-    meta: [{ title: authPathTitles[params.path] ?? "Authentication" }],
-  }),
   ssr: false,
-  async beforeLoad({ params: { path } }) {
+  validateSearch: (search: Record<string, unknown>) =>
+    authSearchSchema.parse(search),
+  async beforeLoad({ params: { path }, search }) {
     if (!Object.values(viewPaths.auth).includes(path)) {
       throw redirect({ to: "/" });
     }
@@ -34,9 +39,14 @@ export const Route = createFileRoute("/auth/$path")({
     }
 
     if (path !== viewPaths.auth.signOut && session) {
-      throw redirect({ replace: true, to: "/dashboard" });
+      throw redirect({ replace: true, to: safeRedirect(search.redirect) });
     }
   },
+  head: ({ params }) => ({
+    meta: [
+      { title: `${authPathTitles[params.path] ?? "Authentication"} | Memora` },
+    ],
+  }),
   component: AuthPage,
 });
 

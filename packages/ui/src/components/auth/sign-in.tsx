@@ -87,7 +87,12 @@ export function SignIn({
           toast.error(error.error?.message || error.message)
         }
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: (data) => {
+        if ((data as { twoFactorRedirect?: boolean })?.twoFactorRedirect) {
+          return
+        }
+        navigate({ to: redirectTo })
+      }
     }
   )
 
@@ -97,7 +102,12 @@ export function SignIn({
         setPassword("")
         toast.error(error.error?.message || error.message)
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: (data) => {
+        if ((data as { twoFactorRedirect?: boolean })?.twoFactorRedirect) {
+          return
+        }
+        navigate({ to: redirectTo })
+      }
     })
 
   const isPending = signInEmailPending || signInUsernamePending

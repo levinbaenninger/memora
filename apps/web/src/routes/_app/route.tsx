@@ -1,31 +1,128 @@
 import { useAuthenticate } from "@better-auth-ui/react";
+import { viewPaths } from "@better-auth-ui/react/core";
 import {
   createFileRoute,
   Link,
   Outlet,
+  redirect,
   useLocation,
+  useNavigate,
+  useSearch,
 } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/modules/app/ui/views/app-shell";
-import { RootLoading } from "@/modules/app/ui/views/root/root-loading";
+import { authClient } from "@/modules/auth/client";
+import { safeRedirect } from "@/modules/auth/safe-redirect";
+import { PENDING_DUPLICATE_TOKEN_KEY } from "@/modules/sharing/pending-duplicate";
+import { client } from "@/utils/orpc";
 
 export const Route = createFileRoute("/_app")({
+  async beforeLoad({ context, location }) {
+    const session = await context.queryClient.ensureQueryData({
+      queryKey: ["auth", "session"],
+      queryFn: async () => {
+        const { data } = await authClient.getSession();
+        return data ?? null;
+      },
+      staleTime: 5 * 60 * 1000,
+    });
+    const redirectTarget = safeRedirect(location.href);
+    if (!session) {
+      throw redirect({
+        params: { path: viewPaths.auth.signIn },
+        replace: true,
+        search: { redirect: redirectTarget },
+        to: "/auth/$path",
+      });
+    }
+
+    const twoFactorEnabled = Boolean(
+      (session.user as { twoFactorEnabled?: boolean | null }).twoFactorEnabled
+    );
+    if (!twoFactorEnabled) {
+      const accounts = await context.queryClient.ensureQueryData({
+        queryKey: ["auth", "accounts", session.user.id],
+        queryFn: async () => {
+          const { data } = await authClient.listAccounts();
+          return data ?? [];
+        },
+        staleTime: 5 * 60 * 1000,
+      });
+      const hasCredential = accounts.some(
+        (account) => account.providerId === "credential"
+      );
+      if (hasCredential) {
+        throw redirect({
+          replace: true,
+          search: { redirect: redirectTarget },
+          to: "/auth/setup-2fa",
+        });
+      }
+    }
+  },
   component: AppShellLayout,
 });
 
 function AppShellLayout() {
   const { data: session } = useAuthenticate();
   const { pathname } = useLocation();
+  const search = useSearch({ strict: false });
+  const navigate = useNavigate();
+  const drainedRef = useRef(false);
 
-  if (!session) {
-    return <RootLoading />;
-  }
+  useEffect(() => {
+    if (drainedRef.current || !session) {
+      return;
+    }
+    let token: string | null = null;
+    try {
+      token = window.localStorage.getItem(PENDING_DUPLICATE_TOKEN_KEY);
+    } catch {
+      return;
+    }
+    if (!token) {
+      return;
+    }
+    drainedRef.current = true;
+    const clearToken = () => {
+      try {
+        window.localStorage.removeItem(PENDING_DUPLICATE_TOKEN_KEY);
+      } catch {
+        // localStorage may be blocked; nothing to clean up.
+      }
+    };
+    client.notes.shares
+      .duplicate({ token })
+      .then(({ id }) => {
+        clearToken();
+        toast.success("Note duplicated");
+        navigate({ to: "/notes/$noteId", params: { noteId: id } });
+      })
+      .catch((error: unknown) => {
+        // Only clear the token for definite server-side failures (a
+        // structured error code that isn't a rate limit). Plain JS errors
+        // — network blips, parse errors, anything without a `code` — are
+        // treated as transient and leave the token in place so a later
+        // visit can retry.
+        const code = (error as { code?: string } | null)?.code;
+        if (code !== undefined && code !== "TOO_MANY_REQUESTS") {
+          clearToken();
+        }
+        toast.error("Could not duplicate the shared note.");
+      });
+  }, [navigate, session]);
 
   return (
     <AppShell
+      currentSearch={search as Record<string, unknown>}
       pathname={pathname}
-      renderLink={(to, params) => <Link params={params} to={to} />}
-      user={session.user}
+      renderLink={(to, params, linkSearch) => (
+        // biome-ignore lint/suspicious/noExplicitAny: TanStack Router search types require cast
+        <Link params={params} search={linkSearch as any} to={to} />
+      )}
+      user={session?.user}
     >
       <Outlet />
     </AppShell>

@@ -13,7 +13,7 @@ import type { AppLinkRenderer, SidebarNavItem } from "@/modules/app/routes";
 
 type AppBreadcrumbPage = Pick<
   SidebarNavItem,
-  "icon" | "params" | "path" | "title"
+  "icon" | "params" | "path" | "search" | "title"
 >;
 
 export function AppBreadcrumbs({
@@ -28,30 +28,38 @@ export function AppBreadcrumbs({
   }
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
+    <Breadcrumb className="min-w-0 flex-1">
+      <BreadcrumbList className="flex-nowrap overflow-hidden">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
+          const linkElement =
+            isLast || !item.path
+              ? null
+              : renderLink(item.path, item.params, item.search);
 
           return (
             <Fragment key={`${item.title}-${item.path ?? index}`}>
-              <BreadcrumbItem>
-                {isLast || !item.path ? (
-                  <BreadcrumbPage className="flex items-center gap-2 [&>svg]:size-3.5">
-                    {item.icon}
-                    {item.title}
-                  </BreadcrumbPage>
-                ) : (
+              <BreadcrumbItem
+                className={isLast ? "min-w-0 flex-1" : "hidden sm:inline-flex"}
+              >
+                {linkElement ? (
                   <BreadcrumbLink
-                    className="flex items-center gap-2 [&>svg]:size-3.5"
-                    render={renderLink(item.path, item.params)}
+                    className="flex min-w-0 items-center gap-2 [&>svg]:size-3.5"
+                    render={linkElement}
                   >
                     {item.icon}
-                    {item.title}
+                    <span className="min-w-0 truncate">{item.title}</span>
                   </BreadcrumbLink>
+                ) : (
+                  <BreadcrumbPage className="flex min-w-0 items-center gap-2 [&>svg]:size-3.5">
+                    {item.icon}
+                    <span className="min-w-0 truncate">{item.title}</span>
+                  </BreadcrumbPage>
                 )}
               </BreadcrumbItem>
-              {!isLast && <BreadcrumbSeparator />}
+              {!isLast && (
+                <BreadcrumbSeparator className="hidden sm:inline-flex" />
+              )}
             </Fragment>
           );
         })}

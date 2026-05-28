@@ -33,13 +33,14 @@ export const restoreNote = authorized
       });
     }
 
-    if (note.folderId) {
+    let folderId = note.folderId;
+    if (folderId) {
       const [folder] = await db
         .select({ id: noteFolders.id })
         .from(noteFolders)
         .where(
           and(
-            eq(noteFolders.id, note.folderId),
+            eq(noteFolders.id, folderId),
             eq(noteFolders.userId, userId),
             isNull(noteFolders.archivedAt)
           )
@@ -47,16 +48,14 @@ export const restoreNote = authorized
         .limit(1);
 
       if (!folder) {
-        throw errors.NOT_FOUND({
-          message: "Folder not found.",
-          data: { id: note.folderId },
-        });
+        folderId = null;
       }
     }
 
     const [restored] = await db
       .update(notes)
       .set({
+        folderId,
         archivedAt: null,
         archiveExpiresAt: null,
         archiveOriginId: null,

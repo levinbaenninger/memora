@@ -8,7 +8,7 @@ import {
 } from "@better-auth-ui/react";
 import { useDebouncer } from "@tanstack/react-pacer";
 import { Check, X } from "lucide-react";
-import { type SyntheticEvent, useEffect, useState } from "react";
+import { type SyntheticEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@memora/ui/components/button";
@@ -21,7 +21,6 @@ import {
   InputGroupInput,
 } from "@memora/ui/components/input-group";
 import { Label } from "@memora/ui/components/label";
-import { Skeleton } from "@memora/ui/components/skeleton";
 import { Spinner } from "@memora/ui/components/spinner";
 import { cn } from "@memora/ui/lib/utils";
 
@@ -65,10 +64,11 @@ export function UserProfile({ className }: UserProfileProps) {
       : session?.user?.username) || "";
 
   const [username, setUsername] = useState(currentUsername);
-
-  useEffect(() => {
+  const prevCurrentUsernameRef = useRef(currentUsername);
+  if (prevCurrentUsernameRef.current !== currentUsername) {
+    prevCurrentUsernameRef.current = currentUsername;
     setUsername(currentUsername);
-  }, [currentUsername]);
+  }
 
   const {
     mutate: isUsernameAvailable,
@@ -178,9 +178,7 @@ export function UserProfile({ className }: UserProfileProps) {
                     )}
                   </InputGroup>
                 ) : (
-                  <Skeleton>
-                    <Input className="invisible" />
-                  </Skeleton>
+                  <Input disabled />
                 )}
 
                 <FieldError>
@@ -222,9 +220,7 @@ export function UserProfile({ className }: UserProfileProps) {
                   required
                 />
               ) : (
-                <Skeleton>
-                  <Input className="invisible" />
-                </Skeleton>
+                <Input disabled />
               )}
 
               <FieldError>{fieldErrors.name}</FieldError>

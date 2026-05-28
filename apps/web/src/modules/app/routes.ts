@@ -1,6 +1,10 @@
 import {
+  ArchiveIcon,
   DashboardSquare01Icon,
+  FavouriteIcon,
+  Notebook01Icon,
   NoteIcon,
+  PinIcon,
   Settings01Icon,
   Task01Icon,
 } from "@hugeicons/core-free-icons";
@@ -12,11 +16,14 @@ type AppRouteTo = NonNullable<LinkProps["to"]>;
 type AppRouteParams = LinkProps["params"];
 
 export interface SidebarNavItem {
+  contextualContent?: ReactNode;
+  exact?: boolean;
   icon?: ReactNode;
   isActive?: boolean;
   matchPaths?: string[];
   params?: AppRouteParams;
   path?: AppRouteTo;
+  search?: Record<string, unknown>;
   subItems?: SidebarNavItem[];
   title: string;
 }
@@ -29,7 +36,8 @@ export interface SidebarNavGroup {
 
 export type AppLinkRenderer = (
   to: AppRouteTo,
-  params?: AppRouteParams
+  params?: AppRouteParams,
+  search?: Record<string, unknown>
 ) => ReactElement;
 
 function routeIcon(icon: Parameters<typeof HugeiconsIcon>[0]["icon"]) {
@@ -49,7 +57,30 @@ const navGroups: SidebarNavGroup[] = [
       {
         title: "Notes",
         path: "/notes",
-        icon: routeIcon(NoteIcon),
+        icon: routeIcon(Notebook01Icon),
+        subItems: [
+          {
+            title: "All Notes",
+            path: "/notes",
+            exact: true,
+            icon: routeIcon(NoteIcon),
+          },
+          {
+            title: "Pinned",
+            path: "/notes/pinned",
+            icon: routeIcon(PinIcon),
+          },
+          {
+            title: "Favorites",
+            path: "/notes/favorites",
+            icon: routeIcon(FavouriteIcon),
+          },
+          {
+            title: "Archive",
+            path: "/notes/archived",
+            icon: routeIcon(ArchiveIcon),
+          },
+        ],
       },
       {
         title: "Tasks",
@@ -70,25 +101,44 @@ const footerNavLinks: SidebarNavItem[] = [
   },
 ];
 
-function isNavItemActive(item: SidebarNavItem, pathname: string) {
+function isNavItemActive(
+  item: SidebarNavItem,
+  pathname: string,
+  currentSearch?: Record<string, unknown>
+) {
   const matchPaths = [item.path, ...(item.matchPaths ?? [])].filter(
     (path): path is string => path != null && path !== ""
   );
 
-  return matchPaths.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  const pathMatch = matchPaths.some((path) =>
+    item.exact
+      ? pathname === path
+      : pathname === path || pathname.startsWith(`${path}/`)
   );
-}
 
-function comparePathLengthDesc(a: SidebarNavItem, b: SidebarNavItem) {
-  return (b.path?.length ?? 0) - (a.path?.length ?? 0);
+  if (!pathMatch) {
+    return false;
+  }
+
+  if (item.search && currentSearch) {
+    return Object.entries(item.search).every(
+      ([k, v]) => (currentSearch[k] ?? undefined) === (v ?? undefined)
+    );
+  }
+
+  return pathMatch;
 }
 
 function getActiveSubItem(item: SidebarNavItem, pathname: string) {
-  return item.subItems
-    ?.filter((child) => isNavItemActive(child, pathname))
-    .slice()
-    .sort(comparePathLengthDesc)[0];
+  const matches = item.subItems?.filter((child) =>
+    isNavItemActive(child, pathname)
+  );
+  if (!matches?.length) {
+    return undefined;
+  }
+  return matches.reduce((best, child) =>
+    (child.path?.length ?? 0) > (best.path?.length ?? 0) ? child : best
+  );
 }
 
 function getActiveNavBreadcrumb(pathname: string) {
@@ -97,6 +147,9 @@ function getActiveNavBreadcrumb(pathname: string) {
       const subItem = getActiveSubItem(item, pathname);
 
       if (subItem) {
+        if (subItem.path === item.path) {
+          return [item];
+        }
         return [item, subItem];
       }
 
@@ -121,19 +174,22 @@ export function getBreadcrumbItems(pathname: string) {
   return footerItem ? [footerItem] : [];
 }
 
-export function getNavGroups(pathname: string) {
+export function getNavGroups(
+  pathname: string,
+  currentSearch?: Record<string, unknown>
+) {
   return navGroups.map((group) => ({
     ...group,
     items: group.items.map((item) => {
       const subItems = item.subItems?.map((subItem) => ({
         ...subItem,
-        isActive: isNavItemActive(subItem, pathname),
+        isActive: isNavItemActive(subItem, pathname, currentSearch),
       }));
 
       return {
         ...item,
         isActive:
-          isNavItemActive(item, pathname) ||
+          isNavItemActive(item, pathname, currentSearch) ||
           !!subItems?.some((subItem) => subItem.isActive),
         subItems,
       };
