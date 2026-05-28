@@ -14,8 +14,6 @@ export const tasks = pgTable("tasks", {
   description: text("description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   completedAt: timestamp("completed_at"),
-  archivedAt: timestamp("archived_at"),
-  archiveExpiresAt: timestamp("archive_expires_at"),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => new Date())

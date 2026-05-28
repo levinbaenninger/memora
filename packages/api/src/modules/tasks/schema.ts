@@ -9,8 +9,6 @@ export const taskSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   completedAt: z.date().nullable(),
-  archivedAt: z.date().nullable(),
-  archiveExpiresAt: z.date().nullable(),
   userId: z.string(),
   tags: z.array(tagSchema),
 });
