@@ -6,6 +6,9 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+
+export { and, eq } from "drizzle-orm";
+
 import { nanoid } from "nanoid";
 
 import { user } from "../auth";

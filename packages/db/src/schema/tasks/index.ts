@@ -1,7 +1,11 @@
 import { relations } from "drizzle-orm";
+
 import { user } from "../auth";
 import { tasksToTags, taskTags } from "./tags";
 import { tasks } from "./tasks";
+
+export * from "./tags";
+export * from "./tasks";
 
 export const taskRelations = relations(tasks, ({ one, many }) => ({
   user: one(user, {
