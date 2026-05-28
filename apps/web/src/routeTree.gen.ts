@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShareTokenRouteImport } from './routes/share/$token'
 import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
 import { Route as AuthSetup2faRouteImport } from './routes/auth/setup-2fa'
+import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
 import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
 import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
@@ -51,6 +52,11 @@ const AuthTwoFactorRoute = AuthTwoFactorRouteImport.update({
 const AuthSetup2faRoute = AuthSetup2faRouteImport.update({
   id: '/auth/setup-2fa',
   path: '/auth/setup-2fa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
+  id: '/auth/check-email',
+  path: '/auth/check-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPathRouteRoute = AuthPathRouteRouteImport.update({
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AppNotesRouteRouteWithChildren
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/setup-2fa': typeof AuthSetup2faRoute
   '/auth/two-factor': typeof AuthTwoFactorRoute
   '/share/$token': typeof ShareTokenRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRouteRoute
   '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/setup-2fa': typeof AuthSetup2faRoute
   '/auth/two-factor': typeof AuthTwoFactorRoute
   '/share/$token': typeof ShareTokenRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/_app/notes': typeof AppNotesRouteRouteWithChildren
   '/_app/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/setup-2fa': typeof AuthSetup2faRoute
   '/auth/two-factor': typeof AuthTwoFactorRoute
   '/share/$token': typeof ShareTokenRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/tasks'
     | '/auth/$path'
+    | '/auth/check-email'
     | '/auth/setup-2fa'
     | '/auth/two-factor'
     | '/share/$token'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/tasks'
     | '/auth/$path'
+    | '/auth/check-email'
     | '/auth/setup-2fa'
     | '/auth/two-factor'
     | '/share/$token'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_app/notes'
     | '/_app/tasks'
     | '/auth/$path'
+    | '/auth/check-email'
     | '/auth/setup-2fa'
     | '/auth/two-factor'
     | '/share/$token'
@@ -252,6 +264,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthPathRouteRoute: typeof AuthPathRouteRoute
+  AuthCheckEmailRoute: typeof AuthCheckEmailRoute
   AuthSetup2faRoute: typeof AuthSetup2faRoute
   AuthTwoFactorRoute: typeof AuthTwoFactorRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/setup-2fa'
       fullPath: '/auth/setup-2fa'
       preLoaderRoute: typeof AuthSetup2faRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/check-email': {
+      id: '/auth/check-email'
+      path: '/auth/check-email'
+      fullPath: '/auth/check-email'
+      preLoaderRoute: typeof AuthCheckEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/$path': {
@@ -443,6 +463,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
   AuthPathRouteRoute: AuthPathRouteRoute,
+  AuthCheckEmailRoute: AuthCheckEmailRoute,
   AuthSetup2faRoute: AuthSetup2faRoute,
   AuthTwoFactorRoute: AuthTwoFactorRoute,
   ShareTokenRoute: ShareTokenRoute,
