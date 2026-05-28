@@ -129,6 +129,7 @@ export function SignUp({
 }: SignUpProps) {
   const {
     basePaths,
+    baseURL,
     emailAndPassword,
     localization,
     redirectTo,
@@ -182,10 +183,13 @@ export function SignUp({
       dispatch({ type: "clearPasswords" })
       toast.error(error.error?.message || error.message)
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       if (emailAndPassword?.requireEmailVerification) {
-        toast.success(localization.auth.verifyYourEmail)
-        navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+        const params = new URLSearchParams({
+          email: variables.email,
+          redirect: redirectTo
+        })
+        navigate({ to: `${basePaths.auth}/check-email?${params.toString()}` })
       } else {
         navigate({ to: redirectTo })
       }
@@ -211,6 +215,7 @@ export function SignUp({
       name,
       email,
       password,
+      callbackURL: `${baseURL}${redirectTo}`,
       ...(usernameConfig?.enabled
         ? {
             username: username.trim(),
