@@ -12,7 +12,7 @@ export const taskRelations = relations(tasks, ({ one, many }) => ({
     fields: [tasks.userId],
     references: [user.id],
   }),
-  tags: many(taskTags),
+  tags: many(tasksToTags),
 }));
 
 export const taskTagRelations = relations(taskTags, ({ one, many }) => ({

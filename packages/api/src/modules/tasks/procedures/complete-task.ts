@@ -25,10 +25,25 @@ export const completeTask = authorized
     const userId = context.user.id;
     const now = new Date();
 
+    const [existing] = await db
+      .select({ completedAt: tasks.completedAt })
+      .from(tasks)
+      .where(and(eq(tasks.id, input.id), eq(tasks.userId, userId)))
+      .limit(1);
+
+    if (!existing) {
+      throw errors.NOT_FOUND({
+        message: "Task not found.",
+        data: { id: input.id },
+      });
+    }
+
+    const completedAt = input.completed ? (existing.completedAt ?? now) : null;
+
     const [task] = await db
       .update(tasks)
       .set({
-        completedAt: input.completed ? now : null,
+        completedAt,
         updatedAt: now,
       })
       .where(and(eq(tasks.id, input.id), eq(tasks.userId, userId)))

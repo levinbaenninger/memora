@@ -114,7 +114,7 @@ export const listNotes = authorized
       })
       .from(notes)
       .where(and(...where))
-      .orderBy(desc(notes.pinned), desc(notes.updatedAt))
+      .orderBy(desc(notes.pinned), desc(notes.updatedAt), desc(notes.id))
       .limit(input.limit)
       .offset(input.offset);
 

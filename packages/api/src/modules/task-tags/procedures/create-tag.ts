@@ -4,7 +4,8 @@ import { db } from "@memora/db";
 import { taskTags } from "@memora/db/schema";
 
 import { authorized } from "../../../procedures/authorized";
-import { tagNameAlphanumericPattern, tagSchema } from "../schemas";
+import { tagNameAlphanumericPattern } from "../constants";
+import { tagSchema } from "../schemas";
 
 export const createTagRequestDtoSchema = z.object({
   name: z.string().trim().min(1).max(60),

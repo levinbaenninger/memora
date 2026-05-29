@@ -7,6 +7,32 @@ import { noteTags } from "@memora/db/schema";
 import { authorized } from "../../../procedures/authorized";
 import { tagSchema } from "../schemas";
 
+const NOTE_TAG_SLUG_UNIQUE_CONSTRAINT = "note_tags_user_slug_unique";
+
+function isNoteTagNameConflict(error: unknown): boolean {
+  let current: unknown = error;
+
+  while (current && typeof current === "object") {
+    const record = current as {
+      code?: string;
+      constraint?: string;
+      cause?: unknown;
+    };
+
+    if (
+      record.code === "23505" &&
+      (!record.constraint ||
+        record.constraint === NOTE_TAG_SLUG_UNIQUE_CONSTRAINT)
+    ) {
+      return true;
+    }
+
+    current = record.cause;
+  }
+
+  return false;
+}
+
 export const updateTagRequestDtoSchema = z.object({
   id: z.nanoid(),
   name: z.string().trim().min(1).max(60),
@@ -17,7 +43,7 @@ export const updateTagResponseDtoSchema = tagSchema;
 export const updateTag = authorized
   .input(updateTagRequestDtoSchema)
   .output(updateTagResponseDtoSchema)
-  .errors({ BAD_REQUEST: {}, NOT_FOUND: {} })
+  .errors({ BAD_REQUEST: {}, CONFLICT: {}, NOT_FOUND: {} })
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
     const name = input.name.replace(/\s+/g, " ");
@@ -34,11 +60,23 @@ export const updateTag = authorized
       });
     }
 
-    const [tag] = await db
-      .update(noteTags)
-      .set({ name, slug, updatedAt: new Date() })
-      .where(and(eq(noteTags.id, input.id), eq(noteTags.userId, userId)))
-      .returning();
+    let tag: typeof noteTags.$inferSelect | undefined;
+
+    try {
+      [tag] = await db
+        .update(noteTags)
+        .set({ name, slug, updatedAt: new Date() })
+        .where(and(eq(noteTags.id, input.id), eq(noteTags.userId, userId)))
+        .returning();
+    } catch (error) {
+      if (isNoteTagNameConflict(error)) {
+        throw errors.CONFLICT({
+          message: "Tag name already exists.",
+        });
+      }
+
+      throw error;
+    }
 
     if (!tag) {
       throw errors.NOT_FOUND({

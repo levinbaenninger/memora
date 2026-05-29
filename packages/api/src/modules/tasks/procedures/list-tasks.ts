@@ -79,7 +79,7 @@ export const listTasks = authorized
       })
       .from(tasks)
       .where(and(...where))
-      .orderBy(desc(tasks.updatedAt))
+      .orderBy(desc(tasks.updatedAt), desc(tasks.id))
       .limit(input.limit)
       .offset(input.offset);
 
