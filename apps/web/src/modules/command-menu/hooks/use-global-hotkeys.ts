@@ -4,6 +4,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { useCreateNote } from "@/modules/notes/mutations";
+import { useCompleteTask, useDeleteTask } from "@/modules/tasks/mutations";
+import { useTasksStore } from "@/modules/tasks/store";
 import { client, orpc } from "@/utils/orpc";
 import { useTagsForPalette } from "./use-eager-entities";
 import { useRouteEntityContext } from "./use-route-context";
@@ -17,6 +19,9 @@ export function useGlobalHotkeys() {
   const tags = useTagsForPalette().data ?? [];
   const queryClient = useQueryClient();
   const createNote = useCreateNote();
+  const { openTaskId, setOpenTaskId, setCreateDialogOpen } = useTasksStore();
+  const completeTask = useCompleteTask();
+  const deleteTask = useDeleteTask();
 
   const noteQuery = useQuery({
     ...orpc.notes.get.queryOptions({
@@ -25,6 +30,12 @@ export function useGlobalHotkeys() {
     enabled: !!noteId,
   });
   const note = noteQuery.data;
+
+  const taskQuery = useQuery({
+    ...orpc.tasks.get.queryOptions({ input: { id: openTaskId ?? "" } }),
+    enabled: !!openTaskId,
+  });
+  const openTask = taskQuery.data;
 
   const invalidateNote = () => {
     if (!noteId) {
@@ -137,6 +148,45 @@ export function useGlobalHotkeys() {
     { ...OPTS, enabled: !!note }
   );
 
+  useHotkey(
+    "Mod+T",
+    (event) => {
+      event.preventDefault();
+      setCreateDialogOpen(true);
+    },
+    OPTS
+  );
+
+  useHotkey(
+    "Mod+Enter",
+    (event) => {
+      if (!openTask) {
+        return;
+      }
+      event.preventDefault();
+      completeTask.mutate({
+        id: openTaskId ?? "",
+        completed: !openTask.completedAt,
+      });
+    },
+    { ...OPTS, enabled: !!openTaskId }
+  );
+
+  useHotkey(
+    "Mod+Backspace",
+    (event) => {
+      if (!openTask || noteId) {
+        return;
+      }
+      event.preventDefault();
+      deleteTask.mutate(
+        { id: openTaskId ?? "" },
+        { onSuccess: () => setOpenTaskId(null) }
+      );
+    },
+    { ...OPTS, enabled: !!openTaskId && !noteId }
+  );
+
   useHotkeySequence(
     ["G", "N"],
     () => navigate({ to: "/notes" }),
@@ -160,6 +210,21 @@ export function useGlobalHotkeys() {
   useHotkeySequence(
     ["G", "D"],
     () => navigate({ to: "/dashboard" }),
+    SEQUENCE_OPTS
+  );
+  useHotkeySequence(
+    ["G", "T"],
+    () => navigate({ to: "/tasks" }),
+    SEQUENCE_OPTS
+  );
+  useHotkeySequence(
+    ["G", "C"],
+    () => navigate({ to: "/tasks/completed" }),
+    SEQUENCE_OPTS
+  );
+  useHotkeySequence(
+    ["G", "L"],
+    () => navigate({ to: "/tasks/all" }),
     SEQUENCE_OPTS
   );
 }

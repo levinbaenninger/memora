@@ -71,6 +71,7 @@ export const jumpToItems: JumpToItem[] = [
     to: "/tasks",
     icon: Task01Icon,
     keywords: ["todo", "tasks", "active"],
+    shortcut: "g t",
   },
   {
     id: "tasks-completed",
@@ -78,6 +79,7 @@ export const jumpToItems: JumpToItem[] = [
     to: "/tasks/completed",
     icon: CheckmarkCircle01Icon,
     keywords: ["done", "finished", "completed", "tasks"],
+    shortcut: "g c",
   },
   {
     id: "tasks-all",
@@ -85,6 +87,7 @@ export const jumpToItems: JumpToItem[] = [
     to: "/tasks/all",
     icon: ListViewIcon,
     keywords: ["all", "tasks"],
+    shortcut: "g l",
   },
   {
     id: "settings",

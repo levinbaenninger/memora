@@ -21,6 +21,8 @@ import {
   RefreshIcon,
   Share01Icon,
   Tag01Icon,
+  Task01Icon,
+  TaskAdd01Icon,
   UndoIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -63,6 +65,7 @@ import {
 import { useNoteSearch } from "./hooks/use-note-search";
 import { useRecents } from "./hooks/use-recents";
 import { useRouteEntityContext } from "./hooks/use-route-context";
+import { useTaskSearch } from "./hooks/use-task-search";
 import { jumpToItems } from "./jump-to-items";
 
 const MIN_QUERY_LENGTH = 2;
@@ -221,8 +224,11 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
   const tags = useTagsForPalette().data ?? [];
   const noteSearch = useNoteSearch(query);
   const notes = noteSearch.data ?? [];
+  const taskSearch = useTaskSearch(query);
+  const searchedTasks = taskSearch.data ?? [];
 
   const createNote = useCreateNote();
+  const { setCreateDialogOpen } = useTasksStore();
 
   const closeAndRun = (action: () => void) => {
     setOpen(false);
@@ -341,6 +347,15 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
           <CommandShortcut>⌘N</CommandShortcut>
         </CommandItem>
         <CommandItem
+          keywords={["new", "create", "todo"]}
+          onSelect={() => closeAndRun(() => setCreateDialogOpen(true))}
+          value="create-task"
+        >
+          <HugeiconsIcon icon={TaskAdd01Icon} strokeWidth={2} />
+          <span>New task</span>
+          <CommandShortcut>⌘T</CommandShortcut>
+        </CommandItem>
+        <CommandItem
           keywords={["new", "create"]}
           onSelect={() => setPage("new-folder")}
           value="create-folder"
@@ -380,6 +395,15 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
           navigate={navigate}
           query={trimmed}
           tags={tags}
+        />
+      ) : null}
+      {showNotes ? (
+        <TasksSearchGroup
+          closeAndRun={closeAndRun}
+          isFetching={taskSearch.isFetching}
+          navigate={navigate}
+          query={trimmed}
+          tasks={searchedTasks}
         />
       ) : null}
     </>
@@ -1036,6 +1060,7 @@ function AddTagPage() {
 type FoldersList = ReturnType<typeof useFoldersForPalette>["data"];
 type TagsList = ReturnType<typeof useTagsForPalette>["data"];
 type NotesList = ReturnType<typeof useNoteSearch>["data"];
+type TaskSearchList = ReturnType<typeof useTaskSearch>["data"];
 
 function EmptyRow({ message }: { message: string }) {
   return (
@@ -1090,6 +1115,55 @@ function NotesGroup({
           {note.folder ? (
             <span className="ml-auto truncate text-muted-foreground text-xs">
               {note.folder.name}
+            </span>
+          ) : null}
+        </CommandItem>
+      ))}
+    </CommandGroup>
+  );
+}
+
+function TasksSearchGroup({
+  closeAndRun,
+  isFetching,
+  navigate,
+  query,
+  tasks,
+}: {
+  closeAndRun: (action: () => void) => void;
+  isFetching: boolean;
+  navigate: NavigateFn;
+  query: string;
+  tasks: NonNullable<TaskSearchList>;
+}) {
+  const { setOpenTaskId } = useTasksStore();
+  const noResults = !isFetching && tasks.length === 0;
+
+  return (
+    <CommandGroup forceMount heading="Tasks" value="tasks-search">
+      {isFetching && tasks.length === 0 ? (
+        <div className="flex items-center justify-center px-2 py-3 text-muted-foreground text-xs">
+          <Spinner className="size-3" />
+        </div>
+      ) : null}
+      {noResults ? <EmptyRow message={`No tasks match "${query}"`} /> : null}
+      {tasks.map((task) => (
+        <CommandItem
+          forceMount
+          key={task.id}
+          onSelect={() =>
+            closeAndRun(() => {
+              navigate({ to: "/tasks" });
+              setOpenTaskId(task.id);
+            })
+          }
+          value={`task-search-${task.id}`}
+        >
+          <HugeiconsIcon icon={Task01Icon} strokeWidth={2} />
+          <span className="truncate">{task.title || "Untitled"}</span>
+          {task.completedAt ? (
+            <span className="ml-auto shrink-0 text-muted-foreground text-xs">
+              Done
             </span>
           ) : null}
         </CommandItem>
@@ -1222,6 +1296,7 @@ function TaskContextActions({
           strokeWidth={2}
         />
         <span>{isCompleted ? "Reopen task" : "Complete task"}</span>
+        <CommandShortcut>⌘↩</CommandShortcut>
       </CommandItem>
       <CommandItem
         keywords={["delete", "remove", "trash"]}
@@ -1237,6 +1312,7 @@ function TaskContextActions({
       >
         <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
         <span>Delete task</span>
+        <CommandShortcut>⌘⌫</CommandShortcut>
       </CommandItem>
     </CommandGroup>
   );
