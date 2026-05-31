@@ -1,7 +1,9 @@
 import {
   ArchiveIcon,
+  CheckmarkCircle01Icon,
   DashboardSquare01Icon,
   FavouriteIcon,
+  ListViewIcon,
   NoteIcon,
   PinIcon,
   Settings01Icon,
@@ -68,7 +70,21 @@ export const jumpToItems: JumpToItem[] = [
     title: "Tasks",
     to: "/tasks",
     icon: Task01Icon,
-    keywords: ["todo", "tasks"],
+    keywords: ["todo", "tasks", "active"],
+  },
+  {
+    id: "tasks-completed",
+    title: "Completed Tasks",
+    to: "/tasks/completed",
+    icon: CheckmarkCircle01Icon,
+    keywords: ["done", "finished", "completed", "tasks"],
+  },
+  {
+    id: "tasks-all",
+    title: "All Tasks",
+    to: "/tasks/all",
+    icon: ListViewIcon,
+    keywords: ["all", "tasks"],
   },
   {
     id: "settings",

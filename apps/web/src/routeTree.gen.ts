@@ -19,7 +19,10 @@ import { Route as AuthPathRouteRouteImport } from './routes/auth/$path/route'
 import { Route as AppTasksRouteRouteImport } from './routes/_app/tasks/route'
 import { Route as AppNotesRouteRouteImport } from './routes/_app/notes/route'
 import { Route as AppDashboardRouteRouteImport } from './routes/_app/dashboard/route'
+import { Route as AppTasksIndexRouteImport } from './routes/_app/tasks/index'
 import { Route as AppNotesIndexRouteImport } from './routes/_app/notes/index'
+import { Route as AppTasksCompletedRouteImport } from './routes/_app/tasks/completed'
+import { Route as AppTasksAllRouteImport } from './routes/_app/tasks/all'
 import { Route as AppNotesPinnedRouteImport } from './routes/_app/notes/pinned'
 import { Route as AppNotesFavoritesRouteImport } from './routes/_app/notes/favorites'
 import { Route as AppNotesArchivedRouteImport } from './routes/_app/notes/archived'
@@ -27,6 +30,7 @@ import { Route as ApiRpcSplatRouteRouteImport } from './routes/api/rpc/$/route'
 import { Route as ApiAuthSplatRouteRouteImport } from './routes/api/auth/$/route'
 import { Route as AppSettingsPathRouteRouteImport } from './routes/_app/settings/$path/route'
 import { Route as AppNotesNoteIdRouteRouteImport } from './routes/_app/notes/$noteId/route'
+import { Route as AppTasksTagTagIdRouteImport } from './routes/_app/tasks/tag/$tagId'
 import { Route as AppNotesTagTagIdRouteImport } from './routes/_app/notes/tag/$tagId'
 import { Route as AppNotesFolderFolderIdRouteImport } from './routes/_app/notes/folder/$folderId'
 
@@ -79,10 +83,25 @@ const AppDashboardRouteRoute = AppDashboardRouteRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppTasksIndexRoute = AppTasksIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppTasksRouteRoute,
+} as any)
 const AppNotesIndexRoute = AppNotesIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppNotesRouteRoute,
+} as any)
+const AppTasksCompletedRoute = AppTasksCompletedRouteImport.update({
+  id: '/completed',
+  path: '/completed',
+  getParentRoute: () => AppTasksRouteRoute,
+} as any)
+const AppTasksAllRoute = AppTasksAllRouteImport.update({
+  id: '/all',
+  path: '/all',
+  getParentRoute: () => AppTasksRouteRoute,
 } as any)
 const AppNotesPinnedRoute = AppNotesPinnedRouteImport.update({
   id: '/pinned',
@@ -119,6 +138,11 @@ const AppNotesNoteIdRouteRoute = AppNotesNoteIdRouteRouteImport.update({
   path: '/$noteId',
   getParentRoute: () => AppNotesRouteRoute,
 } as any)
+const AppTasksTagTagIdRoute = AppTasksTagTagIdRouteImport.update({
+  id: '/tag/$tagId',
+  path: '/tag/$tagId',
+  getParentRoute: () => AppTasksRouteRoute,
+} as any)
 const AppNotesTagTagIdRoute = AppNotesTagTagIdRouteImport.update({
   id: '/tag/$tagId',
   path: '/tag/$tagId',
@@ -134,7 +158,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRouteRoute
   '/notes': typeof AppNotesRouteRouteWithChildren
-  '/tasks': typeof AppTasksRouteRoute
+  '/tasks': typeof AppTasksRouteRouteWithChildren
   '/auth/$path': typeof AuthPathRouteRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/setup-2fa': typeof AuthSetup2faRoute
@@ -147,14 +171,17 @@ export interface FileRoutesByFullPath {
   '/notes/archived': typeof AppNotesArchivedRoute
   '/notes/favorites': typeof AppNotesFavoritesRoute
   '/notes/pinned': typeof AppNotesPinnedRoute
+  '/tasks/all': typeof AppTasksAllRoute
+  '/tasks/completed': typeof AppTasksCompletedRoute
   '/notes/': typeof AppNotesIndexRoute
+  '/tasks/': typeof AppTasksIndexRoute
   '/notes/folder/$folderId': typeof AppNotesFolderFolderIdRoute
   '/notes/tag/$tagId': typeof AppNotesTagTagIdRoute
+  '/tasks/tag/$tagId': typeof AppTasksTagTagIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRouteRoute
-  '/tasks': typeof AppTasksRouteRoute
   '/auth/$path': typeof AuthPathRouteRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/setup-2fa': typeof AuthSetup2faRoute
@@ -167,9 +194,13 @@ export interface FileRoutesByTo {
   '/notes/archived': typeof AppNotesArchivedRoute
   '/notes/favorites': typeof AppNotesFavoritesRoute
   '/notes/pinned': typeof AppNotesPinnedRoute
+  '/tasks/all': typeof AppTasksAllRoute
+  '/tasks/completed': typeof AppTasksCompletedRoute
   '/notes': typeof AppNotesIndexRoute
+  '/tasks': typeof AppTasksIndexRoute
   '/notes/folder/$folderId': typeof AppNotesFolderFolderIdRoute
   '/notes/tag/$tagId': typeof AppNotesTagTagIdRoute
+  '/tasks/tag/$tagId': typeof AppTasksTagTagIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -177,7 +208,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRouteRoute
   '/_app/notes': typeof AppNotesRouteRouteWithChildren
-  '/_app/tasks': typeof AppTasksRouteRoute
+  '/_app/tasks': typeof AppTasksRouteRouteWithChildren
   '/auth/$path': typeof AuthPathRouteRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/setup-2fa': typeof AuthSetup2faRoute
@@ -190,9 +221,13 @@ export interface FileRoutesById {
   '/_app/notes/archived': typeof AppNotesArchivedRoute
   '/_app/notes/favorites': typeof AppNotesFavoritesRoute
   '/_app/notes/pinned': typeof AppNotesPinnedRoute
+  '/_app/tasks/all': typeof AppTasksAllRoute
+  '/_app/tasks/completed': typeof AppTasksCompletedRoute
   '/_app/notes/': typeof AppNotesIndexRoute
+  '/_app/tasks/': typeof AppTasksIndexRoute
   '/_app/notes/folder/$folderId': typeof AppNotesFolderFolderIdRoute
   '/_app/notes/tag/$tagId': typeof AppNotesTagTagIdRoute
+  '/_app/tasks/tag/$tagId': typeof AppTasksTagTagIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -213,14 +248,17 @@ export interface FileRouteTypes {
     | '/notes/archived'
     | '/notes/favorites'
     | '/notes/pinned'
+    | '/tasks/all'
+    | '/tasks/completed'
     | '/notes/'
+    | '/tasks/'
     | '/notes/folder/$folderId'
     | '/notes/tag/$tagId'
+    | '/tasks/tag/$tagId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
-    | '/tasks'
     | '/auth/$path'
     | '/auth/check-email'
     | '/auth/setup-2fa'
@@ -233,9 +271,13 @@ export interface FileRouteTypes {
     | '/notes/archived'
     | '/notes/favorites'
     | '/notes/pinned'
+    | '/tasks/all'
+    | '/tasks/completed'
     | '/notes'
+    | '/tasks'
     | '/notes/folder/$folderId'
     | '/notes/tag/$tagId'
+    | '/tasks/tag/$tagId'
   id:
     | '__root__'
     | '/'
@@ -255,9 +297,13 @@ export interface FileRouteTypes {
     | '/_app/notes/archived'
     | '/_app/notes/favorites'
     | '/_app/notes/pinned'
+    | '/_app/tasks/all'
+    | '/_app/tasks/completed'
     | '/_app/notes/'
+    | '/_app/tasks/'
     | '/_app/notes/folder/$folderId'
     | '/_app/notes/tag/$tagId'
+    | '/_app/tasks/tag/$tagId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -344,12 +390,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/tasks/': {
+      id: '/_app/tasks/'
+      path: '/'
+      fullPath: '/tasks/'
+      preLoaderRoute: typeof AppTasksIndexRouteImport
+      parentRoute: typeof AppTasksRouteRoute
+    }
     '/_app/notes/': {
       id: '/_app/notes/'
       path: '/'
       fullPath: '/notes/'
       preLoaderRoute: typeof AppNotesIndexRouteImport
       parentRoute: typeof AppNotesRouteRoute
+    }
+    '/_app/tasks/completed': {
+      id: '/_app/tasks/completed'
+      path: '/completed'
+      fullPath: '/tasks/completed'
+      preLoaderRoute: typeof AppTasksCompletedRouteImport
+      parentRoute: typeof AppTasksRouteRoute
+    }
+    '/_app/tasks/all': {
+      id: '/_app/tasks/all'
+      path: '/all'
+      fullPath: '/tasks/all'
+      preLoaderRoute: typeof AppTasksAllRouteImport
+      parentRoute: typeof AppTasksRouteRoute
     }
     '/_app/notes/pinned': {
       id: '/_app/notes/pinned'
@@ -400,6 +467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNotesNoteIdRouteRouteImport
       parentRoute: typeof AppNotesRouteRoute
     }
+    '/_app/tasks/tag/$tagId': {
+      id: '/_app/tasks/tag/$tagId'
+      path: '/tag/$tagId'
+      fullPath: '/tasks/tag/$tagId'
+      preLoaderRoute: typeof AppTasksTagTagIdRouteImport
+      parentRoute: typeof AppTasksRouteRoute
+    }
     '/_app/notes/tag/$tagId': {
       id: '/_app/notes/tag/$tagId'
       path: '/tag/$tagId'
@@ -441,17 +515,35 @@ const AppNotesRouteRouteWithChildren = AppNotesRouteRoute._addFileChildren(
   AppNotesRouteRouteChildren,
 )
 
+interface AppTasksRouteRouteChildren {
+  AppTasksAllRoute: typeof AppTasksAllRoute
+  AppTasksCompletedRoute: typeof AppTasksCompletedRoute
+  AppTasksIndexRoute: typeof AppTasksIndexRoute
+  AppTasksTagTagIdRoute: typeof AppTasksTagTagIdRoute
+}
+
+const AppTasksRouteRouteChildren: AppTasksRouteRouteChildren = {
+  AppTasksAllRoute: AppTasksAllRoute,
+  AppTasksCompletedRoute: AppTasksCompletedRoute,
+  AppTasksIndexRoute: AppTasksIndexRoute,
+  AppTasksTagTagIdRoute: AppTasksTagTagIdRoute,
+}
+
+const AppTasksRouteRouteWithChildren = AppTasksRouteRoute._addFileChildren(
+  AppTasksRouteRouteChildren,
+)
+
 interface AppRouteRouteChildren {
   AppDashboardRouteRoute: typeof AppDashboardRouteRoute
   AppNotesRouteRoute: typeof AppNotesRouteRouteWithChildren
-  AppTasksRouteRoute: typeof AppTasksRouteRoute
+  AppTasksRouteRoute: typeof AppTasksRouteRouteWithChildren
   AppSettingsPathRouteRoute: typeof AppSettingsPathRouteRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDashboardRouteRoute: AppDashboardRouteRoute,
   AppNotesRouteRoute: AppNotesRouteRouteWithChildren,
-  AppTasksRouteRoute: AppTasksRouteRoute,
+  AppTasksRouteRoute: AppTasksRouteRouteWithChildren,
   AppSettingsPathRouteRoute: AppSettingsPathRouteRoute,
 }
 
@@ -473,3 +565,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

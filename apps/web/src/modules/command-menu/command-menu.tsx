@@ -5,6 +5,7 @@ import {
   Alert02Icon,
   ArchiveIcon,
   ArrowLeft01Icon,
+  CheckmarkCircle01Icon,
   Delete02Icon,
   Edit02Icon,
   FavouriteIcon,
@@ -17,6 +18,7 @@ import {
   NoteIcon,
   PinIcon,
   PinOffIcon,
+  RefreshIcon,
   Share01Icon,
   Tag01Icon,
   UndoIcon,
@@ -50,6 +52,8 @@ import {
   useUpdateTag,
 } from "@/modules/notes/mutations";
 import { useSharePopoverStore } from "@/modules/sharing/store";
+import { useCompleteTask, useDeleteTask } from "@/modules/tasks/mutations";
+import { useTasksStore } from "@/modules/tasks/store";
 import { client, orpc } from "@/utils/orpc";
 import { useCommandMenu } from "./context";
 import {
@@ -325,6 +329,7 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
           tagId={routeCtx.tagId}
         />
       ) : null}
+      <TaskContextActions closeAndRun={closeAndRun} />
       <CommandGroup heading="Create">
         <CommandItem
           keywords={["new", "create"]}
@@ -1176,6 +1181,61 @@ function TagsGroup({
           <span className="truncate">{tag.name}</span>
         </CommandItem>
       ))}
+    </CommandGroup>
+  );
+}
+
+function TaskContextActions({
+  closeAndRun,
+}: {
+  closeAndRun: (action: () => void) => void;
+}) {
+  const { openTaskId, setOpenTaskId } = useTasksStore();
+  const completeTask = useCompleteTask();
+  const deleteTask = useDeleteTask();
+
+  const taskQuery = useQuery({
+    ...orpc.tasks.get.queryOptions({ input: { id: openTaskId ?? "" } }),
+    enabled: !!openTaskId,
+  });
+
+  if (!(openTaskId && taskQuery.data)) {
+    return null;
+  }
+
+  const task = taskQuery.data;
+  const isCompleted = !!task.completedAt;
+
+  return (
+    <CommandGroup heading="Task actions">
+      <CommandItem
+        keywords={["complete", "done", "finish", "reopen"]}
+        onSelect={() =>
+          closeAndRun(() =>
+            completeTask.mutate({ id: openTaskId, completed: !isCompleted })
+          )
+        }
+        value="task-complete"
+      >
+        <HugeiconsIcon
+          icon={isCompleted ? RefreshIcon : CheckmarkCircle01Icon}
+          strokeWidth={2}
+        />
+        <span>{isCompleted ? "Reopen task" : "Complete task"}</span>
+      </CommandItem>
+      <CommandItem
+        keywords={["delete", "remove", "trash"]}
+        onSelect={() =>
+          closeAndRun(() => {
+            setOpenTaskId(null);
+            deleteTask.mutate({ id: openTaskId });
+          })
+        }
+        value="task-delete"
+      >
+        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+        <span>Delete task</span>
+      </CommandItem>
     </CommandGroup>
   );
 }

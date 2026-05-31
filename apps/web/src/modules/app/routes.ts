@@ -1,7 +1,9 @@
 import {
   ArchiveIcon,
+  CheckmarkCircle01Icon,
   DashboardSquare01Icon,
   FavouriteIcon,
+  ListViewIcon,
   Notebook01Icon,
   NoteIcon,
   PinIcon,
@@ -86,6 +88,24 @@ const navGroups: SidebarNavGroup[] = [
         title: "Tasks",
         path: "/tasks",
         icon: routeIcon(Task01Icon),
+        subItems: [
+          {
+            title: "Active",
+            path: "/tasks",
+            exact: true,
+            icon: routeIcon(CheckmarkCircle01Icon),
+          },
+          {
+            title: "Completed",
+            path: "/tasks/completed",
+            icon: routeIcon(ListViewIcon),
+          },
+          {
+            title: "All Tasks",
+            path: "/tasks/all",
+            icon: routeIcon(ListViewIcon),
+          },
+        ],
       },
     ],
   },

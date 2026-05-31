@@ -14,6 +14,8 @@ import { CommandMenuProvider } from "@/modules/command-menu/context";
 import { useGlobalHotkeys } from "@/modules/command-menu/hooks/use-global-hotkeys";
 import { useNotesBreadcrumbs } from "@/modules/notes/hooks/use-notes-breadcrumbs";
 import { NotesNavPanel } from "@/modules/notes/ui/components/notes-nav-panel";
+import { useTasksBreadcrumbs } from "@/modules/tasks/hooks/use-tasks-breadcrumbs";
+import { TasksNavPanel } from "@/modules/tasks/ui/components/tasks-nav-panel";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -32,20 +34,33 @@ export function AppShell({
 }: AppShellProps) {
   const baseBreadcrumbItems = getBreadcrumbItems(pathname);
   const notesBreadcrumbs = useNotesBreadcrumbs(pathname);
-  const breadcrumbItems = [...baseBreadcrumbItems, ...notesBreadcrumbs];
+  const tasksBreadcrumbs = useTasksBreadcrumbs(pathname);
+  const breadcrumbItems = [
+    ...baseBreadcrumbItems,
+    ...notesBreadcrumbs,
+    ...tasksBreadcrumbs,
+  ];
   const footerNavLinks = getFooterNavLinks(pathname);
   const isNotes = pathname.startsWith("/notes");
+  const isTasks = pathname.startsWith("/tasks");
 
   const navGroups = getNavGroups(pathname, currentSearch).map((group) => ({
     ...group,
-    items: group.items.map((item) =>
-      item.path === "/notes"
-        ? {
-            ...item,
-            contextualContent: isNotes ? <NotesNavPanel /> : undefined,
-          }
-        : item
-    ),
+    items: group.items.map((item) => {
+      if (item.path === "/notes") {
+        return {
+          ...item,
+          contextualContent: isNotes ? <NotesNavPanel /> : undefined,
+        };
+      }
+      if (item.path === "/tasks") {
+        return {
+          ...item,
+          contextualContent: isTasks ? <TasksNavPanel /> : undefined,
+        };
+      }
+      return item;
+    }),
   }));
 
   return (
