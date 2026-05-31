@@ -167,11 +167,10 @@ export const auth = betterAuth({
     allowedHosts: [
       "memora.baenninger.me",
       "memora-*-levexis.vercel.app",
-      "unquick-unarticulative-arlene.ngrok-free.dev",
       "localhost:3000",
     ],
     fallback: "https://memora.baenninger.me",
-    protocol: process.env.NODE_ENV === "development" ? "https" : "https",
+    protocol: process.env.NODE_ENV === "development" ? "http" : "https",
   },
   socialProviders: {
     google: {
