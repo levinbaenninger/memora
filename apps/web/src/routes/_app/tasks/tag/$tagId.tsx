@@ -1,13 +1,15 @@
 import { Tag01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { isDefinedError, ORPCError } from "@orpc/client";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import { tasksListInput, useTaskTagsList } from "@/modules/tasks/queries";
+import { tasksListInput } from "@/modules/tasks/queries";
 import { TaskListSkeleton } from "@/modules/tasks/ui/views/task-list-skeleton";
 import { TaskListView } from "@/modules/tasks/ui/views/task-list-view";
 import { TaskTagNotFoundView } from "@/modules/tasks/ui/views/task-tag-not-found-view";
+import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/_app/tasks/tag/$tagId")({
   loader: async ({ context, params }) => {
@@ -50,8 +52,8 @@ export const Route = createFileRoute("/_app/tasks/tag/$tagId")({
 function TagView() {
   const { tagId } = Route.useParams();
   const { tagName: initialName } = Route.useLoaderData();
-  const { data: tags } = useTaskTagsList();
-  const tagName = tags.find((tag) => tag.id === tagId)?.name ?? initialName;
+  const { data: tags } = useQuery(orpc.tasks.tags.list.queryOptions());
+  const tagName = tags?.find((tag) => tag.id === tagId)?.name ?? initialName;
 
   useEffect(() => {
     document.title = `${tagName} | Memora`;

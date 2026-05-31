@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { orpc } from "@/utils/orpc";
 
@@ -34,11 +34,18 @@ export function tasksListInput(params: TasksListParams) {
 }
 
 export function useTasksList(params: TasksListParams) {
-  return useSuspenseQuery(
+  const result = useQuery(
     orpc.tasks.list.queryOptions({
       input: tasksListInput(params),
     })
   );
+
+  return {
+    tasks: result.data ?? [],
+    isPending: result.isPending,
+    isError: result.isError,
+    error: result.error,
+  };
 }
 
 export function useTask(id: string) {

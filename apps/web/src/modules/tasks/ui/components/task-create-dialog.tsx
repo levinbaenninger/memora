@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { Button } from "@memora/ui/components/button";
@@ -12,8 +13,8 @@ import { Field, FieldGroup, FieldLabel } from "@memora/ui/components/field";
 import { Input } from "@memora/ui/components/input";
 import { Textarea } from "@memora/ui/components/textarea";
 
+import { orpc } from "@/utils/orpc";
 import { useCreateTask } from "../../mutations";
-import { useTaskTagsList } from "../../queries";
 import { useTasksStore } from "../../store";
 import { DueDatePicker } from "./due-date-picker";
 import { TaskTagCombobox } from "./task-tag-combobox";
@@ -27,7 +28,7 @@ function TaskCreateDialogInner({
   onClose,
   defaultTagNames = [],
 }: TaskCreateDialogInnerProps) {
-  const { data: allTags } = useTaskTagsList();
+  const { data: allTags = [] } = useQuery(orpc.tasks.tags.list.queryOptions());
   const createTask = useCreateTask();
   const { setOpenTaskId } = useTasksStore();
 
@@ -131,12 +132,14 @@ export function TaskCreateDialog({
 
   return (
     <Dialog onOpenChange={setCreateDialogOpen} open={createDialogOpen}>
-      <DialogContent className="max-w-md">
-        <TaskCreateDialogInner
-          defaultTagNames={defaultTagNames}
-          onClose={() => setCreateDialogOpen(false)}
-        />
-      </DialogContent>
+      {createDialogOpen ? (
+        <DialogContent className="max-w-md">
+          <TaskCreateDialogInner
+            defaultTagNames={defaultTagNames}
+            onClose={() => setCreateDialogOpen(false)}
+          />
+        </DialogContent>
+      ) : null}
     </Dialog>
   );
 }

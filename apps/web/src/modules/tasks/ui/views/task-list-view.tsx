@@ -1,8 +1,10 @@
 import {
+  Alert01Icon,
   CheckmarkCircle01Icon,
   ListViewIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import { Button } from "@memora/ui/components/button";
@@ -13,10 +15,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@memora/ui/components/empty";
+import { Spinner } from "@memora/ui/components/spinner";
 
+import { orpc } from "@/utils/orpc";
 import { sortTasks } from "../../lib/task-dates";
 import type { TaskView } from "../../queries";
-import { TASK_LIMIT, useTasksList, useTaskTagsList } from "../../queries";
+import { TASK_LIMIT, useTasksList } from "../../queries";
 import { useTasksStore } from "../../store";
 import { TaskCreateDialog } from "../components/task-create-dialog";
 import { TaskDetailSheet } from "../components/task-detail-sheet";
@@ -64,13 +68,16 @@ export function TaskListView({
   titleIcon,
   view,
 }: TaskListViewProps) {
-  const { data: tasks } = useTasksList({ view, tagId });
-  const { data: allTags } = useTaskTagsList();
+  const { tasks, isPending, isError } = useTasksList({ view, tagId });
+  const tagsQuery = useQuery({
+    ...orpc.tasks.tags.list.queryOptions(),
+    enabled: !!tagId,
+  });
   const { setCreateDialogOpen } = useTasksStore();
   const sorted = sortTasks(tasks);
   const isTruncated = tasks.length >= TASK_LIMIT;
   const activeTagName = tagId
-    ? allTags.find((t) => t.id === tagId)?.name
+    ? tagsQuery.data?.find((t) => t.id === tagId)?.name
     : undefined;
   const defaultTagNames = activeTagName ? [activeTagName] : undefined;
 
@@ -80,11 +87,11 @@ export function TaskListView({
         <h1 className="flex items-center gap-2 font-semibold text-2xl [&>svg]:size-5">
           {titleIcon}
           {title}
-          {sorted.length > 0 ? (
+          {isPending || isError || isTruncated ? null : (
             <span className="ml-1 font-normal text-base text-muted-foreground">
               {sorted.length}
             </span>
-          ) : null}
+          )}
         </h1>
         <div className="flex items-center gap-2">
           {contextActions}
@@ -103,14 +110,34 @@ export function TaskListView({
         <TaskQuickAdd defaultTagNames={defaultTagNames} />
       ) : null}
 
-      {isTruncated ? (
+      {isPending ? (
+        <div className="flex flex-1 items-center justify-center">
+          <Spinner className="size-6" />
+        </div>
+      ) : null}
+
+      {!isPending && isError ? (
+        <Empty className="flex-1">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={Alert01Icon} strokeWidth={2} />
+            </EmptyMedia>
+            <EmptyTitle>Couldn&apos;t load tasks</EmptyTitle>
+            <EmptyDescription>
+              Something went wrong fetching this view. Try refreshing the page.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : null}
+
+      {!(isPending || isError) && isTruncated ? (
         <p className="text-muted-foreground text-xs">
           Showing first {TASK_LIMIT} tasks. Use tags or filters to narrow
           results.
         </p>
       ) : null}
 
-      {sorted.length === 0 ? (
+      {!(isPending || isError) && sorted.length === 0 ? (
         <Empty className="flex-1">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -122,7 +149,9 @@ export function TaskListView({
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
-      ) : (
+      ) : null}
+
+      {!(isPending || isError) && sorted.length > 0 ? (
         <div className="flex flex-col gap-1.5">
           {sorted.map((task) => (
             <TaskRow
@@ -135,9 +164,9 @@ export function TaskListView({
             />
           ))}
         </div>
-      )}
+      ) : null}
 
-      <TaskCreateDialog />
+      <TaskCreateDialog defaultTagNames={defaultTagNames} />
       <TaskDetailSheet />
     </div>
   );

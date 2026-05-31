@@ -2,7 +2,7 @@ import { Add01Icon, Cancel01Icon, Tag01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 
-import { tagNameAlphanumericPattern } from "@memora/api";
+import { tagNameAlphanumericPattern } from "@memora/api/modules/task-tags/constants";
 import { Badge } from "@memora/ui/components/badge";
 import { Button } from "@memora/ui/components/button";
 import {

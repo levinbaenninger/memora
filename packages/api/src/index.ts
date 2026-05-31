@@ -1,6 +1,2 @@
 export { tagNameAlphanumericPattern } from "./modules/task-tags/constants";
-export {
-  type AppRouter,
-  type AppRouterClient,
-  appRouter,
-} from "./router";
+export type { AppRouter, AppRouterClient } from "./router";

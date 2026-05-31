@@ -1,28 +1,18 @@
-import { createORPCClient, createSafeClient } from "@orpc/client";
-import { RPCLink } from "@orpc/client/fetch";
-import { createRouterClient, type RouterClient } from "@orpc/server";
+import { createSafeClient } from "@orpc/client";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createIsomorphicFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 
-import { appRouter } from "@memora/api/router";
+import type { AppRouterClient } from "@memora/api/router";
+
+import { createORPCBrowserClient } from "./orpc.client";
 
 const getORPCClient = createIsomorphicFn()
-  .server(() => {
-    return createRouterClient(appRouter, {
-      context: async () => ({
-        reqHeaders: getRequestHeaders(),
-      }),
-    });
+  .server(async () => {
+    const { createORPCServerClient } = await import("./orpc.server");
+    return createORPCServerClient();
   })
-  .client((): RouterClient<typeof appRouter> => {
-    const link = new RPCLink({
-      url: `${window.location.origin}/api/rpc`,
-    });
+  .client(() => createORPCBrowserClient());
 
-    return createORPCClient(link);
-  });
-
-export const client: RouterClient<typeof appRouter> = getORPCClient();
+export const client = getORPCClient() as AppRouterClient;
 export const safeClient = createSafeClient(client);
 export const orpc = createTanstackQueryUtils(client);

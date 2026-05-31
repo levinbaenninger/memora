@@ -5,6 +5,7 @@ import {
   RefreshIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useState } from "react";
 
 import {
@@ -29,15 +30,16 @@ import {
 import { Skeleton } from "@memora/ui/components/skeleton";
 import { Textarea } from "@memora/ui/components/textarea";
 
+import { orpc } from "@/utils/orpc";
 import { useCompleteTask, useDeleteTask, useUpdateTask } from "../../mutations";
-import { useTask, useTaskTagsList } from "../../queries";
+import { useTask } from "../../queries";
 import { useTasksStore } from "../../store";
 import { DueDatePicker } from "./due-date-picker";
 import { TaskTagCombobox } from "./task-tag-combobox";
 
 function TaskDetailContent({ taskId }: { taskId: string }) {
   const { data: task } = useTask(taskId);
-  const { data: allTags } = useTaskTagsList();
+  const { data: allTags = [] } = useQuery(orpc.tasks.tags.list.queryOptions());
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
   const completeTask = useCompleteTask();

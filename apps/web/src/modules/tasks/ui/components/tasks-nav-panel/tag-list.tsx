@@ -1,11 +1,12 @@
+import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 
 import { TagNavList } from "@/components/tag-nav-list";
 import { useDeleteTaskTag, useUpdateTaskTag } from "@/modules/tasks/mutations";
-import { useTaskTagsList } from "@/modules/tasks/queries";
+import { orpc } from "@/utils/orpc";
 
 export function TaskTagList() {
-  const { data: tags } = useTaskTagsList();
+  const { data: tags = [] } = useQuery(orpc.tasks.tags.list.queryOptions());
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const deleteTag = useDeleteTaskTag();
