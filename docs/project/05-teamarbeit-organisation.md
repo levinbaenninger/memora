@@ -2,7 +2,19 @@
 
 ## Zusammenarbeit
 
-Unsere Zusammenarbeit ist über Git nachvollziehbar. Commits, Branches und Pull Requests zeigen, wer an welchen Teilen gearbeitet hat.
+Unsere Zusammenarbeit ist über Git nachvollziehbar. Wir haben grössere Arbeiten über Branches und Pull Requests umgesetzt. Dadurch konnten wir Änderungen getrennt entwickeln, prüfen und erst danach in `main` übernehmen.
+
+Wir haben die Arbeit grob nach Themen aufgeteilt. Levin hat zuerst die Projektbasis, Notes, Auth/Security und Sharing aufgebaut. Tobias hat später vor allem den Task-Bereich übernommen. Beim Task-Frontend, beim Dashboard, bei Shortcuts und bei der Dokumentation gab es Überschneidungen, bei denen wir gegenseitig ergänzt und angepasst haben.
+
+Unser Vorgehen war iterativ:
+
+1. Grundfunktionen planen und umsetzen.
+2. Feature in einem Branch entwickeln.
+3. Pull Request erstellen und Checks laufen lassen.
+4. Review-Findings, Fehler und UI-Probleme korrigieren.
+5. Feature mergen und die Dokumentation nachführen.
+
+Für Security-Themen haben wir zusätzlich bewusst nach OWASP-Kategorien gearbeitet. Dadurch konnten wir prüfen, ob die Massnahmen nicht nur im Code vorhanden sind, sondern auch dokumentiert und mit manuellen Testprotokollen nachweisbar sind.
 
 ## Beiträge
 
@@ -26,13 +38,17 @@ Unsere Zusammenarbeit ist über Git nachvollziehbar. Commits, Branches und Pull 
 
 ## Organisation
 
-Das Projekt ist als Monorepo organisiert. Dadurch sind Web-App, API, Auth, Database, UI und Env-Konfiguration getrennt, aber im gleichen Repository versioniert. Grössere Architekturentscheidungen halten wir als ADRs unter `docs/adr/` fest. Die Domain-Language und die Beziehungen zwischen den Entitäten sind in `CONTEXT.md` festgehalten.
+Für die Organisation haben wir GitHub als zentrale Stelle genutzt. Commits zeigen die einzelnen Arbeitsschritte, Pull Requests bündeln grössere Änderungen und GitHub Actions prüfen Linting, Typechecking und Build. Dadurch war jederzeit sichtbar, welche Änderung zu welchem Feature gehört.
 
-Wichtige organisatorische Dateien:
+Wichtige organisatorische Hilfsmittel:
 
-- `README.md`
-- `CONTEXT.md`
-- `docs/adr/**`
+- Branches und Pull Requests für grössere Features
+- GitHub Actions für automatische Checks
+- Commit-History zur Nachvollziehbarkeit der Beiträge
+- Teams für Kommunikation und Koordination
+- `docs/adr/**` für grössere Architekturentscheidungen
+- `CONTEXT.md` für Domain-Language und wichtige Zusammenhänge
+- `docs/project/**` für die Abgabedokumentation
 
 ## Nachweise
 
