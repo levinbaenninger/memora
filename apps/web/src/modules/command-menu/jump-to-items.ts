@@ -69,6 +69,7 @@ export const jumpToItems: JumpToItem[] = [
     to: "/tasks",
     icon: Task01Icon,
     keywords: ["todo", "tasks"],
+    shortcut: "g t",
   },
   {
     id: "settings",

@@ -2,8 +2,8 @@
 
 import { useSession } from "@better-auth-ui/react";
 
-import { QuickCapture } from "@/modules/dashboard/ui/components/quick-capture";
 import { RecentNotes } from "@/modules/dashboard/ui/components/recent-notes";
+import { TasksToday } from "@/modules/dashboard/ui/components/tasks-today";
 
 function greeting(date: Date): string {
   const h = date.getHours();
@@ -59,7 +59,7 @@ export function DashboardView() {
         <p className="text-muted-foreground text-sm">{dateLabel}</p>
       </header>
 
-      <QuickCapture />
+      <TasksToday />
 
       <RecentNotes />
     </div>
