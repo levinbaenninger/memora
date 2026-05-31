@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarIcon } from "@hugeicons/core-free-icons";
+import { CalendarIcon, Delete02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { startTransition } from "react";
 
@@ -9,7 +9,7 @@ import { Checkbox } from "@memora/ui/components/checkbox";
 import { cn } from "@memora/ui/lib/utils";
 
 import { formatDueDate, isOverdue } from "../../lib/task-dates";
-import { useCompleteTask } from "../../mutations";
+import { useCompleteTask, useDeleteTask } from "../../mutations";
 import { useTasksStore } from "../../store";
 
 interface TaskRowProps {
@@ -23,6 +23,7 @@ interface TaskRowProps {
 export function TaskRow({ id, title, dueAt, completedAt, tags }: TaskRowProps) {
   const { setOpenTaskId } = useTasksStore();
   const completeTask = useCompleteTask();
+  const deleteTask = useDeleteTask();
 
   const isCompleted = !!completedAt;
   const overdue = isOverdue({ dueAt, completedAt });
@@ -87,6 +88,21 @@ export function TaskRow({ id, title, dueAt, completedAt, tags }: TaskRowProps) {
           ))}
         </div>
       </div>
+
+      <button
+        aria-label="Delete task"
+        className="ml-1 shrink-0 self-center rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive disabled:pointer-events-none group-hover:opacity-100"
+        disabled={deleteTask.isPending}
+        onClick={(e) => {
+          e.stopPropagation();
+          startTransition(() => {
+            deleteTask.mutate({ id });
+          });
+        }}
+        type="button"
+      >
+        <HugeiconsIcon className="size-4" icon={Delete02Icon} strokeWidth={2} />
+      </button>
     </button>
   );
 }
