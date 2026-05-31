@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteTags } from "@memora/db/schema";
 
+import { isUniqueViolation } from "../../../lib/db-errors";
 import {
   hasAlphanumericContent,
   normalizeTagName,
@@ -11,6 +12,8 @@ import {
 } from "../../../lib/tag-name";
 import { authorized } from "../../../procedures/authorized";
 import { tagSchema } from "../schemas";
+
+const NOTE_TAG_SLUG_UNIQUE_CONSTRAINT = "note_tags_user_slug_unique";
 
 export const createTagRequestDtoSchema = z.object({
   name: z.string().trim().min(1).max(60),
@@ -34,13 +37,24 @@ export const createTag = authorized
 
     const slug = slugifyTagName(name);
 
-    await db
-      .insert(noteTags)
-      .values({ userId, name, slug })
-      .onConflictDoUpdate({
-        target: [noteTags.userId, noteTags.slug],
-        set: { updatedAt: new Date() },
-      });
+    try {
+      const [tag] = await db
+        .insert(noteTags)
+        .values({ userId, name, slug })
+        .returning();
+
+      if (!tag) {
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "Internal server error.",
+        });
+      }
+
+      return createTagResponseDtoSchema.parse(tag);
+    } catch (error) {
+      if (!isUniqueViolation(error, NOTE_TAG_SLUG_UNIQUE_CONSTRAINT)) {
+        throw error;
+      }
+    }
 
     const [tag] = await db
       .select()

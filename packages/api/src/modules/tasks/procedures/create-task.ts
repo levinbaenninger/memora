@@ -5,6 +5,7 @@ import { db } from "@memora/db";
 import { tasks, tasksToTags, taskTags } from "@memora/db/schema";
 
 import { authorized } from "../../../procedures/authorized";
+import { insertTaskTags } from "../../task-tags/lib/insert-tags";
 import { tagNameAlphanumericPattern, tagSchema } from "../../task-tags/schemas";
 import { taskSchema } from "../schema";
 
@@ -75,13 +76,7 @@ export const createTask = authorized
       createdTask = created;
 
       if (tagRows.length > 0) {
-        await tx
-          .insert(taskTags)
-          .values(tagRows.map((tag) => ({ ...tag, userId })))
-          .onConflictDoUpdate({
-            target: [taskTags.userId, taskTags.name],
-            set: { updatedAt: new Date() },
-          });
+        await insertTaskTags(tx, userId, tagRows);
       }
 
       const tags =
