@@ -12,6 +12,7 @@ import { Button } from "@memora/ui/components/button";
 
 export function TasksErrorView({ error }: ErrorComponentProps) {
   const router = useRouter();
+  console.error(error);
 
   return (
     <div className="flex h-full items-center justify-center p-6">
@@ -23,9 +24,7 @@ export function TasksErrorView({ error }: ErrorComponentProps) {
             strokeWidth={2}
           />
           <AlertTitle>Something went wrong</AlertTitle>
-          <AlertDescription>
-            {error instanceof Error ? error.message : "Failed to load tasks."}
-          </AlertDescription>
+          <AlertDescription>{"Failed to load tasks."}</AlertDescription>
         </Alert>
         <Button
           className="w-full"

@@ -26,7 +26,13 @@ export function isOverdue(
   if (!task.dueAt || task.completedAt) {
     return false;
   }
-  return task.dueAt < new Date();
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  return task.dueAt < startOfToday;
 }
 
 export function formatDueDate(date: Date): string {

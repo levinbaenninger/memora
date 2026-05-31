@@ -1227,8 +1227,10 @@ function TaskContextActions({
         keywords={["delete", "remove", "trash"]}
         onSelect={() =>
           closeAndRun(() => {
-            setOpenTaskId(null);
-            deleteTask.mutate({ id: openTaskId });
+            deleteTask.mutate(
+              { id: openTaskId },
+              { onSuccess: () => setOpenTaskId(null) }
+            );
           })
         }
         value="task-delete"

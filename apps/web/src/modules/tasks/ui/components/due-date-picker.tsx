@@ -52,21 +52,29 @@ export function DueDatePicker({
               {value ? formatDueDate(value) : placeholder}
             </span>
             {value ? (
-              <button
+              // biome-ignore lint/a11y/useSemanticElements: nested inside <button>; cannot use <button>
+              <span
                 aria-label="Clear due date"
                 className="-mr-0.5 ml-auto flex size-4 shrink-0 items-center justify-center rounded hover:text-foreground"
                 onClick={(e) => {
                   e.stopPropagation();
                   onChange(null);
                 }}
-                type="button"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation();
+                    onChange(null);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
               >
                 <HugeiconsIcon
                   className="size-3"
                   icon={Cancel01Icon}
                   strokeWidth={2}
                 />
-              </button>
+              </span>
             ) : null}
           </Button>
         )}
