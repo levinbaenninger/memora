@@ -14,6 +14,7 @@ import { CommandMenuProvider } from "@/modules/command-menu/context";
 import { useGlobalHotkeys } from "@/modules/command-menu/hooks/use-global-hotkeys";
 import { useNotesBreadcrumbs } from "@/modules/notes/hooks/use-notes-breadcrumbs";
 import { NotesNavPanel } from "@/modules/notes/ui/components/notes-nav-panel";
+import { TaskDialog } from "@/modules/tasks/ui/components/task-dialog";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -69,6 +70,7 @@ export function AppShell({
           </div>
         </SidebarInset>
         <CommandMenu />
+        <TaskDialog />
         <GlobalHotkeysMount />
       </SidebarProvider>
     </CommandMenuProvider>

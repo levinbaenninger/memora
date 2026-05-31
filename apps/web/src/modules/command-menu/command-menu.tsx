@@ -5,6 +5,7 @@ import {
   Alert02Icon,
   ArchiveIcon,
   ArrowLeft01Icon,
+  CheckListIcon,
   Delete02Icon,
   Edit02Icon,
   FavouriteIcon,
@@ -19,6 +20,7 @@ import {
   PinOffIcon,
   Share01Icon,
   Tag01Icon,
+  Task01Icon,
   UndoIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -35,7 +37,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandShortcut,
 } from "@memora/ui/components/command";
 import { Spinner } from "@memora/ui/components/spinner";
 
@@ -50,6 +51,7 @@ import {
   useUpdateTag,
 } from "@/modules/notes/mutations";
 import { useSharePopoverStore } from "@/modules/sharing/store";
+import { useTaskDialogStore } from "@/modules/tasks/store";
 import { client, orpc } from "@/utils/orpc";
 import { useCommandMenu } from "./context";
 import {
@@ -60,6 +62,7 @@ import { useNoteSearch } from "./hooks/use-note-search";
 import { useRecents } from "./hooks/use-recents";
 import { useRouteEntityContext } from "./hooks/use-route-context";
 import { jumpToItems } from "./jump-to-items";
+import { Shortcut } from "./shortcut";
 
 const MIN_QUERY_LENGTH = 2;
 
@@ -72,7 +75,7 @@ const recentIcon = {
 const PLACEHOLDERS = {
   root: "Search or jump to…",
   "new-folder": "Folder name…",
-  "new-tag": "Tag name…",
+  "new-tag": "Note tag name…",
   "rename-folder": "New folder name…",
   "rename-tag": "New tag name…",
   "delete-folder": "Press Enter to delete…",
@@ -87,7 +90,7 @@ const PAGE_TITLES = {
   "rename-tag": "Rename tag",
   "delete-folder": "Delete folder",
   "delete-tag": "Delete tag",
-  "new-tag": "Create tag",
+  "new-tag": "Create note tag",
   "move-to-folder": "Move to folder",
   "add-tag": "Add tag",
 } as const;
@@ -218,6 +221,16 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
   const noteSearch = useNoteSearch(query);
   const notes = noteSearch.data ?? [];
 
+  const openCreateTask = useTaskDialogStore((s) => s.openCreate);
+  const openEditTask = useTaskDialogStore((s) => s.openEdit);
+  const tasksQuery = useQuery({
+    ...orpc.tasks.list.queryOptions({
+      input: { completed: false, limit: 100 },
+    }),
+    enabled: open && showEntities,
+  });
+  const tasks = tasksQuery.data ?? [];
+
   const createNote = useCreateNote();
 
   const closeAndRun = (action: () => void) => {
@@ -298,9 +311,7 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
           >
             <HugeiconsIcon icon={item.icon} strokeWidth={2} />
             <span>{item.title}</span>
-            {item.shortcut ? (
-              <CommandShortcut>{item.shortcut}</CommandShortcut>
-            ) : null}
+            {item.shortcut ? <Shortcut keys={item.shortcut} /> : null}
           </CommandItem>
         ))}
       </CommandGroup>
@@ -333,7 +344,7 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
         >
           <HugeiconsIcon icon={NoteAddIcon} strokeWidth={2} />
           <span>New note</span>
-          <CommandShortcut>⌘N</CommandShortcut>
+          <Shortcut keys="C" />
         </CommandItem>
         <CommandItem
           keywords={["new", "create"]}
@@ -344,12 +355,20 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
           <span>New folder</span>
         </CommandItem>
         <CommandItem
-          keywords={["new", "create"]}
+          keywords={["new", "create", "note", "label"]}
           onSelect={() => setPage("new-tag")}
-          value="create-tag"
+          value="create-note-tag"
         >
           <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
-          <span>New tag</span>
+          <span>New note tag</span>
+        </CommandItem>
+        <CommandItem
+          keywords={["new", "create", "task", "todo"]}
+          onSelect={() => closeAndRun(() => openCreateTask())}
+          value="create-task"
+        >
+          <HugeiconsIcon icon={CheckListIcon} strokeWidth={2} />
+          <span>New task</span>
         </CommandItem>
       </CommandGroup>
       {showNotes ? (
@@ -377,7 +396,62 @@ function RootPage({ navigate, open, query, setOpen, setPage }: RootPageProps) {
           tags={tags}
         />
       ) : null}
+      {showEntities ? (
+        <TasksGroup
+          closeAndRun={closeAndRun}
+          onOpenTask={openEditTask}
+          query={trimmed}
+          tasks={tasks}
+        />
+      ) : null}
     </>
+  );
+}
+
+interface ActiveTask {
+  id: string;
+  tags: { id: string; name: string }[];
+  title: string;
+}
+
+function TasksGroup({
+  closeAndRun,
+  onOpenTask,
+  query,
+  tasks,
+}: {
+  closeAndRun: (action: () => void) => void;
+  onOpenTask: (id: string) => void;
+  query: string;
+  tasks: ActiveTask[];
+}) {
+  const q = query.toLowerCase();
+  const matches = tasks
+    .filter((task) => task.title.toLowerCase().includes(q))
+    .slice(0, 8);
+
+  return (
+    <CommandGroup forceMount heading="Tasks" value="tasks">
+      {matches.length === 0 ? (
+        <EmptyRow message={`No tasks match “${query}”`} />
+      ) : null}
+      {matches.map((task) => (
+        <CommandItem
+          forceMount
+          key={task.id}
+          onSelect={() => closeAndRun(() => onOpenTask(task.id))}
+          value={`task-${task.id}`}
+        >
+          <HugeiconsIcon icon={Task01Icon} strokeWidth={2} />
+          <span className="truncate">{task.title}</span>
+          {task.tags.length > 0 ? (
+            <span className="ml-auto truncate text-muted-foreground text-xs">
+              #{task.tags[0].name}
+            </span>
+          ) : null}
+        </CommandItem>
+      ))}
+    </CommandGroup>
   );
 }
 
@@ -480,7 +554,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{note.pinned ? "Unpin note" : "Pin note"}</span>
-        <CommandShortcut>⌘⇧P</CommandShortcut>
+        <Shortcut keys="P" />
       </CommandItem>
       <CommandItem
         keywords={["favorite", "favourite", "star", "unfavorite"]}
@@ -494,7 +568,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{note.favorite ? "Unfavorite note" : "Favorite note"}</span>
-        <CommandShortcut>⌘⇧F</CommandShortcut>
+        <Shortcut keys="F" />
       </CommandItem>
       <CommandItem
         keywords={["move", "folder"]}
@@ -534,7 +608,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{isArchived ? "Restore note" : "Archive note"}</span>
-        {isArchived ? null : <CommandShortcut>⌘⌫</CommandShortcut>}
+        {isArchived ? null : <Shortcut keys="E" />}
       </CommandItem>
     </CommandGroup>
   );

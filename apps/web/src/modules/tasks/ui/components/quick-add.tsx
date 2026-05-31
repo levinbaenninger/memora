@@ -1,5 +1,3 @@
-"use client";
-
 import { Add01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
@@ -7,19 +5,19 @@ import { useState } from "react";
 import { Button } from "@memora/ui/components/button";
 import { Input } from "@memora/ui/components/input";
 
-import { useCreateNote } from "@/modules/notes/mutations";
+import { useCreateTask } from "@/modules/tasks/mutations";
 
-export function QuickCapture() {
-  const createNote = useCreateNote();
+export function QuickAdd({ tagNames }: { tagNames?: string[] }) {
+  const create = useCreateTask();
   const [title, setTitle] = useState("");
 
   const submit = () => {
     const trimmed = title.trim();
-    if (!trimmed || createNote.isPending) {
+    if (!trimmed || create.isPending) {
       return;
     }
-    createNote.mutate(
-      { title: trimmed, content: [] },
+    create.mutate(
+      { title: trimmed, tagNames: tagNames ?? [] },
       { onSuccess: () => setTitle("") }
     );
   };
@@ -34,16 +32,16 @@ export function QuickCapture() {
             submit();
           }
         }}
-        placeholder="Capture a thought…"
+        placeholder="Add a task…"
         value={title}
       />
       <Button
-        disabled={!title.trim() || createNote.isPending}
+        disabled={!title.trim() || create.isPending}
         onClick={submit}
         type="button"
       >
         <HugeiconsIcon className="size-4" icon={Add01Icon} strokeWidth={2} />
-        Create
+        Add
       </Button>
     </div>
   );

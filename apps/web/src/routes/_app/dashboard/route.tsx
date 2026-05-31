@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_app/dashboard")({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData(
       context.orpc.notes.list.queryOptions({
-        input: notesListInput({ view: "all", limit: 8 }),
+        input: notesListInput({ view: "all", limit: 5 }),
       })
     ),
   head: () => ({

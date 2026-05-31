@@ -1,9 +1,10 @@
 import { useHotkey, useHotkeySequence } from "@tanstack/react-hotkeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { useCreateNote } from "@/modules/notes/mutations";
+import { useTaskDialogStore } from "@/modules/tasks/store";
 import { client, orpc } from "@/utils/orpc";
 import { useTagsForPalette } from "./use-eager-entities";
 import { useRouteEntityContext } from "./use-route-context";
@@ -13,10 +14,12 @@ const SEQUENCE_OPTS = { ignoreInputs: true, timeout: 1000 } as const;
 
 export function useGlobalHotkeys() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { noteId, folderId, tagId } = useRouteEntityContext();
   const tags = useTagsForPalette().data ?? [];
   const queryClient = useQueryClient();
   const createNote = useCreateNote();
+  const openCreateTask = useTaskDialogStore((s) => s.openCreate);
 
   const noteQuery = useQuery({
     ...orpc.notes.get.queryOptions({
@@ -87,9 +90,16 @@ export function useGlobalHotkeys() {
   });
 
   useHotkey(
-    "Mod+N",
+    // Browsers reserve Mod+N (new window) and won't let JS intercept it, so
+    // "create" is bound to a bare key instead.
+    "C",
     (event) => {
       event.preventDefault();
+      // On the tasks surface, "c" creates a task; everywhere else, a note.
+      if (pathname.startsWith("/tasks")) {
+        openCreateTask();
+        return;
+      }
       const activeTag = tagId ? tags.find((tag) => tag.id === tagId) : null;
       createNote.mutate({
         title: "Untitled",
@@ -101,8 +111,11 @@ export function useGlobalHotkeys() {
     OPTS
   );
 
+  // Note actions use bare keys: Mod combos either collide with the browser
+  // (Mod+Shift+P opens a private window) or read inconsistently with "C".
+  // ignoreInputs keeps these from firing while typing in the editor.
   useHotkey(
-    "Mod+Shift+F",
+    "F",
     (event) => {
       if (!note) {
         return;
@@ -114,7 +127,7 @@ export function useGlobalHotkeys() {
   );
 
   useHotkey(
-    "Mod+Shift+P",
+    "P",
     (event) => {
       if (!note) {
         return;
@@ -126,7 +139,7 @@ export function useGlobalHotkeys() {
   );
 
   useHotkey(
-    "Mod+Backspace",
+    "E",
     (event) => {
       if (!note || note.archivedAt) {
         return;
@@ -160,6 +173,11 @@ export function useGlobalHotkeys() {
   useHotkeySequence(
     ["G", "D"],
     () => navigate({ to: "/dashboard" }),
+    SEQUENCE_OPTS
+  );
+  useHotkeySequence(
+    ["G", "T"],
+    () => navigate({ to: "/tasks" }),
     SEQUENCE_OPTS
   );
 }

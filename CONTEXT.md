@@ -35,7 +35,7 @@ A Task with no completion timestamp — still open.
 A Task marked done; records when completion happened.
 
 **Task tag**:
-A user-scoped label attached to one or more Tasks. Tag names are unique per user.
+A user-scoped label attached to one or more Tasks. Tag names are unique per user. Created implicitly by typing a name on a Task; renamed and deleted like Note Tags.
 _Avoid_: Label, category.
 
 **Complete (task)**:
@@ -44,10 +44,26 @@ Set a Task to completed or active. Completing records completion time; reopening
 **Delete (task)**:
 Permanently remove a Task. Tasks are not archived.
 
+**Due**:
+A Task's optional deadline — a date, optionally carrying a time-of-day. A Task with a time becomes overdue the moment that time passes; a date-only Task becomes overdue once its day ends.
+_Avoid_: Deadline, schedule.
+
+**Due bucket**:
+A derived grouping of active Tasks by their Due — `overdue`, `today`, `upcoming`, or `no-date`. Drives the Dashboard's Today card and the Task List's ordering. Buckets are computed, never stored.
+_Avoid_: Section, group.
+
+**Status filter**:
+The mutually-exclusive `active` / `completed` / `all` toggle over the Task List. Defaults to `active`. Combined with an optional Task tag filter.
+_Avoid_: View (that term is Notes-only — see Navigation).
+
+**Task List**:
+The single browse surface for Tasks at `/tasks`, showing Tasks matching the current Status filter and tag filter. The Notes analog of the Grid — but Tasks have no Detail route; they are created and edited in a dialog.
+_Avoid_: Task grid, todo list.
+
 ### Navigation
 
 **View**:
-A path-based filter over Notes — `all`, `pinned`, `favorites`, `archived`, `folder/$id`, or `tag/$id`. Views are mutually exclusive; URL → state is 1:1.
+A path-based filter over Notes — `all`, `pinned`, `favorites`, `archived`, `folder/$id`, or `tag/$id`. Views are mutually exclusive; URL → state is 1:1. Notes-only: Tasks filter via a Status filter + tag in URL search params, not path-based Views.
 _Avoid_: Filter, query, smart-list.
 
 **Grid**:
@@ -100,6 +116,8 @@ _Avoid_: Shared view, preview.
 - A **Share Link** points to exactly one **Note**; deleted when the Note is hard-deleted. While the Note is archived, the Share Link resolves to 404.
 - A **Visitor** opens a **Share Link** and sees a **Public Detail**; they have no access to any other entity.
 - A **Task** carries many **Task tags**; **Task tags** are scoped per user and independent of Note **Tags**.
+- The **Task List** filters Tasks by **Status filter** and an optional **Task tag**; a **Due bucket** orders the result. Clicking a Task opens it in a dialog, not a route.
+- The **Command Menu** searches active Tasks by title (client-side over the loaded set, no FTS) and offers New task + open. Tasks are never **Recent Visits**.
 
 ## Example dialogue
 
