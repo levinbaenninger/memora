@@ -554,7 +554,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{note.pinned ? "Unpin note" : "Pin note"}</span>
-        <Shortcut keys="Mod+Shift+P" />
+        <Shortcut keys="P" />
       </CommandItem>
       <CommandItem
         keywords={["favorite", "favourite", "star", "unfavorite"]}
@@ -568,7 +568,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{note.favorite ? "Unfavorite note" : "Favorite note"}</span>
-        <Shortcut keys="Mod+Shift+F" />
+        <Shortcut keys="F" />
       </CommandItem>
       <CommandItem
         keywords={["move", "folder"]}
@@ -608,7 +608,7 @@ function NoteContextActions({
           strokeWidth={2}
         />
         <span>{isArchived ? "Restore note" : "Archive note"}</span>
-        {isArchived ? null : <Shortcut keys="Mod+Backspace" />}
+        {isArchived ? null : <Shortcut keys="E" />}
       </CommandItem>
     </CommandGroup>
   );

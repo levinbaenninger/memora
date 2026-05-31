@@ -111,8 +111,11 @@ export function useGlobalHotkeys() {
     OPTS
   );
 
+  // Note actions use bare keys: Mod combos either collide with the browser
+  // (Mod+Shift+P opens a private window) or read inconsistently with "C".
+  // ignoreInputs keeps these from firing while typing in the editor.
   useHotkey(
-    "Mod+Shift+F",
+    "F",
     (event) => {
       if (!note) {
         return;
@@ -124,7 +127,7 @@ export function useGlobalHotkeys() {
   );
 
   useHotkey(
-    "Mod+Shift+P",
+    "P",
     (event) => {
       if (!note) {
         return;
@@ -136,7 +139,7 @@ export function useGlobalHotkeys() {
   );
 
   useHotkey(
-    "Mod+Backspace",
+    "E",
     (event) => {
       if (!note || note.archivedAt) {
         return;
