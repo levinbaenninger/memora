@@ -1,4 +1,4 @@
-import { CheckmarkCircle01Icon } from "@hugeicons/core-free-icons";
+import { Task01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_app/tasks/")({
   component: () => (
     <TaskListView
       title="Tasks"
-      titleIcon={<HugeiconsIcon icon={CheckmarkCircle01Icon} strokeWidth={2} />}
+      titleIcon={<HugeiconsIcon icon={Task01Icon} strokeWidth={2} />}
       view="active"
     />
   ),

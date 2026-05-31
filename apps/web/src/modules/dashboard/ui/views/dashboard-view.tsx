@@ -1,9 +1,13 @@
 "use client";
 
 import { useSession } from "@better-auth-ui/react";
+import { Suspense } from "react";
+
+import { Skeleton } from "@memora/ui/components/skeleton";
 
 import { QuickCapture } from "@/modules/dashboard/ui/components/quick-capture";
 import { RecentNotes } from "@/modules/dashboard/ui/components/recent-notes";
+import { UpcomingTasks } from "@/modules/dashboard/ui/components/upcoming-tasks";
 
 function greeting(date: Date): string {
   const h = date.getHours();
@@ -39,6 +43,23 @@ function firstName(
   return user.email?.split("@")[0];
 }
 
+function UpcomingTasksSkeleton() {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-3 w-12" />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        {Array.from({ length: 3 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder
+          <Skeleton className="h-10 w-full rounded-lg" key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function DashboardView() {
   const { data: session } = useSession();
   const now = new Date();
@@ -60,6 +81,10 @@ export function DashboardView() {
       </header>
 
       <QuickCapture />
+
+      <Suspense fallback={<UpcomingTasksSkeleton />}>
+        <UpcomingTasks />
+      </Suspense>
 
       <RecentNotes />
     </div>

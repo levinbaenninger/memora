@@ -27,13 +27,11 @@ export function TaskRow({ id, title, dueAt, completedAt, tags }: TaskRowProps) {
   const overdue = isOverdue({ dueAt, completedAt });
 
   return (
-    <button
+    <div
       className={cn(
-        "group flex min-h-10 w-full cursor-pointer items-start gap-3 rounded-lg border bg-card px-3 py-2.5 text-left transition-colors hover:bg-accent/40",
+        "group flex min-h-10 w-full items-start gap-3 rounded-lg border bg-card px-3 py-2.5 transition-colors hover:bg-accent/40",
         isCompleted && "opacity-60"
       )}
-      onClick={() => setOpenTaskId(id)}
-      type="button"
     >
       <span className="mt-0.5 shrink-0">
         <Checkbox
@@ -44,11 +42,14 @@ export function TaskRow({ id, title, dueAt, completedAt, tags }: TaskRowProps) {
               completeTask.mutate({ id, completed: Boolean(checked) });
             });
           }}
-          onClick={(e) => e.stopPropagation()}
         />
       </span>
 
-      <div className="min-w-0 flex-1">
+      <button
+        className="min-w-0 flex-1 cursor-pointer text-left"
+        onClick={() => setOpenTaskId(id)}
+        type="button"
+      >
         <p
           className={cn(
             "text-sm leading-snug",
@@ -85,14 +86,13 @@ export function TaskRow({ id, title, dueAt, completedAt, tags }: TaskRowProps) {
             </Badge>
           ))}
         </div>
-      </div>
+      </button>
 
       <button
         aria-label="Delete task"
         className="ml-1 shrink-0 self-center rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive disabled:pointer-events-none group-hover:opacity-100"
         disabled={deleteTask.isPending}
-        onClick={(e) => {
-          e.stopPropagation();
+        onClick={() => {
           startTransition(() => {
             deleteTask.mutate({ id });
           });
@@ -101,6 +101,6 @@ export function TaskRow({ id, title, dueAt, completedAt, tags }: TaskRowProps) {
       >
         <HugeiconsIcon className="size-4" icon={Delete02Icon} strokeWidth={2} />
       </button>
-    </button>
+    </div>
   );
 }

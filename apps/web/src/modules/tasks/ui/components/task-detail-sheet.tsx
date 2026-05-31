@@ -28,13 +28,14 @@ import {
   SheetTitle,
 } from "@memora/ui/components/sheet";
 import { Skeleton } from "@memora/ui/components/skeleton";
+import { Spinner } from "@memora/ui/components/spinner";
 import { Textarea } from "@memora/ui/components/textarea";
 
 import { orpc } from "@/utils/orpc";
 import { useCompleteTask, useDeleteTask, useUpdateTask } from "../../mutations";
 import { useTask } from "../../queries";
 import { useTasksStore } from "../../store";
-import { DueDatePicker } from "./due-date-picker";
+import { TaskDatePicker } from "./task-date-picker";
 import { TaskTagCombobox } from "./task-tag-combobox";
 
 function TaskDetailContent({ taskId }: { taskId: string }) {
@@ -112,7 +113,7 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
 
           <Field>
             <FieldLabel>Due date</FieldLabel>
-            <DueDatePicker onChange={setDueAt} value={dueAt} />
+            <TaskDatePicker onChange={setDueAt} value={dueAt} />
           </Field>
 
           <Field>
@@ -128,7 +129,6 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
 
       <div className="flex items-center gap-2 border-t px-4 py-3">
         <Button
-          className="gap-2"
           onClick={() =>
             completeTask.mutate({ id: taskId, completed: !isCompleted })
           }
@@ -136,7 +136,7 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
           variant="outline"
         >
           <HugeiconsIcon
-            className="size-4"
+            data-icon="inline-start"
             icon={isCompleted ? RefreshIcon : CheckmarkCircle01Icon}
             strokeWidth={2}
           />
@@ -144,27 +144,30 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
         </Button>
 
         <Button
-          className="gap-2"
           disabled={!isDirty || updateTask.isPending}
           onClick={handleSave}
           size="sm"
         >
-          <HugeiconsIcon
-            className="size-4"
-            icon={FloppyDiskIcon}
-            strokeWidth={2}
-          />
+          {updateTask.isPending ? (
+            <Spinner data-icon="inline-start" />
+          ) : (
+            <HugeiconsIcon
+              data-icon="inline-start"
+              icon={FloppyDiskIcon}
+              strokeWidth={2}
+            />
+          )}
           {updateTask.isPending ? "Saving…" : "Save"}
         </Button>
 
         <Button
-          className="ml-auto gap-2 text-destructive hover:text-destructive"
+          className="ml-auto text-destructive hover:text-destructive"
           onClick={() => setDeleteOpen(true)}
           size="sm"
           variant="ghost"
         >
           <HugeiconsIcon
-            className="size-4"
+            data-icon="inline-start"
             icon={Delete02Icon}
             strokeWidth={2}
           />

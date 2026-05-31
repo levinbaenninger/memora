@@ -11,12 +11,13 @@ import {
 } from "@memora/ui/components/dialog";
 import { Field, FieldGroup, FieldLabel } from "@memora/ui/components/field";
 import { Input } from "@memora/ui/components/input";
+import { Spinner } from "@memora/ui/components/spinner";
 import { Textarea } from "@memora/ui/components/textarea";
 
 import { orpc } from "@/utils/orpc";
 import { useCreateTask } from "../../mutations";
 import { useTasksStore } from "../../store";
-import { DueDatePicker } from "./due-date-picker";
+import { TaskDatePicker } from "./task-date-picker";
 import { TaskTagCombobox } from "./task-tag-combobox";
 
 interface TaskCreateDialogInnerProps {
@@ -66,7 +67,7 @@ function TaskCreateDialogInner({
         <DialogTitle>New task</DialogTitle>
       </DialogHeader>
 
-      <div className="px-6 pb-2">
+      <div className="px-6 pt-3 pb-2">
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="task-title">Title</FieldLabel>
@@ -97,7 +98,7 @@ function TaskCreateDialogInner({
 
           <Field>
             <FieldLabel>Due date</FieldLabel>
-            <DueDatePicker onChange={setDueAt} value={dueAt} />
+            <TaskDatePicker onChange={setDueAt} value={dueAt} />
           </Field>
 
           <Field>
@@ -116,6 +117,7 @@ function TaskCreateDialogInner({
           Cancel
         </Button>
         <Button disabled={!trimmedTitle || createTask.isPending} type="submit">
+          {createTask.isPending && <Spinner data-icon="inline-start" />}
           Create task
         </Button>
       </DialogFooter>

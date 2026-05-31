@@ -1,7 +1,7 @@
 import {
   Alert01Icon,
   CheckmarkCircle01Icon,
-  ListViewIcon,
+  TaskAdd01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +15,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@memora/ui/components/empty";
-import { Spinner } from "@memora/ui/components/spinner";
 
 import { orpc } from "@/utils/orpc";
 import { sortTasks } from "../../lib/task-dates";
@@ -24,8 +23,8 @@ import { TASK_LIMIT, useTasksList } from "../../queries";
 import { useTasksStore } from "../../store";
 import { TaskCreateDialog } from "../components/task-create-dialog";
 import { TaskDetailSheet } from "../components/task-detail-sheet";
-import { TaskQuickAdd } from "../components/task-quick-add";
 import { TaskRow } from "../components/task-row";
+import { TaskListRowsSkeleton } from "./task-list-skeleton";
 
 interface TaskListViewProps {
   contextActions?: ReactNode;
@@ -87,34 +86,23 @@ export function TaskListView({
         <h1 className="flex items-center gap-2 font-semibold text-2xl [&>svg]:size-5">
           {titleIcon}
           {title}
-          {isPending || isError || isTruncated ? null : (
-            <span className="ml-1 font-normal text-base text-muted-foreground">
-              {sorted.length}
-            </span>
-          )}
         </h1>
         <div className="flex items-center gap-2">
           {contextActions}
-          <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-            <HugeiconsIcon
-              className="size-4"
-              icon={ListViewIcon}
-              strokeWidth={2}
-            />
-            New task
-          </Button>
+          {view === "completed" ? null : (
+            <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+              <HugeiconsIcon
+                data-icon="inline-start"
+                icon={TaskAdd01Icon}
+                strokeWidth={2}
+              />
+              New task
+            </Button>
+          )}
         </div>
       </div>
 
-      {view === "active" || view === "all" ? (
-        <TaskQuickAdd defaultTagNames={defaultTagNames} />
-      ) : null}
-
-      {isPending ? (
-        <div className="flex flex-1 items-center justify-center">
-          <Spinner className="size-6" />
-        </div>
-      ) : null}
+      {isPending ? <TaskListRowsSkeleton /> : null}
 
       {!isPending && isError ? (
         <Empty className="flex-1">
