@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { type KeyboardEvent, useEffect, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 
 import { Button } from "@memora/ui/components/button";
 import {
@@ -44,23 +44,32 @@ export function TaskDialog() {
   const [dueAt, setDueAt] = useState<Date | null>(null);
   const [tagNames, setTagNames] = useState<string[]>([]);
 
+  // Seed the form only once per opened task. Tracking the initialized key keeps
+  // background refetches (which produce a fresh `task` object) from clobbering
+  // in-progress edits.
+  const initializedFor = useRef<string | null>(null);
+
   useEffect(() => {
     if (!open) {
+      initializedFor.current = null;
       return;
     }
-    if (isEdit) {
-      if (task) {
-        setTitle(task.title);
-        setDescription(task.description);
-        setDueAt(task.dueAt ? new Date(task.dueAt) : null);
-        setTagNames(task.tags.map((t) => t.name));
-      }
+    const key = isEdit ? task?.id : "__new__";
+    if (!key || initializedFor.current === key) {
+      return;
+    }
+    if (isEdit && task) {
+      setTitle(task.title);
+      setDescription(task.description);
+      setDueAt(task.dueAt ? new Date(task.dueAt) : null);
+      setTagNames(task.tags.map((t) => t.name));
     } else {
       setTitle(prefillTitle);
       setDescription("");
       setDueAt(null);
       setTagNames([]);
     }
+    initializedFor.current = key;
   }, [open, isEdit, task, prefillTitle]);
 
   const submit = () => {

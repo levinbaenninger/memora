@@ -22,6 +22,7 @@ export function TasksToday() {
     status: "active",
     dueBefore: endOfToday(),
     sort: "dueAt",
+    limit: 8,
   });
 
   const upcoming = useTasksList({

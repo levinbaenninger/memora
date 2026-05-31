@@ -41,6 +41,9 @@ function TagRow({ id, name }: { id: string; name: string }) {
   };
 
   const save = () => {
+    if (update.isPending) {
+      return;
+    }
     const next = draft.trim();
     if (!next || next === name) {
       setEditing(false);
