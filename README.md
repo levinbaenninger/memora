@@ -1,6 +1,33 @@
 # Memora
 
-Memora is a personal notes and tasks workspace. Write rich-text notes, organize them with folders and tags, and navigate via a single-sidebar shell with path-based filter views and a global Command Menu.
+Memora is a personal workspace for notes and tasks. It combines a rich-text notes editor, folder and tag organization, task planning, share links, and account security tools in one web app.
+
+## What Memora Can Do
+
+- **Capture notes:** create rich-text notes with headings, lists, links, and structured blocks powered by BlockNote.
+- **Organize knowledge:** group notes into folders, add multiple tags, pin important notes, favorite references, and archive notes when they are no longer active.
+- **Manage tasks:** create tasks with descriptions, tags, completion state, and due dates. The task list can show active, completed, or all tasks.
+- **Start from the dashboard:** see recent notes and today's tasks from the main dashboard.
+- **Move quickly:** use the global Command Menu to jump to routes, open notes, search entities, create notes/tasks/folders/tags, and run context actions.
+- **Share read-only notes:** create public Share Links for individual notes, revoke them later, and optionally use expiring links.
+- **Secure the account:** sign up, verify email, reset passwords, manage sessions, and enable two-factor authentication.
+
+## Using The App
+
+After starting [**Memora**](https://memora.baenninger.me), open the web app in your browser, create an account, and sign in. The root route redirects to the dashboard, and authenticated users can access the main workspace from there.
+
+Common places in the app:
+
+| Area | Path | Use it for |
+| --- | --- | --- |
+| Dashboard | `/dashboard` | Recent notes and today's tasks |
+| Notes | `/notes` | All notes, note cards, folders, tags, pinned notes, favorites, and archive |
+| Note Detail | `/notes/$noteId` | Full rich-text editing for a single note |
+| Tasks | `/tasks` | Task list with status and tag filters |
+| Settings | `/settings/account`, `/settings/security` | Profile, account, sessions, password, and 2FA |
+| Public Share | `/share/$token` | Read-only note page for anyone with a Share Link |
+
+Open the Command Menu from the app chrome or with `Cmd+K` on macOS / `Ctrl+K` on Windows and Linux. Use it to search, create, navigate, pin or favorite notes, move notes to folders, add tags, and manage folders or tags without leaving the keyboard.
 
 ## Tech Stack
 

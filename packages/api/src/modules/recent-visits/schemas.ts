@@ -6,7 +6,7 @@ export const recentVisitEntityTypeSchema = z.enum(recentVisitEntityTypes);
 
 export const recordVisitRequestDtoSchema = z.object({
   entityType: recentVisitEntityTypeSchema,
-  entityId: z.string().min(1).max(64),
+  entityId: z.nanoid(),
 });
 
 export const recentEntitySchema = z.object({
