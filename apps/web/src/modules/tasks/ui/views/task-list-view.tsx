@@ -10,7 +10,6 @@ import type { ReactNode } from "react";
 import { Button } from "@memora/ui/components/button";
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -109,13 +108,6 @@ export function TaskListView({
               {getEmptyDescription(view, tagId)}
             </EmptyDescription>
           </EmptyHeader>
-          {view === "completed" ? null : (
-            <EmptyContent>
-              <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-                New task
-              </Button>
-            </EmptyContent>
-          )}
         </Empty>
       ) : (
         <div className="flex flex-col gap-1.5">
