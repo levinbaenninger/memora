@@ -16,7 +16,7 @@ import {
 
 import { sortTasks } from "../../lib/task-dates";
 import type { TaskView } from "../../queries";
-import { useTasksList } from "../../queries";
+import { TASK_LIMIT, useTasksList, useTaskTagsList } from "../../queries";
 import { useTasksStore } from "../../store";
 import { TaskCreateDialog } from "../components/task-create-dialog";
 import { TaskDetailSheet } from "../components/task-detail-sheet";
@@ -57,8 +57,6 @@ function getEmptyDescription(view: TaskView, tagId: string | null | undefined) {
   return "Create your first task to get started.";
 }
 
-const TASK_LIMIT = 50;
-
 export function TaskListView({
   contextActions,
   tagId,
@@ -67,9 +65,14 @@ export function TaskListView({
   view,
 }: TaskListViewProps) {
   const { data: tasks } = useTasksList({ view, tagId });
+  const { data: allTags } = useTaskTagsList();
   const { setCreateDialogOpen } = useTasksStore();
   const sorted = sortTasks(tasks);
   const isTruncated = tasks.length >= TASK_LIMIT;
+  const activeTagName = tagId
+    ? allTags.find((t) => t.id === tagId)?.name
+    : undefined;
+  const defaultTagNames = activeTagName ? [activeTagName] : undefined;
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -96,7 +99,9 @@ export function TaskListView({
         </div>
       </div>
 
-      {view === "active" || view === "all" ? <TaskQuickAdd /> : null}
+      {view === "active" || view === "all" ? (
+        <TaskQuickAdd defaultTagNames={defaultTagNames} />
+      ) : null}
 
       {isTruncated ? (
         <p className="text-muted-foreground text-xs">

@@ -21,8 +21,10 @@ function viewToCompleted(view: TaskView): boolean | undefined {
   return undefined;
 }
 
+export const TASK_LIMIT = 50;
+
 export function tasksListInput(params: TasksListParams) {
-  const { tagId, view, limit = 50, offset = 0 } = params;
+  const { tagId, view, limit = TASK_LIMIT, offset = 0 } = params;
   return {
     completed: viewToCompleted(view),
     tagId: tagId ?? undefined,
