@@ -65,6 +65,7 @@ Die wichtigsten Auth-Anforderungen sind umgesetzt. Better Auth ist für unser Pr
 - [Better Auth Session Management](https://better-auth.com/docs/concepts/session-management)
 - [Better Auth Rate Limit](https://better-auth.com/docs/concepts/rate-limit)
 - [Better Auth Two-Factor Authentication](https://better-auth.com/docs/plugins/2fa)
+- [Better Auth Have I Been Pwned Plugin](https://better-auth.com/docs/plugins/have-i-been-pwned)
 - [Have I Been Pwned API](https://haveibeenpwned.com/API/V3)
 - [Upstash Rate Limit](https://upstash.com/docs/oss/sdks/ts/ratelimit/overview)
 - 2FA Setup / Redirect: [2FA Required](./assets/2fa-required.mov)
