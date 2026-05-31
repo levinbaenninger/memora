@@ -61,7 +61,11 @@ export function DueDatePicker({
                   onChange(null);
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+                  if (e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onChange(null);
+                  } else if (e.key === "Enter") {
                     e.stopPropagation();
                     onChange(null);
                   }
