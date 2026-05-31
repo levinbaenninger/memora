@@ -50,7 +50,7 @@ Die Access Control ist für die Kernfunktionen sauber umgesetzt. Wichtig ist, da
 
 ## Quellen / Nachweise
 
-- [OWASP Broken Access Control](https://owasp.org/Top10/2021/A01_2021-Broken_Access_Control/)
+- [OWASP Broken Access Control](https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/)
 - [Better Auth Session Management](https://better-auth.com/docs/concepts/session-management)
 - [TanStack Router Authenticated Routes](https://tanstack.com/router/latest/docs/framework/react/guide/authenticated-routes)
 - [oRPC Procedures](https://orpc.dev/docs/procedure)

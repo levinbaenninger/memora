@@ -44,7 +44,7 @@ Injection-Risiken sind in den wichtigsten Pfaden sinnvoll reduziert. Die Kombina
 
 ## Quellen / Nachweise
 
-- [OWASP Injection](https://owasp.org/Top10/2021/A03_2021-Injection/)
+- [OWASP Injection](https://owasp.org/Top10/2025/A05_2025-Injection/)
 - [Zod String Validation](https://zod.dev/api?id=strings)
 - [oRPC Procedures mit Input/Output Schemas](https://orpc.dev/docs/procedure)
 - [Drizzle SQL Template und Parameterized Queries](https://orm.drizzle.team/docs/sql)

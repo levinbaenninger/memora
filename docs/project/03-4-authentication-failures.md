@@ -1,4 +1,4 @@
-# 3.4 OWASP: Identification & Authentication Failures
+# 3.4 OWASP: Authentication Failures
 
 ## Risiko
 
@@ -60,7 +60,7 @@ Die wichtigsten Auth-Anforderungen sind umgesetzt. Better Auth ist für unser Pr
 
 ## Quellen / Nachweise
 
-- [OWASP Identification and Authentication Failures](https://owasp.org/Top10/2021/A07_2021-Identification_and_Authentication_Failures/)
+- [OWASP Identification and Authentication Failures](https://owasp.org/Top10/2025/A07_2025-Authentication_Failures/)
 - [Better Auth](https://better-auth.com/docs)
 - [Better Auth Session Management](https://better-auth.com/docs/concepts/session-management)
 - [Better Auth Rate Limit](https://better-auth.com/docs/concepts/rate-limit)
