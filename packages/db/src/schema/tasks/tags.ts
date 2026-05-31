@@ -32,7 +32,6 @@ export const taskTags = pgTable(
   },
   (table) => [
     uniqueIndex("task_tags_user_name_unique").on(table.userId, table.name),
-    index("task_tags_user_name_idx").on(table.userId, table.name),
   ]
 );
 

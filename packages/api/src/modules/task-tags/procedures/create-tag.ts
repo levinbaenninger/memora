@@ -4,7 +4,6 @@ import { db } from "@memora/db";
 import { taskTags } from "@memora/db/schema";
 
 import { authorized } from "../../../procedures/authorized";
-import { tagNameAlphanumericPattern } from "../constants";
 import { tagSchema } from "../schemas";
 
 export const createTagRequestDtoSchema = z.object({
@@ -20,8 +19,14 @@ export const createTag = authorized
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
     const name = input.name.trim().replace(/\s+/g, " ");
+    const slug = name
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
-    if (!tagNameAlphanumericPattern.test(name)) {
+    if (!slug) {
       throw errors.BAD_REQUEST({
         message: "Tag name must contain letters or numbers.",
       });

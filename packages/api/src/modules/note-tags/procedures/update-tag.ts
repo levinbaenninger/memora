@@ -4,33 +4,14 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { noteTags } from "@memora/db/schema";
 
+import { isUniqueViolation } from "../../../lib/db-errors";
 import { authorized } from "../../../procedures/authorized";
 import { tagSchema } from "../schemas";
 
 const NOTE_TAG_SLUG_UNIQUE_CONSTRAINT = "note_tags_user_slug_unique";
 
 function isNoteTagNameConflict(error: unknown): boolean {
-  let current: unknown = error;
-
-  while (current && typeof current === "object") {
-    const record = current as {
-      code?: string;
-      constraint?: string;
-      cause?: unknown;
-    };
-
-    if (
-      record.code === "23505" &&
-      (!record.constraint ||
-        record.constraint === NOTE_TAG_SLUG_UNIQUE_CONSTRAINT)
-    ) {
-      return true;
-    }
-
-    current = record.cause;
-  }
-
-  return false;
+  return isUniqueViolation(error, NOTE_TAG_SLUG_UNIQUE_CONSTRAINT);
 }
 
 export const updateTagRequestDtoSchema = z.object({

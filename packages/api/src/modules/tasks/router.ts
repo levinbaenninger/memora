@@ -1,3 +1,4 @@
+import { completeTask } from "./procedures/complete-task";
 import { createTask } from "./procedures/create-task";
 import { deleteTask } from "./procedures/delete-task";
 import { getTask } from "./procedures/get-task";
@@ -10,4 +11,5 @@ export const tasksRouter = {
   list: listTasks,
   update: updateTask,
   delete: deleteTask,
+  complete: completeTask,
 };

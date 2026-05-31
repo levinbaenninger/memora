@@ -3,33 +3,14 @@ import { z } from "zod";
 import { db } from "@memora/db";
 import { and, eq, taskTags } from "@memora/db/schema";
 
+import { isUniqueViolation } from "../../../lib/db-errors";
 import { authorized } from "../../../procedures/authorized";
-import { tagNameAlphanumericPattern, tagSchema } from "../schemas";
+import { tagSchema } from "../schemas";
 
 const TASK_TAG_NAME_UNIQUE_CONSTRAINT = "task_tags_user_name_unique";
 
 function isTaskTagNameConflict(error: unknown): boolean {
-  let current: unknown = error;
-
-  while (current && typeof current === "object") {
-    const record = current as {
-      code?: string;
-      constraint?: string;
-      cause?: unknown;
-    };
-
-    if (
-      record.code === "23505" &&
-      (!record.constraint ||
-        record.constraint === TASK_TAG_NAME_UNIQUE_CONSTRAINT)
-    ) {
-      return true;
-    }
-
-    current = record.cause;
-  }
-
-  return false;
+  return isUniqueViolation(error, TASK_TAG_NAME_UNIQUE_CONSTRAINT);
 }
 
 export const updateTagRequestDtoSchema = z.object({
@@ -46,8 +27,14 @@ export const updateTag = authorized
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
     const name = input.name.trim().replace(/\s+/g, " ");
+    const slug = name
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
-    if (!tagNameAlphanumericPattern.test(name)) {
+    if (!slug) {
       throw errors.BAD_REQUEST({
         message: "Tag name must contain letters or numbers.",
       });
