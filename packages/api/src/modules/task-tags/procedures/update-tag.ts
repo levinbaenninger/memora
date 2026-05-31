@@ -4,6 +4,10 @@ import { db } from "@memora/db";
 import { and, eq, taskTags } from "@memora/db/schema";
 
 import { isUniqueViolation } from "../../../lib/db-errors";
+import {
+  hasAlphanumericContent,
+  normalizeTagName,
+} from "../../../lib/tag-name";
 import { authorized } from "../../../procedures/authorized";
 import { tagSchema } from "../schemas";
 
@@ -26,15 +30,9 @@ export const updateTag = authorized
   .errors({ BAD_REQUEST: {}, CONFLICT: {}, NOT_FOUND: {} })
   .handler(async ({ context, input, errors }) => {
     const userId = context.user.id;
-    const name = input.name.trim().replace(/\s+/g, " ");
-    const slug = name
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+    const name = normalizeTagName(input.name);
 
-    if (!slug) {
+    if (!hasAlphanumericContent(name)) {
       throw errors.BAD_REQUEST({
         message: "Tag name must contain letters or numbers.",
       });
