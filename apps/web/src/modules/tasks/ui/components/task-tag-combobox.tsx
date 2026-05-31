@@ -1,9 +1,8 @@
-"use client";
-
 import { Add01Icon, Cancel01Icon, Tag01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 
+import { tagNameAlphanumericPattern } from "@memora/api";
 import { Badge } from "@memora/ui/components/badge";
 import { Button } from "@memora/ui/components/button";
 import {
@@ -46,9 +45,12 @@ export function TaskTagCombobox({
   const filteredTags = availableTags.filter((t) =>
     t.name.toLowerCase().includes(input.toLowerCase())
   );
+  const isValidTagName =
+    trimmed.length > 0 && tagNameAlphanumericPattern.test(trimmed);
   const showCreate =
-    trimmed.length > 0 &&
+    isValidTagName &&
     !filteredTags.some((t) => t.name.toLowerCase() === trimmed.toLowerCase());
+  const showInvalidHint = trimmed.length > 0 && !isValidTagName;
 
   const toggle = (name: string) => {
     const next = tagNames.includes(name)
@@ -126,7 +128,14 @@ export function TaskTagCombobox({
               value={input}
             />
             <CommandList>
-              <CommandEmpty>No tags</CommandEmpty>
+              {showInvalidHint ? (
+                <p className="px-3 py-2 text-muted-foreground text-xs">
+                  Tag name must contain only letters, numbers, and single
+                  spaces.
+                </p>
+              ) : (
+                <CommandEmpty>No tags</CommandEmpty>
+              )}
               <CommandGroup>
                 {filteredTags.map((tag) => {
                   const selected = tagNames.includes(tag.name);

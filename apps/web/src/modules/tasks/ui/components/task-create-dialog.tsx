@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 
 import { Button } from "@memora/ui/components/button";

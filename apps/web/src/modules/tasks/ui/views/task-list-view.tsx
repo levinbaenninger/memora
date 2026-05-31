@@ -1,5 +1,3 @@
-"use client";
-
 import {
   CheckmarkCircle01Icon,
   ListViewIcon,
@@ -59,6 +57,8 @@ function getEmptyDescription(view: TaskView, tagId: string | null | undefined) {
   return "Create your first task to get started.";
 }
 
+const TASK_LIMIT = 50;
+
 export function TaskListView({
   contextActions,
   tagId,
@@ -69,6 +69,7 @@ export function TaskListView({
   const { data: tasks } = useTasksList({ view, tagId });
   const { setCreateDialogOpen } = useTasksStore();
   const sorted = sortTasks(tasks);
+  const isTruncated = tasks.length >= TASK_LIMIT;
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -96,6 +97,13 @@ export function TaskListView({
       </div>
 
       {view === "active" || view === "all" ? <TaskQuickAdd /> : null}
+
+      {isTruncated ? (
+        <p className="text-muted-foreground text-xs">
+          Showing first {TASK_LIMIT} tasks. Use tags or filters to narrow
+          results.
+        </p>
+      ) : null}
 
       {sorted.length === 0 ? (
         <Empty className="flex-1">

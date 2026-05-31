@@ -1,5 +1,3 @@
-"use client";
-
 import {
   CheckmarkCircle01Icon,
   Delete02Icon,
@@ -7,7 +5,7 @@ import {
   RefreshIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import {
   AlertDialog,
@@ -51,6 +49,13 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
   const [tagNames, setTagNames] = useState(task.tags.map((t) => t.name));
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  useEffect(() => {
+    setTitle(task.title);
+    setDescription(task.description ?? "");
+    setDueAt(task.dueAt ?? null);
+    setTagNames(task.tags.map((t) => t.name));
+  }, [task.title, task.description, task.dueAt, task.tags]);
+
   const isCompleted = !!task.completedAt;
 
   const isDirty =
@@ -64,16 +69,13 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
     if (!title.trim()) {
       return;
     }
-    updateTask.mutate(
-      {
-        id: taskId,
-        title: title.trim(),
-        description,
-        dueAt: dueAt ?? null,
-        tagNames,
-      },
-      { onSuccess: () => setOpenTaskId(null) }
-    );
+    updateTask.mutate({
+      id: taskId,
+      title: title.trim(),
+      description,
+      dueAt: dueAt ?? null,
+      tagNames,
+    });
   };
 
   return (
@@ -87,13 +89,18 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <FieldGroup>
           <Field>
-            <FieldLabel>Title</FieldLabel>
-            <Input onChange={(e) => setTitle(e.target.value)} value={title} />
+            <FieldLabel htmlFor="detail-title">Title</FieldLabel>
+            <Input
+              id="detail-title"
+              onChange={(e) => setTitle(e.target.value)}
+              value={title}
+            />
           </Field>
 
           <Field>
-            <FieldLabel>Description</FieldLabel>
+            <FieldLabel htmlFor="detail-description">Description</FieldLabel>
             <Textarea
+              id="detail-description"
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add more details…"
               rows={4}

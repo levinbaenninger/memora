@@ -93,12 +93,12 @@ const navGroups: SidebarNavGroup[] = [
             title: "Active",
             path: "/tasks",
             exact: true,
-            icon: routeIcon(CheckmarkCircle01Icon),
+            icon: routeIcon(Task01Icon),
           },
           {
             title: "Completed",
             path: "/tasks/completed",
-            icon: routeIcon(ListViewIcon),
+            icon: routeIcon(CheckmarkCircle01Icon),
           },
           {
             title: "All Tasks",

@@ -1,5 +1,3 @@
-"use client";
-
 import { CalendarIcon, Delete02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { startTransition } from "react";

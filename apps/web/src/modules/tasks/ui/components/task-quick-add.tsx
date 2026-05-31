@@ -1,8 +1,7 @@
-"use client";
-
 import { Add01Icon, AlignLeftIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@memora/ui/components/button";
 import { Input } from "@memora/ui/components/input";
@@ -29,7 +28,10 @@ export function TaskQuickAdd({ defaultTagNames = [] }: TaskQuickAddProps) {
     createTask.mutate(
       { title: trimmed, tagNames: defaultTagNames },
       {
-        onSuccess: () => setValue(""),
+        onSuccess: () => {
+          setValue("");
+          toast.success("Task added");
+        },
       }
     );
   };
