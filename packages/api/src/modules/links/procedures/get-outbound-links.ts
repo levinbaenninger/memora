@@ -13,8 +13,8 @@ import {
 
 import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../../folders/schemas";
+import { tagSchema } from "../../note-tags/schemas";
 import { noteSchema } from "../../notes/schemas";
-import { tagSchema } from "../../tags/schemas";
 
 export const getOutboundLinksRequestDtoSchema = z.object({
   id: z.nanoid(),

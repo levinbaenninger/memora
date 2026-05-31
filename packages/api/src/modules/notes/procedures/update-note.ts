@@ -12,7 +12,7 @@ import {
 
 import { authorized } from "../../../procedures/authorized";
 import { folderSchema } from "../../folders/schemas";
-import { tagSchema } from "../../tags/schemas";
+import { tagSchema } from "../../note-tags/schemas";
 import { normalizeNoteContent, noteContentSchema } from "../content/schema";
 import { noteSchema } from "../schemas";
 

@@ -2,10 +2,12 @@ import type { RouterClient } from "@orpc/server";
 
 import { foldersRouter } from "./modules/folders/router";
 import { linksRouter } from "./modules/links/router";
+import { tagsRouter as noteTagsRouter } from "./modules/note-tags/router";
 import { notesRouter } from "./modules/notes/router";
 import { recentVisitsRouter } from "./modules/recent-visits/router";
 import { sharesRouter } from "./modules/shares/router";
-import { tagsRouter } from "./modules/tags/router";
+import { tagsRouter as taskTagsRouter } from "./modules/task-tags/router";
+import { tasksRouter } from "./modules/tasks/router";
 
 export const appRouter = {
   notes: {
@@ -13,9 +15,13 @@ export const appRouter = {
     folders: foldersRouter,
     links: linksRouter,
     shares: sharesRouter,
-    tags: tagsRouter,
+    tags: noteTagsRouter,
   },
   recentVisits: recentVisitsRouter,
+  tasks: {
+    ...tasksRouter,
+    tags: taskTagsRouter,
+  },
 };
 
 export type AppRouter = typeof appRouter;

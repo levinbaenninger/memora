@@ -22,6 +22,28 @@ _Avoid_: Category, topic.
 The global bin holding Notes (or Folders) with a non-null `archivedAt`. Restorable until `archiveExpiresAt`.
 _Avoid_: Trash, deleted.
 
+### Tasks
+
+**Task**:
+A user-owned todo item with title, optional description, completion state, and tags.
+_Avoid_: Todo, item, checklist entry.
+
+**Active task**:
+A Task with no completion timestamp — still open.
+
+**Completed task**:
+A Task marked done; records when completion happened.
+
+**Task tag**:
+A user-scoped label attached to one or more Tasks. Tag names are unique per user.
+_Avoid_: Label, category.
+
+**Complete (task)**:
+Set a Task to completed or active. Completing records completion time; reopening clears it.
+
+**Delete (task)**:
+Permanently remove a Task. Tasks are not archived.
+
 ### Navigation
 
 **View**:
@@ -77,6 +99,7 @@ _Avoid_: Shared view, preview.
 - The **Command Menu** reads **Folders**, **Tags**, and **Recent Visits** eagerly; it queries **Notes** lazily via FTS.
 - A **Share Link** points to exactly one **Note**; deleted when the Note is hard-deleted. While the Note is archived, the Share Link resolves to 404.
 - A **Visitor** opens a **Share Link** and sees a **Public Detail**; they have no access to any other entity.
+- A **Task** carries many **Task tags**; **Task tags** are scoped per user and independent of Note **Tags**.
 
 ## Example dialogue
 
