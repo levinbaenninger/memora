@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_app")({
       staleTime: 5 * 60 * 1000,
     });
     const redirectTarget = safeRedirect(location.href);
-    if (!session) {
+    if (!session?.user) {
       throw redirect({
         params: { path: viewPaths.auth.signIn },
         replace: true,
