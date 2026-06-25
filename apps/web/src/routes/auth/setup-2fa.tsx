@@ -23,7 +23,7 @@ export const Route = createFileRoute("/auth/setup-2fa")({
       },
       staleTime: 5 * 60 * 1000,
     });
-    if (!session) {
+    if (!session?.user) {
       throw redirect({
         params: { path: viewPaths.auth.signIn },
         replace: true,
