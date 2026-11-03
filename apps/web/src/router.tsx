@@ -9,6 +9,7 @@ import { env } from "@memora/env/client";
 
 import { routeTree } from "./routeTree.gen";
 import { orpc } from "./utils/orpc";
+import { sentryDataCollection } from "./utils/sentry-data-collection";
 
 export const getRouter = () => {
   const queryClient = new QueryClient({
@@ -38,6 +39,7 @@ export const getRouter = () => {
   if (!router.isServer) {
     Sentry.init({
       dsn: env.VITE_SENTRY_DSN,
+      dataCollection: sentryDataCollection,
       enabled: process.env.NODE_ENV === "production",
     });
   }
