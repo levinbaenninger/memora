@@ -1,0 +1,13 @@
+diff --git a/dist/configLoader/findup.js b/dist/configLoader/findup.js
+index 2e2f07a12e10547e6b82cc09f5b03e9ec822be1b..1e5958d2145d8585c6ea99abc26698b85702fdc2 100644
+--- a/dist/configLoader/findup.js
++++ b/dist/configLoader/findup.js
+@@ -312,7 +312,7 @@ function findup(patterns, options, fn) {
+     cov_wjwib8bhg().s[4]++;
+     file = patterns.filter(function (pattern) {
+       cov_wjwib8bhg().f[1]++;
+-      var configPath = (cov_wjwib8bhg().s[5]++, _glob.default.sync(pattern, options)[0]);
++      var configPath = (cov_wjwib8bhg().s[5]++, (_glob.default || _glob).sync(pattern, options)[0]);
+       cov_wjwib8bhg().s[6]++;
+       if (configPath) {
+         cov_wjwib8bhg().b[0][0]++;

@@ -1,7 +1,12 @@
 import type { PartialBlock } from "@blocknote/core";
 import { NoteAddIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Link, useNavigate, useParams } from "@tanstack/react-router";
+import {
+  type ErrorComponentProps,
+  Link,
+  useNavigate,
+  useParams,
+} from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -157,7 +162,7 @@ export function PublicShareNotFound() {
   );
 }
 
-export function PublicShareError({ error }: { error: Error }) {
+export function PublicShareError({ error }: ErrorComponentProps) {
   // React Query aborts in-flight queries when the route unmounts (e.g. on
   // navigate-away after duplicate). The thrown CancelledError isn't a real
   // failure — render the skeleton until the new route takes over.

@@ -85,6 +85,13 @@
       "when": 1779979410377,
       "tag": "0011_neat_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793715215661,
+      "tag": "0012_long_goliath",
+      "breakpoints": true
     }
   ]
 }

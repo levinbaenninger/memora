@@ -1,19 +1,13 @@
 import { Alert02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import * as Sentry from "@sentry/tanstackstart-react";
-import { Link } from "@tanstack/react-router";
+import { type ErrorComponentProps, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import { Button, buttonVariants } from "@memora/ui/components/button";
 import { Card, CardContent } from "@memora/ui/components/card";
 
-export function RootError({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export function RootError({ error, reset }: ErrorComponentProps) {
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
@@ -29,7 +23,8 @@ export function RootError({
             <div className="flex flex-col gap-1">
               <h1 className="font-medium text-sm">Something went wrong.</h1>
               <p className="text-muted-foreground text-xs/relaxed">
-                {error.message || "The page could not be rendered right now."}
+                {(error instanceof Error && error.message) ||
+                  "The page could not be rendered right now."}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
